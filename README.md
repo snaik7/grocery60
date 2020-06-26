@@ -1,5 +1,5 @@
 # grocery60
-Grocery 60 app deployed in Cloud Run on GCP
+Grocery 60 app is deployed in Cloud Run on GCP
 
 Set default project
 gcloud config set project my-project
