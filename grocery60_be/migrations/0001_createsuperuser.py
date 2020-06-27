@@ -1,5 +1,13 @@
 from django.db import migrations
 
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+'''
 import google.auth
 from google.cloud import secretmanager_v1beta1 as sm
 
@@ -27,3 +35,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(createsuperuser)
     ]
+'''

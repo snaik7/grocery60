@@ -45,12 +45,16 @@ env.read_env(env_file)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
+
 SECRET_KEY = env("SECRET_KEY")
+
+#SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['grocery60-be-b2yd4bi7eq-uc.a.run.app']
+ALLOWED_HOSTS = ['*','grocery60-be-b2yd4bi7eq-uc.a.run.app']
 
 
 # Application definition
@@ -64,7 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'grocery60_be',  # for a later data migration
     'storages',  # for django-storages
-]
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -100,18 +104,21 @@ WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 
 # Use django-environ to define the connection string
 DATABASES = {"default": env.db()}
-
+'''
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "grocery60",
+        "USER": "djuser",
+        "PASSWORD": "djuser",
+        "HOST": "35.202.32.52",
+        "PORT": "5432",
+    }
+}
+'''
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
@@ -142,11 +149,13 @@ STATIC_URL = '/static/'
 # Define static storage via django-storages[google]
 GS_BUCKET_NAME = env("GS_BUCKET_NAME", None)
 
+
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 GS_DEFAULT_ACL = "publicRead"
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
