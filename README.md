@@ -22,13 +22,21 @@ gcloud run services describe grocery60-be \
   --format "value(status.url)"
 
 URLS to API
+
 Get Store
+
 http://localhost:8000/store/
+
 http://localhost:8000/store/1
+
 http://localhost:8000/store/?zip=94526
 
+
 Catalog
+
 http://localhost:8000/catalog/
+
 http://localhost:8000/catalog/?product_category=dairy&store_id=1
+
 
 
