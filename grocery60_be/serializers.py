@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from grocery60_be.models import Store, Product, Customer, Cart
+from grocery60_be.models import Store, Product, Customer, Cart, BillingAddress, ShippingAddress
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -35,6 +35,18 @@ class CatalogSerializer(serializers.ModelSerializer):
 	    class Meta:
 	        db_table = 'product'
 	        model = Product
+	        fields = '__all__'
+
+class BillingAddressSerializer(serializers.ModelSerializer):
+	    class Meta:
+	        db_table = 'billingaddress'
+	        model = BillingAddress
+	        fields = '__all__'
+
+class ShippingAddressSerializer(serializers.ModelSerializer):
+	    class Meta:
+	        db_table = 'shippingaddress'
+	        model = ShippingAddress
 	        fields = '__all__'
 
 

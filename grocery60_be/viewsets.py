@@ -22,3 +22,11 @@ class StoreViewset(viewsets.ModelViewSet):
     serializer_class = serializers.StoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['zip','nearby_zip']
+
+class BillingAddressViewset(viewsets.ModelViewSet):
+    queryset = models.BillingAddress.objects.all()
+    serializer_class = serializers.BillingAddressSerializer
+
+class ShippingAddressViewset(viewsets.ModelViewSet):
+    queryset = models.ShippingAddress.objects.all()
+    serializer_class = serializers.ShippingAddressSerializer

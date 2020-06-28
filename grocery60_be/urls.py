@@ -25,6 +25,8 @@ router.register('cart',viewsets.CartViewset)
 router.register('catalog',viewsets.CatalogViewset)
 router.register('store',viewsets.StoreViewset)
 router.register('customer',viewsets.CustomerViewset)
+router.register('billing',viewsets.BillingAddressViewset)
+router.register('shipping',viewsets.ShippingAddressViewset)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -25,6 +25,9 @@ class Store(models.Model):
     country = models.CharField(
         max_length=50
     )
+    media = models.CharField(
+        max_length=500
+    )
 
     def __str__(self):
         return self.name
@@ -48,7 +51,7 @@ class Product(models.Model):
         max_length=50
     )
     media = models.CharField(
-        max_length=100
+        max_length=500
     )
     caption = models.CharField(
         max_length=100
@@ -99,4 +102,65 @@ class Cart(models.Model):
 
     class Meta:
         db_table = "cart"
+
+class BillingAddress(models.Model):
+    priority = models.IntegerField()
+    name = models.CharField(
+        max_length=1024
+    )
+    company_name = models.CharField(
+        max_length=1024,
+        blank=True
+    )
+    address = models.CharField(
+        max_length=1024
+    )
+    house_number =  models.CharField(
+        max_length=12
+    )
+    zip = models.CharField(
+        max_length=12   
+    )
+    city = models.CharField(
+        max_length=1024
+    )
+    country = models.CharField(
+        max_length=3
+    )
+    customer_id = models.IntegerField()
+
+    class Meta:
+        db_table = "billingaddress"
+
+
+class ShippingAddress(models.Model):    
+    priority = models.IntegerField()
+    name = models.CharField(
+        max_length=1024
+    )
+    company_name = models.CharField(
+        max_length=1024,
+        blank=True
+    )
+    address = models.CharField(
+        max_length=1024
+    )
+    house_number =  models.CharField(
+        max_length=12
+    )
+    zip = models.CharField(
+        max_length=12   
+    )
+    city = models.CharField(
+        max_length=1024
+    )
+    country = models.CharField(
+        max_length=3
+    )
+    customer_id = models.IntegerField()
+
+
+    class Meta:
+        db_table = "shippingaddress"
+
 
