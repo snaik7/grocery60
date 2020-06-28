@@ -47,9 +47,7 @@ class Product(models.Model):
     product_category = models.CharField(
         max_length=200
     )
-    price = models.CharField(
-        max_length=50
-    )
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     media = models.CharField(
         max_length=500
     )
@@ -65,15 +63,17 @@ class Product(models.Model):
         db_table = "product"
 
 class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
     last_access = models.CharField(
         max_length=50
     )
     extra = models.CharField(
-        max_length=200
+        max_length=200,
+        blank=True
     )
     salutation = models.CharField(
-        max_length=5
+        max_length=5,
+        blank=True
     )
     phone_number = models.CharField(
         max_length=128
@@ -163,4 +163,92 @@ class ShippingAddress(models.Model):
     class Meta:
         db_table = "shippingaddress"
 
+class Order(models.Model):
 
+    status = models.CharField(
+        max_length=50
+    )
+    currency = models.CharField(
+        max_length=7
+    )
+    subtotal = models.DecimalField(max_digits=6, decimal_places=2)
+    total = models.DecimalField(max_digits=6, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    extra = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    stored_request = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    shipping_address_text = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    billing_address_text = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    token = models.CharField(
+        max_length=40,
+        blank=True
+    )
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    class Meta:
+        db_table = "order"
+
+class OrderItem(models.Model):
+
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    line_total = models.DecimalField(max_digits=6, decimal_places=2)
+    extra = models.CharField(
+        max_length=200
+    )
+    quantity = models.IntegerField()
+    canceled = models.BooleanField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "orderitem"
+
+class OrderPayment(models.Model):
+    amount = models.DecimalField(max_digits=6, decimal_places=2)
+    transaction_id = models.CharField(
+        max_length=200
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(
+        max_length=200
+    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "orderpayment"
+
+class ShippingMethod(models.Model):
+    name = models.CharField(
+        max_length=255
+    )
+    carrier = models.CharField(
+        max_length=32
+    )
+    min_weight = models.DecimalField(max_digits=6, decimal_places=2)
+    max_weight = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "shippingmethod"
+
+
+class Delivery(models.Model):
+    fulfilled_at = models.DateTimeField(blank=True)
+    shipped_at = models.DateTimeField(blank=True)
+    shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "delivery"

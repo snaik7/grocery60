@@ -27,10 +27,15 @@ router.register('store',viewsets.StoreViewset)
 router.register('customer',viewsets.CustomerViewset)
 router.register('billing',viewsets.BillingAddressViewset)
 router.register('shipping',viewsets.ShippingAddressViewset)
+router.register('order',viewsets.OrderViewset)
+router.register('order-item',viewsets.OrderItemViewset)
+router.register('delivery',viewsets.DeliveryViewset)
+router.register('shipping-method',viewsets.ShippingMethodViewset)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('customer-payment/<int:customer_id>', views.CustomerPaymentView.as_view({'get': 'get'})),
+    path('rest-auth/', include('rest_auth.urls')),
 
 ]

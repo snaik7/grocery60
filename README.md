@@ -6,6 +6,10 @@ gcloud config set project my-project
 
 To make this the default region, run `gcloud config set run/region us-central1`.
 
+Go to grocery60_be dir and run command to start the project
+
+pipenv run python manage.py runserver
+
 Create build after change
 gcloud builds submit --tag gcr.io/$PROJECT_ID/grocery60-be
 
@@ -37,6 +41,26 @@ Catalog
 http://localhost:8000/catalog/
 
 http://localhost:8000/catalog/?product_category=dairy&store_id=1
+
+Get Customer and other sets
+
+http://localhost:8000/customer/
+
+Get last few order for customer=1 and status is active
+
+http://localhost:8000/order/?customer_id=1&status=active
+
+Shipping method
+
+http://localhost:8000/shipping-method
+
+Delivery
+
+http://localhost:8000/delivery
+
+
+Hosted App : https://grocery60-be-b2yd4bi7eq-uc.a.run.app
+
 
 
 
