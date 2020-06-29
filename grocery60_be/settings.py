@@ -15,6 +15,7 @@ import os
 import environ
 import google.auth
 from google.cloud import secretmanager_v1beta1 as sm
+import stripe
 
 # Import settings with django-environ
 env = environ.Env()
@@ -169,3 +170,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+# Set your secret key. Remember to switch to your live secret key in production!
+# See your keys here: https://dashboard.stripe.com/account/apikeys
+stripe.api_key = os.getenv('STRIPE_PUBKEY', 'pk_test_HlEp5oZyPonE21svenqowhXp')
+stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
+
+

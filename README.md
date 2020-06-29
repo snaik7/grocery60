@@ -25,39 +25,8 @@ gcloud run services describe grocery60-be \
   --region $REGION  \
   --format "value(status.url)"
 
-URLS to API
-
-Get Store
-
-http://localhost:8000/store/
-
-http://localhost:8000/store/1
-
-http://localhost:8000/store/?zip=94526
-
-
-Catalog
-
-http://localhost:8000/catalog/
-
-http://localhost:8000/catalog/?product_category=dairy&store_id=1
-
-Get Customer and other sets
-
-http://localhost:8000/customer/
-
-Get last few order for customer=1 and status is active
-
-http://localhost:8000/order/?customer_id=1&status=active
-
-Shipping method
-
-http://localhost:8000/shipping-method
-
-Delivery
-
-http://localhost:8000/delivery
-
+Postman Collection for API
+https://www.getpostman.com/collections/b691809e7a7d9c5ba1a0
 
 Hosted App : https://grocery60-be-b2yd4bi7eq-uc.a.run.app
 

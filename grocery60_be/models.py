@@ -163,8 +163,7 @@ class ShippingAddress(models.Model):
     class Meta:
         db_table = "shippingaddress"
 
-class Order(models.Model):
-
+class Order(models.Model):    
     status = models.CharField(
         max_length=50
     )
@@ -219,7 +218,11 @@ class OrderPayment(models.Model):
     transaction_id = models.CharField(
         max_length=200
     )
+    status = models.CharField(
+        max_length=100
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     payment_method = models.CharField(
         max_length=200
     )

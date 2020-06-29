@@ -31,11 +31,13 @@ router.register('order',viewsets.OrderViewset)
 router.register('order-item',viewsets.OrderItemViewset)
 router.register('delivery',viewsets.DeliveryViewset)
 router.register('shipping-method',viewsets.ShippingMethodViewset)
+router.register('order-payment',viewsets.OrderPaymentViewset)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('customer-payment/<int:customer_id>', views.CustomerPaymentView.as_view({'get': 'get'})),
     path('rest-auth/', include('rest_auth.urls')),
-
+    path('payment/', views.PaymentView.as_view()), 
+    path('webhook/payment/', views.PaymentWebhookView.as_view()), 
 ]
