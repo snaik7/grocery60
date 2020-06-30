@@ -22,6 +22,7 @@ from grocery60_be import views, viewsets
 
 router = routers.DefaultRouter()
 router.register('cart',viewsets.CartViewset)
+router.register('cart-item',viewsets.CartItemViewset)
 router.register('catalog',viewsets.CatalogViewset)
 router.register('store',viewsets.StoreViewset)
 router.register('customer',viewsets.CustomerViewset)
@@ -40,4 +41,5 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('payment/', views.PaymentView.as_view()), 
     path('webhook/payment/', views.PaymentWebhookView.as_view()), 
+    path('search/', views.CatalogSearchView.as_view()), 
 ]

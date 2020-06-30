@@ -54,6 +54,10 @@ class Product(models.Model):
     caption = models.CharField(
         max_length=100
     )
+    extra = models.CharField(
+        max_length=200,
+        blank=True
+    )
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -102,6 +106,18 @@ class Cart(models.Model):
 
     class Meta:
         db_table = "cart"
+
+class CartItem(models.Model):
+    updated_at = models.DateTimeField(auto_now=True)
+    extra = models.CharField(
+        max_length=200,
+        blank=True
+    )
+    quantity = models.IntegerField()
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    class Meta:
+        db_table = "cartitem"
 
 class BillingAddress(models.Model):
     priority = models.IntegerField()

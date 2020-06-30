@@ -8,6 +8,10 @@ class CartViewset(viewsets.ModelViewSet):
     queryset = models.Cart.objects.all()
     serializer_class = serializers.CartSerializer
 
+class CartItemViewset(viewsets.ModelViewSet):
+    queryset = models.CartItem.objects.all()
+    serializer_class = serializers.CartItemSerializer
+
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer

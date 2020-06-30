@@ -15,8 +15,41 @@ class CustomerPaymentView(viewsets.ViewSet):
     def get(self, request, customer_id):
         query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id)
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data)
 
+
+class CatalogSearchView(APIView):
+    def get(self, request):
+        search_key = request.GET.get('search_key')
+        if search_key:
+            search_list = search_key.split()
+            if len(search_list) > 2 :
+                response_dict = {
+                # the format of error message determined by you base exception class
+                'msg': 'Refine search criteria'
+                }
+                return JsonResponse(response_dict,status=403)
+            elif len(search_list) > 0 :
+                search_query = get_search_query(search_list)
+            else:
+                response_dict = {
+                # the format of error message determined by you base exception class
+                'msg': 'No search criteria found' 
+                }
+                return JsonResponse(response_dict,status=403)
+        else:
+            response_dict = {
+            # the format of error message determined by you base exception class
+            'msg': 'No search criteria found'
+            }
+            return JsonResponse(response_dict,status=200)
+
+        print('Search query ', search_query[0], ' criteria ', search_query[1])
+        with connection.cursor() as cursor:
+            cursor.execute(search_query[0],search_query[1])
+            print(cursor.rowcount)
+            row = dictfetchall(cursor)
+        return JsonResponse(row, safe=False)
 
 class PaymentView(APIView):
     def post(self,request):
@@ -123,3 +156,19 @@ def update_payment(transaction_id,status):
         cursor.execute("update orderpayment set status =%s, updated_at=%s where transaction_id=%s ",[amount,transaction_id,payment_method,order_id,status,datetime.now(), datetime.now() ])
     return cursor.rowcount
 
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+def get_search_query(search_list):
+    if len(search_list) == 1 :
+        query_search_list = search_list * 2 
+        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE lower(product_name) ~ %s OR lower(extra) ~ %s "
+    else:
+        query_search_list = search_list * 2 
+        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE lower(product_name) ~ %s OR lower(product_name) ~ %s  OR lower(extra) ~ %s OR lower(extra) ~ %s "
+    return (query,query_search_list)
