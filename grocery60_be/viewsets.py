@@ -3,65 +3,93 @@ from . import models
 from . import serializers
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.parsers import FormParser, MultiPartParser
+from grocery60_be import settings 
+from google.cloud import storage
+from django.contrib.auth.models import User, Group
+from rest_framework.parsers import JSONParser
+from django.http import JsonResponse
+from grocery60_be.models import *
+from grocery60_be.serializers import *
 
 class CartViewset(viewsets.ModelViewSet):
-    queryset = models.Cart.objects.all()
-    serializer_class = serializers.CartSerializer
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
 
 class CartItemViewset(viewsets.ModelViewSet):
-    queryset = models.CartItem.objects.all()
-    serializer_class = serializers.CartItemSerializer
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
 
 class CustomerViewset(viewsets.ModelViewSet):
-    queryset = models.Customer.objects.all()
-    serializer_class = serializers.CustomerSerializer
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+
+    def create(self, request):
+        data = JSONParser().parse(request)
+        user =User.objects.get(id=data.get('customer_id'))
+        data['customer_id'] = user.id
+        Customer.objects.create(customer_id=user.id, last_access=data.get('last_access'), 
+            extra=data.get('extra'), salutation=data.get('salutation'), phone_number=data.get('phone_number'))
+        return JsonResponse(data)
+
+    def update(self, request, pk):
+        data = JSONParser().parse(request)
+        customer = Customer.objects.get(pk=pk)
+        customer.salutation=data.get('salutation')
+        customer.last_access=data.get('last_access')
+        customer.extra=data.get('extra')
+        customer.phone_number=data.get('phone_number')
+        customer.save()
+        serializer = CustomerSerializer(customer)
+        return JsonResponse(serializer.data)
+
 
 class CatalogViewset(viewsets.ModelViewSet):
-    queryset = models.Product.objects.all()
-    serializer_class = serializers.CatalogSerializer
+    queryset = Product.objects.all()
+    serializer_class = CatalogSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['product_category', 'store_id']
 
 class StoreViewset(viewsets.ModelViewSet):
-    queryset = models.Store.objects.all()
-    serializer_class = serializers.StoreSerializer
+    queryset = Store.objects.all()
+    serializer_class = StoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['zip','nearby_zip']
 
 class BillingAddressViewset(viewsets.ModelViewSet):
-    queryset = models.BillingAddress.objects.all()
-    serializer_class = serializers.BillingAddressSerializer
+    queryset = BillingAddress.objects.all()
+    serializer_class = BillingAddressSerializer
 
 class ShippingAddressViewset(viewsets.ModelViewSet):
-    queryset = models.ShippingAddress.objects.all()
-    serializer_class = serializers.ShippingAddressSerializer
+    queryset = ShippingAddress.objects.all()
+    serializer_class = ShippingAddressSerializer
 
 
 class OrderViewset(viewsets.ModelViewSet):
-    queryset = models.Order.objects.all()
-    serializer_class = serializers.OrderSerializer
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id','status']
 
 class OrderItemViewset(viewsets.ModelViewSet):
-    queryset = models.OrderItem.objects.all()
-    serializer_class = serializers.OrderItemSerializer
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
 
 class OrderPaymentViewset(viewsets.ModelViewSet):
-    queryset = models.OrderPayment.objects.all()
-    serializer_class = serializers.OrderPaymentSerializer
+    queryset = OrderPayment.objects.all()
+    serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
 
 class ShippingMethodViewset(viewsets.ModelViewSet):
-    queryset = models.ShippingMethod.objects.all()
-    serializer_class = serializers.ShippingMethodSerializer
+    queryset = ShippingMethod.objects.all()
+    serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
 
 class DeliveryViewset(viewsets.ModelViewSet):
-    queryset = models.Delivery.objects.all()
-    serializer_class = serializers.DeliverySerializer
+    queryset = Delivery.objects.all()
+    serializer_class = DeliverySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']

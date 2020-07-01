@@ -111,18 +111,7 @@ WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 
 # Use django-environ to define the connection string
 DATABASES = {"default": env.db()}
-'''
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "grocery60",
-        "USER": "djuser",
-        "PASSWORD": "djuser",
-        "HOST": "35.202.32.52",
-        "PORT": "5432",
-    }
-}
-'''
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},

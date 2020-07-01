@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
-
 class Store(models.Model):
     name = models.CharField(
         max_length=50,
@@ -27,6 +26,9 @@ class Store(models.Model):
     )
     media = models.CharField(
         max_length=500
+    )
+    image = models.FileField(
+        blank=True
     )
 
     def __str__(self):
@@ -59,6 +61,10 @@ class Product(models.Model):
         blank=True
     )
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    image = models.FileField(
+        blank=True
+    )
+
 
     def __str__(self):
         return self.name
@@ -69,7 +75,8 @@ class Product(models.Model):
 class Customer(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
     last_access = models.CharField(
-        max_length=50
+        max_length=50,
+        blank=True
     )
     extra = models.CharField(
         max_length=200,
@@ -271,3 +278,7 @@ class Delivery(models.Model):
 
     class Meta:
         db_table = "delivery"
+
+
+
+

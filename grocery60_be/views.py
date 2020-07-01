@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from . import models
 from . import serializers
-from grocery60_be.models import Order, OrderPayment
+from grocery60_be.models import Order, OrderPayment, Product
 from rest_framework.response import Response
 import stripe 
 from rest_framework.views import APIView
@@ -17,11 +17,12 @@ class CustomerPaymentView(viewsets.ViewSet):
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
         return JsonResponse(serializer.data)
 
-
 class CatalogSearchView(APIView):
     def get(self, request):
         search_key = request.GET.get('search_key')
-        if search_key:
+        store_id = request.GET.get('store_id')
+        print(store_id)
+        if search_key and store_id :
             search_list = search_key.split()
             if len(search_list) > 2 :
                 response_dict = {
@@ -30,7 +31,7 @@ class CatalogSearchView(APIView):
                 }
                 return JsonResponse(response_dict,status=403)
             elif len(search_list) > 0 :
-                search_query = get_search_query(search_list)
+                search_query = get_search_query(search_list, store_id)
             else:
                 response_dict = {
                 # the format of error message determined by you base exception class
@@ -164,11 +165,12 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-def get_search_query(search_list):
+def get_search_query(search_list,store_id):
     if len(search_list) == 1 :
         query_search_list = search_list * 2 
-        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE lower(product_name) ~ %s OR lower(extra) ~ %s "
+        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE  (lower(product_name) ~ %s OR lower(extra) ~ %s) AND store_id = %s"
     else:
         query_search_list = search_list * 2 
-        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE lower(product_name) ~ %s OR lower(product_name) ~ %s  OR lower(extra) ~ %s OR lower(extra) ~ %s "
+        query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM product WHERE (lower(product_name) ~ %s OR lower(product_name) ~ %s  OR lower(extra) ~ %s OR lower(extra) ~ %s) AND store_id = %s"
+    query_search_list.append(store_id)
     return (query,query_search_list)
