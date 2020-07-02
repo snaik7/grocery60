@@ -60,7 +60,6 @@ https://www.getpostman.com/collections/b691809e7a7d9c5ba1a0
 
 ##Deployment
 
-
 Read setup guide for more details  https://docs.google.com/document/d/1dODRtnbE1NpOdIMGnGwpap-sVouwTz9pjrxJCMp31Cs/edit#heading=h.bfe1hv37sxqb
 
 
