@@ -11,11 +11,11 @@ from rest_framework.parsers import JSONParser
 from django.db import connection
 from datetime import datetime
 
-class CustomerPaymentView(viewsets.ViewSet):
+class CustomerPaymentView(APIView):
     def get(self, request, customer_id):
         query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id)
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
-        return JsonResponse(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
 class CatalogSearchView(APIView):
     def get(self, request):
@@ -48,7 +48,6 @@ class CatalogSearchView(APIView):
         print('Search query ', search_query[0], ' criteria ', search_query[1])
         with connection.cursor() as cursor:
             cursor.execute(search_query[0],search_query[1])
-            print(cursor.rowcount)
             row = dictfetchall(cursor)
         return JsonResponse(row, safe=False)
 

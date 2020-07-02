@@ -17,6 +17,12 @@ import google.auth
 from google.cloud import secretmanager_v1beta1 as sm
 import stripe
 
+
+import logging
+# Imports the Cloud Logging client library
+import google.cloud.logging # Don't conflict with standard logging
+from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
+
 # Import settings with django-environ
 env = environ.Env()
 
@@ -82,6 +88,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'grocery60_be.middleware.AuditMiddleware',
 ]
 
 ROOT_URLCONF = 'grocery60_be.urls'
@@ -158,11 +165,26 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'EXCEPTION_HANDLER': 'grocery60_be.error.grocery60_exception_handler',
 }
 
 # Set your secret key. Remember to switch to your live secret key in production!
 # See your keys here: https://dashboard.stripe.com/account/apikeys
 stripe.api_key = os.getenv('STRIPE_PUBKEY', 'pk_test_HlEp5oZyPonE21svenqowhXp')
 stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
+
+PROJECT = 'named-enigma-277405'
+
+# Instantiates a client
+client = google.cloud.logging.Client()
+
+# Retrieves a Cloud Logging handler based on the environment
+# you're running in and integrates the handler with the
+# Python logging module. By default this captures all logs
+# at INFO level and higher
+
+handler = CloudLoggingHandler(client)
+logging.getLogger().setLevel(logging.INFO) # defaults to WARN
+setup_logging(handler)
 
 
