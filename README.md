@@ -3,7 +3,7 @@
 # Overview
 
 Grocery 60 app is deployed in Cloud Run on GCP. The README file introduces the general approach for organizing this stuff and then explains how to install it, how to use the existing functionality
-and how to extend it.
+and how to extend it. Cloud build automatically deploys the app to Cloud Run after checkin to repo.
 
 ## Introduction
 
@@ -58,7 +58,7 @@ gcloud run services describe grocery60-be \
 Postman Collection for API
 https://www.getpostman.com/collections/b691809e7a7d9c5ba1a0
 
-## Extensions and customization
+## Extensions and customizations
 
 Read setup guide for more details  https://docs.google.com/document/d/1dODRtnbE1NpOdIMGnGwpap-sVouwTz9pjrxJCMp31Cs/edit#heading=h.bfe1hv37sxqb
 
