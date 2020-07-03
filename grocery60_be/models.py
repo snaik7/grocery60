@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+
 class Store(models.Model):
     name = models.CharField(
         max_length=50,
@@ -30,9 +31,6 @@ class Store(models.Model):
     image = models.FileField(
         blank=True
     )
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         db_table = "store"
@@ -65,12 +63,9 @@ class Product(models.Model):
         blank=True
     )
 
-
-    def __str__(self):
-        return self.name
-
     class Meta:
         db_table = "product"
+
 
 class Customer(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
@@ -90,9 +85,6 @@ class Customer(models.Model):
         max_length=128
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         db_table = "customer"
 
@@ -108,11 +100,9 @@ class Cart(models.Model):
     customer_id = models.IntegerField()
     shipping_address_id = models.IntegerField(blank=True)
 
-    def __str__(self):
-        return self.id
-
     class Meta:
         db_table = "cart"
+
 
 class CartItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
@@ -123,8 +113,10 @@ class CartItem(models.Model):
     quantity = models.IntegerField()
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
     class Meta:
         db_table = "cartitem"
+
 
 class BillingAddress(models.Model):
     priority = models.IntegerField()
@@ -138,11 +130,11 @@ class BillingAddress(models.Model):
     address = models.CharField(
         max_length=1024
     )
-    house_number =  models.CharField(
+    house_number = models.CharField(
         max_length=12
     )
     zip = models.CharField(
-        max_length=12   
+        max_length=12
     )
     city = models.CharField(
         max_length=1024
@@ -156,7 +148,7 @@ class BillingAddress(models.Model):
         db_table = "billingaddress"
 
 
-class ShippingAddress(models.Model):    
+class ShippingAddress(models.Model):
     priority = models.IntegerField()
     name = models.CharField(
         max_length=1024
@@ -168,11 +160,11 @@ class ShippingAddress(models.Model):
     address = models.CharField(
         max_length=1024
     )
-    house_number =  models.CharField(
+    house_number = models.CharField(
         max_length=12
     )
     zip = models.CharField(
-        max_length=12   
+        max_length=12
     )
     city = models.CharField(
         max_length=1024
@@ -182,11 +174,11 @@ class ShippingAddress(models.Model):
     )
     customer_id = models.IntegerField()
 
-
     class Meta:
         db_table = "shippingaddress"
 
-class Order(models.Model):    
+
+class Order(models.Model):
     status = models.CharField(
         max_length=50
     )
@@ -218,11 +210,12 @@ class Order(models.Model):
         blank=True
     )
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
     class Meta:
         db_table = "order"
 
-class OrderItem(models.Model):
 
+class OrderItem(models.Model):
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     line_total = models.DecimalField(max_digits=6, decimal_places=2)
     extra = models.CharField(
@@ -235,6 +228,7 @@ class OrderItem(models.Model):
 
     class Meta:
         db_table = "orderitem"
+
 
 class OrderPayment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
@@ -253,6 +247,7 @@ class OrderPayment(models.Model):
 
     class Meta:
         db_table = "orderpayment"
+
 
 class ShippingMethod(models.Model):
     name = models.CharField(
@@ -278,7 +273,3 @@ class Delivery(models.Model):
 
     class Meta:
         db_table = "delivery"
-
-
-
-

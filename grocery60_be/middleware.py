@@ -2,7 +2,6 @@ import logging
 from grocery60_be import settings
 import json 
 import time
-import sys
 
 class AuditMiddleware(object):
     

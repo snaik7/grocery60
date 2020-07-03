@@ -11,13 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
 import environ
-import google.auth
-from google.cloud import secretmanager_v1beta1 as sm
 import stripe
-
-
 import logging
 # Imports the Cloud Logging client library
 import google.cloud.logging # Don't conflict with standard logging

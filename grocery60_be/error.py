@@ -1,4 +1,3 @@
-import traceback
 import logging
 from django.http import HttpResponse, JsonResponse
 import traceback
