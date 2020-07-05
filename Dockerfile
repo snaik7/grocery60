@@ -20,7 +20,7 @@ EXPOSE 8000
 # This default value facilitates local development.
 ENV PORT 8000
 
-
+# reference doc - https://medium.com/@lhennessy/running-django-on-google-cloud-run-with-cloudsql-ac8141095b77
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
 # For environments with multiple CPU cores, increase the number of workers

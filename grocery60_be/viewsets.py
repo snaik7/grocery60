@@ -8,11 +8,13 @@ from grocery60_be.serializers import *
 class CartViewset(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    filterset_fields = ['customer_id']
 
 
 class CartItemViewset(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
+    filterset_fields = ['cart_id']
 
 
 class CustomerViewset(viewsets.ModelViewSet):

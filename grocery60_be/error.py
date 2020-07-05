@@ -42,7 +42,6 @@ def grocery60_exception_handler(exc, context):
     # to get the standard error response.
     exception_handler(exc, context)
     print(' Error Type ',type(exc)) 
-    print(' Error Type ',context['txn_id'])
     # set status_code by category of the exception you caught
     if isinstance(exc, ERRORS_400):
         status_code = 400
