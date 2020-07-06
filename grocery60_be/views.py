@@ -182,4 +182,4 @@ def get_search_query(search_list, store_id):
                 "product WHERE (lower(product_name) ~ %s OR lower(product_name) ~ %s  OR lower(extra) ~ %s OR lower(" \
                 "extra) ~ %s) AND store_id = %s "
     query_search_list.append(store_id)
-    return (query, query_search_list)
+    return query, query_search_list

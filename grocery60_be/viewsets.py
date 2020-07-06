@@ -1,8 +1,14 @@
+from django.contrib.auth.models import User
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
-from grocery60_be.serializers import *
+
+from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
+    OrderItem, OrderPayment, ShippingMethod, Delivery
+from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
+    StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
+    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer
 
 
 class CartViewset(viewsets.ModelViewSet):
@@ -17,6 +23,7 @@ class CartItemViewset(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cart_id']
+
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
