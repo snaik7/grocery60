@@ -1,4 +1,6 @@
-from django.db import models
+from datetime import datetime
+
+from django.db import models, connection
 from django.contrib.auth.models import User, Group
 
 
@@ -63,6 +65,60 @@ class Product(models.Model):
         blank=True
     )
 
+    def search_catalog(self, search_key, store_id):
+        if search_key and store_id:
+            search_list = search_key.split()
+            if len(search_list) > 2:
+                response_dict = {
+                    # the format of error message determined by you base exception class
+                    'msg': 'Refine search criteria'
+                }
+                status = 403
+                return response_dict, status
+            elif len(search_list) > 0:
+                search_query = self.get_search_query(search_list, store_id)
+            else:
+                response_dict = {
+                    # the format of error message determined by you base exception class
+                    'msg': 'No search criteria found'
+                }
+                status = 403
+                return response_dict, status
+        else:
+            response_dict = {
+                # the format of error message determined by you base exception class
+                'msg': 'No search criteria found'
+            }
+            status = 200
+            return response_dict, status
+        print('Search query ', search_query[0], ' criteria ', search_query[1])
+        with connection.cursor() as cursor:
+            cursor.execute(search_query[0], search_query[1])
+            row = self.dictfetchall(cursor)
+        status = 200
+        return row, status
+
+    def dictfetchall(self, cursor):
+        "Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+
+    def get_search_query(self, search_list, store_id):
+        if len(search_list) == 1:
+            query_search_list = search_list * 2
+            query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM " \
+                    "product WHERE  (lower(product_name) ~ %s OR lower(extra) ~ %s) AND store_id = %s "
+        else:
+            query_search_list = search_list * 2
+            query = "SELECT id, product_name, product_url, product_category, media, caption, store_id, price, extra FROM " \
+                    "product WHERE (lower(product_name) ~ %s OR lower(product_name) ~ %s  OR lower(extra) ~ %s OR lower(" \
+                    "extra) ~ %s) AND store_id = %s "
+        query_search_list.append(store_id)
+        return query, query_search_list
+
     class Meta:
         db_table = "product"
 
@@ -116,7 +172,6 @@ class CartItem(models.Model):
 
     class Meta:
         db_table = "cartitem"
-
 
 
 class BillingAddress(models.Model):
@@ -245,6 +300,30 @@ class OrderPayment(models.Model):
         max_length=200
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    def record_payment(self, data, intent):
+        try:
+            amount = data.get('amount')
+            transaction_id = intent.get('id')
+            payment_method = 'card'
+            order_id = data.get('metadata').get('order_id')
+            status = intent.get('status')
+            order_payment = OrderPayment(amount=amount, transaction_id=transaction_id, payment_method=payment_method,
+                                         order_id=order_id, status=status)
+            order_payment.save()
+        except Exception as e:
+            raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e) )
+        return order_payment.id
+
+    def update_payment(self,transaction_id, status):
+        try:
+            order_payment = OrderPayment.objects.filter(transaction_id=transaction_id)
+            order_payment.status = status
+            order_payment.updated_at = datetime.now()
+            order_payment.save()
+        except Exception as e:
+            raise Exception('Order Payment failed for Order''s  transaction_id = ' + transaction_id + ' with ' + str(e))
+        return order_payment.id
 
     class Meta:
         db_table = "orderpayment"

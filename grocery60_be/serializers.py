@@ -4,16 +4,16 @@ from grocery60_be.models import Store, Product, Customer, Cart, CartItem, Billin
     OrderItem, OrderPayment, ShippingMethod, Delivery
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ['username', 'email', 'first_name', 'is_active', 'last_login',  'last_name', 'groups']
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ['url', 'name']
+        fields = ['name']
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -23,6 +23,8 @@ class StoreSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    customer = UserSerializer(read_only=True)
+
     class Meta:
         model = Customer
         fields = '__all__'

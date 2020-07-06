@@ -32,6 +32,7 @@ router.register('order-item',viewsets.OrderItemViewset)
 router.register('delivery',viewsets.DeliveryViewset)
 router.register('shipping-method',viewsets.ShippingMethodViewset)
 router.register('order-payment',viewsets.OrderPaymentViewset)
+router.register('user',viewsets.UserViewset)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,5 +41,5 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('payment/', views.PaymentView.as_view()), 
     path('webhook/payment/', views.PaymentWebhookView.as_view()), 
-    path('search/', views.CatalogSearchView.as_view()), 
+    path('search/', views.CatalogSearchView.as_view()),
 ]

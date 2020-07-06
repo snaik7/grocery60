@@ -8,7 +8,12 @@ from grocery60_be.models import Cart, CartItem, Customer, Product, Store, Billin
     OrderItem, OrderPayment, ShippingMethod, Delivery
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
-    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer
+    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer
+
+
+class UserViewset(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class CartViewset(viewsets.ModelViewSet):
@@ -28,6 +33,8 @@ class CartItemViewset(viewsets.ModelViewSet):
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['customer_id']
 
     def create(self, request):
         data = JSONParser().parse(request)
@@ -67,11 +74,15 @@ class StoreViewset(viewsets.ModelViewSet):
 class BillingAddressViewset(viewsets.ModelViewSet):
     queryset = BillingAddress.objects.all()
     serializer_class = BillingAddressSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['customer_id']
 
 
 class ShippingAddressViewset(viewsets.ModelViewSet):
     queryset = ShippingAddress.objects.all()
     serializer_class = ShippingAddressSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['customer_id']
 
 
 class OrderViewset(viewsets.ModelViewSet):
