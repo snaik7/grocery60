@@ -8,14 +8,15 @@ from grocery60_be.serializers import *
 class CartViewset(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id']
 
 
 class CartItemViewset(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cart_id']
-
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()

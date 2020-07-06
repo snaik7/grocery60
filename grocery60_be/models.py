@@ -118,6 +118,7 @@ class CartItem(models.Model):
         db_table = "cartitem"
 
 
+
 class BillingAddress(models.Model):
     priority = models.IntegerField()
     name = models.CharField(
