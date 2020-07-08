@@ -29,6 +29,16 @@ class CartItemViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cart_id']
 
+    def create(self, request):
+        data = JSONParser().parse(request)
+        product = Product.objects.get(id=data.get('product_id'))
+        cart = Cart.objects.get(id=data.get('cart_id'))
+        data['product_id'] = product.id
+        data['cart_id'] = cart.id
+        CartItem.objects.create(product_id=product.id, extra=data.get('extra'),
+                                quantity=data.get('quantity'), cart_id=cart.id)
+        return JsonResponse(data)
+
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
