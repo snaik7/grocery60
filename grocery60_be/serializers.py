@@ -7,7 +7,7 @@ from grocery60_be.models import Store, Product, Customer, Cart, CartItem, Billin
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'is_active', 'last_login',  'last_name', 'groups']
+        fields = ['id', 'username', 'email', 'first_name', 'is_active', 'last_login',  'last_name', 'groups']
 
 
 class GroupSerializer(serializers.ModelSerializer):

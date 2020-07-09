@@ -1,4 +1,7 @@
+import json
+
 from django.contrib.auth.models import User
+from django.db.models import Count
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
@@ -14,6 +17,8 @@ from grocery60_be.serializers import CartSerializer, CartItemSerializer, Custome
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['username']
 
 
 class CartViewset(viewsets.ModelViewSet):
@@ -39,6 +44,34 @@ class CartItemViewset(viewsets.ModelViewSet):
                                 quantity=data.get('quantity'), cart_id=cart.id)
         return JsonResponse(data)
 
+    def list(self, request):
+        print('enter get')
+        cart_id = request.GET.get('cart_id')
+        cart = Cart.objects.get(id=cart_id)
+        cart_item = CartItem.objects.select_related('product').all().filter(cart_id=cart_id).\
+            annotate(total=Count('product_id')).order_by('product_id')
+        print(cart_item.query)
+        cart_item_list = []
+        count = 0
+        for item in cart_item:
+            _dict = {}
+            product_id_list = [_item['product_id'] for _item in cart_item_list]
+            if item.product.id in product_id_list:
+                _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.id]
+                print(_item[0])
+                cart_item_list.remove(_item[0])
+                _dict['cart_id'] = item.cart.id
+                _dict['product_id'] = item.product.id
+                _dict['product_name'] = item.product.product_name
+                _dict['quantity'] = _item[0]['quantity'] + 1
+                cart_item_list.append(_dict)
+            else:
+                _dict['cart_id'] = item.cart.id
+                _dict['product_id'] = item.product.id
+                _dict['product_name'] = item.product.product_name
+                _dict['quantity'] = item.quantity
+                cart_item_list.append(_dict)
+        return JsonResponse(cart_item_list, safe=False)
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
