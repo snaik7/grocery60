@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models, connection
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 
 class Store(models.Model):

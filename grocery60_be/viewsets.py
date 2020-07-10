@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth.models import User
 from django.db.models import Count
 from rest_framework import viewsets
