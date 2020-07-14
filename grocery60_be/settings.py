@@ -167,7 +167,7 @@ REST_FRAMEWORK = {
 
 # Set your secret key. Remember to switch to your live secret key in production!
 # See your keys here: https://dashboard.stripe.com/account/apikeys
-stripe.api_key = os.getenv('STRIPE_PUBKEY', 'pk_test_HlEp5oZyPonE21svenqowhXp')
+stripe.api_key = os.getenv('STRIPE_PUBKEY', 'sk_test_4eC39HqLyjWDarjtT1zdp7dc')
 stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
 
 PROJECT = 'named-enigma-277405'
