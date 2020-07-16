@@ -4,6 +4,16 @@ import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_auth.views import LoginView
+
+
+class CustomLoginView(LoginView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data.get('key'))
+        return Response({'token': token.key, 'id': token.user_id})
 
 
 class CustomerPaymentView(APIView):
