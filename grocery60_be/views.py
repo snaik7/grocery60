@@ -1,5 +1,8 @@
+import decimal
+from decimal import Decimal
+
 from grocery60_be import serializers, models
-from grocery60_be.models import OrderPayment
+from grocery60_be.models import OrderPayment, Email, BillingAddress
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -7,6 +10,19 @@ from rest_framework.parsers import JSONParser
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_auth.views import LoginView
+
+
+class TaxCalView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = JSONParser().parse(request)
+        sub_total = data.get('sub_total')
+        customer_id = data.get('customer_id')
+        address = BillingAddress.objects.filter(customer_id=customer_id)
+        print('state', address[0].state)
+        cents = Decimal('.01')
+        total = Decimal(sub_total) * models.get_tax(address[0].state) + Decimal(sub_total)
+        total = total.quantize(cents, decimal.ROUND_HALF_UP)
+        return Response({'total': total})
 
 
 class CustomLoginView(LoginView):
@@ -76,6 +92,11 @@ class PaymentView(APIView):
         )
 
         if OrderPayment().record_payment(data, intent):
+            recipient_email = Email()
+            recipient_email.email = data.get('receipt_email')
+            recipient_email.order_id = order_id
+            orderPayment = OrderPayment()
+            orderPayment.send_email(recipient_email)
             return JsonResponse(intent)
         else:
             raise Exception('Order Payment failed for Order = ' + order_id)

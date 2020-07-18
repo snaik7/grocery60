@@ -43,4 +43,5 @@ urlpatterns = [
     path('webhook/payment/', views.PaymentWebhookView.as_view()), 
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
+    path('tax/', views.TaxCalView.as_view()),
 ]

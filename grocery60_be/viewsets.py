@@ -6,10 +6,10 @@ from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
-    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer
+    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer
 
 
 class UserViewset(viewsets.ModelViewSet):
@@ -46,7 +46,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         print('enter get')
         cart_id = request.GET.get('cart_id')
         cart = Cart.objects.get(id=cart_id)
-        cart_item = CartItem.objects.select_related('product').all().filter(cart_id=cart_id).\
+        cart_item = CartItem.objects.select_related('product').all().filter(cart_id=cart_id). \
             annotate(total=Count('product_id')).order_by('product_id')
         print(cart_item.query)
         cart_item_list = []
@@ -72,6 +72,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['quantity'] = item.quantity
                 cart_item_list.append(_dict)
         return JsonResponse(cart_item_list, safe=False)
+
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
@@ -118,14 +119,14 @@ class BillingAddressViewset(viewsets.ModelViewSet):
     queryset = BillingAddress.objects.all()
     serializer_class = BillingAddressSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['customer_id']
+    filterset_fields = ['customer_id','state']
 
 
 class ShippingAddressViewset(viewsets.ModelViewSet):
     queryset = ShippingAddress.objects.all()
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['customer_id']
+    filterset_fields = ['customer_id','state']
 
 
 class OrderViewset(viewsets.ModelViewSet):
@@ -140,6 +141,19 @@ class OrderItemViewset(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
+
+    def create(self, request):
+        data_list = JSONParser().parse(request)
+
+        for data in data_list:
+            print(data)
+            product = Product.objects.get(id=data.get('product_id'))
+            order = Order.objects.get(id=data.get('order_id'))
+            line_total = product.price * data.get('quantity')
+            OrderItem.objects.create(product_id=product.id, order_id=order.id, extra=data.get('extra'),
+                                     line_total=line_total,
+                                     quantity=data.get('quantity'), canceled=data.get('canceled'))
+        return JsonResponse(data_list, safe=False)
 
 
 class OrderPaymentViewset(viewsets.ModelViewSet):
@@ -160,3 +174,10 @@ class DeliveryViewset(viewsets.ModelViewSet):
     serializer_class = DeliverySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
+
+
+class TaxViewset(viewsets.ModelViewSet):
+    queryset = Tax.objects.all()
+    serializer_class = TaxSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['state']

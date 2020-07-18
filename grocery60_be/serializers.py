@@ -1,7 +1,10 @@
+import decimal
+from decimal import Decimal, getcontext
+
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from grocery60_be.models import Store, Product, Customer, Cart, CartItem, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax
 from django.contrib.auth.hashers import make_password
 
 
@@ -75,6 +78,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = CatalogSerializer(read_only=True)
+
     class Meta:
         model = OrderItem
         fields = '__all__'
@@ -96,3 +100,11 @@ class DeliverySerializer(serializers.ModelSerializer):
     class Meta:
         model = Delivery
         fields = '__all__'
+
+
+class TaxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tax
+        fields = '__all__'
+
+

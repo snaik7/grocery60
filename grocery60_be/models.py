@@ -1,7 +1,11 @@
+import decimal
 from datetime import datetime
+from decimal import Decimal
 
 from django.db import models, connection
 from django.contrib.auth.models import User
+from grocery60_be import email as email_send
+from grocery60_be import models as model
 
 
 class Store(models.Model):
@@ -195,6 +199,9 @@ class BillingAddress(models.Model):
     city = models.CharField(
         max_length=1024
     )
+    state = models.CharField(
+        max_length=2
+    )
     country = models.CharField(
         max_length=3
     )
@@ -225,6 +232,9 @@ class ShippingAddress(models.Model):
     city = models.CharField(
         max_length=1024
     )
+    state = models.CharField(
+        max_length=2
+    )
     country = models.CharField(
         max_length=3
     )
@@ -232,6 +242,11 @@ class ShippingAddress(models.Model):
 
     class Meta:
         db_table = "shippingaddress"
+
+
+def get_tax(state):
+    tax = Tax.objects.filter(state=state)
+    return Decimal(tax[0].tax)
 
 
 class Order(models.Model):
@@ -272,7 +287,6 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     line_total = models.DecimalField(max_digits=6, decimal_places=2)
     extra = models.CharField(
         max_length=200
@@ -312,10 +326,14 @@ class OrderPayment(models.Model):
                                          order_id=order_id, status=status)
             order_payment.save()
         except Exception as e:
-            raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e) )
+            raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
         return order_payment.id
 
-    def update_payment(self,transaction_id, status):
+    def send_email(self, email):
+        print('data received ' + email.order_id)
+        email_send.send_email(email, 'order_confirmation.html')
+
+    def update_payment(self, transaction_id, status):
         try:
             order_payment = OrderPayment.objects.filter(transaction_id=transaction_id)
             order_payment.status = status
@@ -353,3 +371,19 @@ class Delivery(models.Model):
 
     class Meta:
         db_table = "delivery"
+
+
+class Email(models.Model):
+    username = models.TextField()
+    email = models.TextField()
+    order_id = models.TextField()
+
+
+class Tax(models.Model):
+    state = models.CharField(
+        max_length=2
+    )
+    tax = models.DecimalField(max_digits=3, decimal_places=2)
+
+    class Meta:
+        db_table = "tax"
