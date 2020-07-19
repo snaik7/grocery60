@@ -144,6 +144,9 @@ class Customer(models.Model):
     phone_number = models.CharField(
         max_length=128
     )
+    email = models.CharField(
+        max_length=100
+    )
 
     class Meta:
         db_table = "customer"
@@ -329,18 +332,37 @@ class OrderPayment(models.Model):
             raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
         return order_payment.id
 
-    def send_email(self, email):
+    def send_success_email(self, email):
         print('data received ' + email.order_id)
         email_send.send_email(email, 'order_confirmation.html')
+
+    def send_failure_email(self, transaction_id):
+        print('Payment failure data received ' + transaction_id)
+        order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
+        customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
+        email = Email()
+        email.email = customer.email
+        email.order_id = order_payment.order_id
+        email_send.send_email(email, 'order_payment_failure.html')
+
+    def send_store_email(self, transaction_id):
+        print('Store success data received ' + transaction_id)
+        order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
+        customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
+        email = Email()
+        email.email = customer.email
+        email.order_id = order_payment.order_id
+        email_send.send_email(email, 'store_order_confirmation.html')
 
     def update_payment(self, transaction_id, status):
         try:
             order_payment = OrderPayment.objects.filter(transaction_id=transaction_id)
+            order_payment = order_payment[0]
             order_payment.status = status
             order_payment.updated_at = datetime.now()
             order_payment.save()
         except Exception as e:
-            raise Exception('Order Payment failed for Order''s  transaction_id = ' + transaction_id + ' with ' + str(e))
+            raise Exception('Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(e))
         return order_payment.id
 
     class Meta:

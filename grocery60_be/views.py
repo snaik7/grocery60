@@ -95,8 +95,8 @@ class PaymentView(APIView):
             recipient_email = Email()
             recipient_email.email = data.get('receipt_email')
             recipient_email.order_id = order_id
-            orderPayment = OrderPayment()
-            orderPayment.send_email(recipient_email)
+            order_payment = OrderPayment()
+            order_payment.send_success_email(recipient_email)
             return JsonResponse(intent)
         else:
             raise Exception('Order Payment failed for Order = ' + order_id)
@@ -110,6 +110,7 @@ class PaymentWebhookView(APIView):
         sig_header = request.META.get('STRIPE_SIGNATURE')
         event = None
         endpoint_secret = 'we_1GzJNB2eZvKYlo2CMyWT8lZu'
+        '''
         try:
             event = stripe.Webhook.construct_event(
                 payload, sig_header, endpoint_secret
@@ -122,17 +123,22 @@ class PaymentWebhookView(APIView):
             # invalid signature
             response_dict = {'status': 'Invalid signature'}
             return JsonResponse(response_dict, status=400)
-
-        event_dict = event.to_dict()
+        '''
+        event_dict = payload
+        #event_dict = event.to_dict()
         if event_dict['type'] == "payment_intent.succeeded":
             intent = event_dict['data']['object']
             print("Succeeded: ", intent['id'])
             # Fulfill the customer's purchase
+            order_payment = OrderPayment()
+            order_payment.send_store_email(intent['id'])
         elif event_dict['type'] == "payment_intent.payment_failed":
             intent = event_dict['data']['object']
             error_message = intent['last_payment_error']['message'] if intent.get('last_payment_error') else None
             print("Failed: ", intent['id'], error_message)
             # Notify the customer that payment failed
+            order_payment = OrderPayment()
+            order_payment.send_failure_email(intent['id'])
 
         OrderPayment().update_payment(intent['id'], event_dict['type'])
         print("Database Update Succeeded: ", intent['id'])
