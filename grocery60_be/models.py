@@ -37,6 +37,12 @@ class Store(models.Model):
     image = models.FileField(
         blank=True
     )
+    email = models.CharField(
+        max_length=50
+    )
+    phone = models.CharField(
+        max_length=50
+    )
 
     class Meta:
         db_table = "store"
