@@ -29,11 +29,10 @@ class FeeCalView(APIView):
         tip = tip.quantize(cents, decimal.ROUND_HALF_UP)
         tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
         tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
-        discount = Decimal(models.get_discount(customer_id))
-        discount = discount.quantize(cents, decimal.ROUND_HALF_UP)
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
         service_fee = models.get_service_fee(sub_total)
+        discount = models.get_discount(customer_id, sub_total)
         total = Decimal(sub_total) + tax + tip + service_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
         return Response({'sub_total': sub_total, 'tax': tax, 'tip': tip, 'service_fee': service_fee,
