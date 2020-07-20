@@ -123,27 +123,7 @@ class PaymentWebhookView(APIView):
     def post(self, request):
         payload = JSONParser().parse(request)
         print('Webhook Payload from Stripe ', payload)
-        # payload = request.get_data()
-        # sig_header = request.headers.get('STRIPE_SIGNATURE')
-        sig_header = request.META.get('STRIPE_SIGNATURE')
-        event = None
-        endpoint_secret = 'we_1GzJNB2eZvKYlo2CMyWT8lZu'
-        '''
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, endpoint_secret
-            )
-        except ValueError as e:
-            # invalid payload
-            response_dict = {'status': 'Invalid payload'}
-            return JsonResponse(response_dict, status=400)
-        except stripe.error.SignatureVerificationError as e:
-            # invalid signature
-            response_dict = {'status': 'Invalid signature'}
-            return JsonResponse(response_dict, status=400)
-        '''
         event_dict = payload
-        # event_dict = event.to_dict()
         if event_dict['type'] == "payment_intent.succeeded":
             intent = event_dict['data']['object']
             print("Succeeded: ", intent['id'])
@@ -157,21 +137,12 @@ class PaymentWebhookView(APIView):
             # Notify the customer that payment failed
             order_payment = OrderPayment()
             order_payment.send_failure_email(intent['id'])
+        else:
+            intent = event_dict['data']['object']
+            print("Update unknown event : ", intent['id'], '   ', event_dict['type'])
 
-        OrderPayment().update_payment(intent['id'], event_dict['type'])
-        print("Database Update Succeeded: ", intent['id'])
+        if event_dict['type'] == "payment_intent.succeeded" or event_dict['type'] == "payment_intent.payment_failed":
+            OrderPayment().update_payment(intent['id'], event_dict['type'])
+            print("Database Update Succeeded: ", intent['id'])
+
         return JsonResponse(event_dict, status=200)
-
-
-# views.py
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from graphene_django.views import GraphQLView
-
-'''
-@authentication_classes([])
-@permission_classes([])
-class PrivateGraphQLView(GraphQLView):
-    print('Enter')
-    pass
-'''
