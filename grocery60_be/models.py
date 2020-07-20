@@ -259,8 +259,11 @@ def get_tax(state):
     return Decimal(tax.tax)
 
 
-def get_discount(customer_id):
-    return settings.DISCOUNT
+def get_discount(customer_id, sub_total):
+    discount = Decimal(settings.DISCOUNT) / Decimal(100) * Decimal(sub_total)
+    cents = Decimal('.01')
+    discount = discount.quantize(cents, decimal.ROUND_HALF_UP)
+    return discount
 
 
 def get_service_fee(sub_total):
