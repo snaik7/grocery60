@@ -22,12 +22,12 @@ class ProductType(DjangoObjectType):
 class Query:
     stores = graphene.List(StoreType)
     store = graphene.Field(StoreType, id=graphene.String())
-    store_search = graphene.List(StoreType, string=graphene.String())
+    store_search = graphene.List(StoreType, store_name=graphene.String())
 
     products = graphene.List(ProductType)
     product = graphene.Field(ProductType, id=graphene.String())
-    product_category = graphene.List(ProductType, category=graphene.String(), product_name=graphene.String(),store_id=graphene.Int())
-    product_search = graphene.List(ProductType, string=graphene.String())
+    product_search = graphene.List(ProductType, category=graphene.String(), product_name=graphene.String(), store_id=graphene.Int())
+
 
     def resolve_stores(self, info, **kwargs):
         # Querying a list
@@ -38,8 +38,8 @@ class Query:
         return Store.objects.get(pk=id)
 
     def resolve_store_search(self, info, **kwargs):
-        string = kwargs.get("string", "")
-        return Store.objects.filter(name__icontains=string)
+        store_name = kwargs.get("store_name", "")
+        return Store.objects.filter(name__icontains=store_name)
 
     def resolve_products(self, info, **kwargs):
         # Querying a list
@@ -49,13 +49,9 @@ class Query:
         # Querying a list
         return Product.objects.get(pk=id)
 
-    def resolve_product_search(self, info, **kwargs):
-        string = kwargs.get("string", "")
-        return Product.objects.filter(product_name__icontains=string)
 
-    def resolve_product_category(self, info, **kwargs):
+    def resolve_product_search(self, info, **kwargs):
         category = kwargs.get("category", "")
         product_name = kwargs.get("product_name", "")
-        store_id = kwargs.get("store_id",0)
-        print(store_id)
-        return Product.objects.filter(product_category__icontains=category,product_name__icontains=product_name, store=store_id)
+        store_id = kwargs.get("store_id", 0)
+        return Product.objects.filter(product_category__icontains=category, product_name__icontains=product_name, store=store_id)
