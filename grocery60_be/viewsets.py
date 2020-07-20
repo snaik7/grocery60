@@ -4,7 +4,9 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
+from rest_framework.serializers import ListSerializer
 
+from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
     OrderItem, OrderPayment, ShippingMethod, Delivery, Tax
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
@@ -109,6 +111,13 @@ class CatalogViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['product_category', 'store_id']
 
+    '''Allows bulk creation of a resource.'''
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+        return super(CatalogViewset, self).get_serializer(*args, **kwargs)
+
 
 class StoreViewset(viewsets.ModelViewSet):
     queryset = Store.objects.all()
@@ -121,14 +130,14 @@ class BillingAddressViewset(viewsets.ModelViewSet):
     queryset = BillingAddress.objects.all()
     serializer_class = BillingAddressSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['customer_id','state']
+    filterset_fields = ['customer_id', 'state']
 
 
 class ShippingAddressViewset(viewsets.ModelViewSet):
     queryset = ShippingAddress.objects.all()
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['customer_id','state']
+    filterset_fields = ['customer_id', 'state']
 
 
 class OrderViewset(viewsets.ModelViewSet):
