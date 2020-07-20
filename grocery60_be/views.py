@@ -122,6 +122,7 @@ class PaymentView(APIView):
 class PaymentWebhookView(APIView):
     def post(self, request):
         payload = JSONParser().parse(request)
+        print('Webhook Payload from Stripe ', payload)
         # payload = request.get_data()
         # sig_header = request.headers.get('STRIPE_SIGNATURE')
         sig_header = request.META.get('STRIPE_SIGNATURE')
