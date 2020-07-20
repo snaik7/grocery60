@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.db import models, connection
 from django.contrib.auth.models import User
 from grocery60_be import email as email_send
-from grocery60_be import models as model
+from grocery60_be import  settings
 
 
 class Store(models.Model):
@@ -51,7 +51,7 @@ class Store(models.Model):
 class Product(models.Model):
     product_name = models.CharField(
         max_length=50,
-#        unique=True,
+        #        unique=True,
     )
     product_url = models.CharField(
         max_length=200
@@ -260,7 +260,15 @@ def get_tax(state):
 
 
 def get_discount(customer_id):
-    return Decimal('0')
+    return settings.DISCOUNT
+
+
+def get_service_fee(sub_total):
+    service_fee = Decimal(settings.SERVICE_FEE)/Decimal(100) * Decimal(sub_total)
+    service_fee = Decimal(2) if service_fee < 2 else service_fee
+    cents = Decimal('.01')
+    service_fee = service_fee.quantize(cents, decimal.ROUND_HALF_UP)
+    return service_fee
 
 
 class Order(models.Model):

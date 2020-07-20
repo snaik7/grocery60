@@ -33,9 +33,11 @@ class FeeCalView(APIView):
         discount = discount.quantize(cents, decimal.ROUND_HALF_UP)
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
-        total = Decimal(sub_total) + tax + tip - discount
+        service_fee = models.get_service_fee(sub_total)
+        total = Decimal(sub_total) + tax + tip + service_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
-        return Response({'sub_total': sub_total, 'total': total, 'tax': tax, 'tip': tip, 'discount': discount})
+        return Response({'sub_total': sub_total, 'tax': tax, 'tip': tip, 'service_fee': service_fee,
+                        'discount': discount,'total': total})
 
 
 class CustomLoginView(LoginView):

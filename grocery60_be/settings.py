@@ -208,3 +208,5 @@ GRAPHENE = {
     'SCHEMA': 'grocery60_be.schema.schema'
 }
 
+SERVICE_FEE = env('SERVICE_FEE')
+DISCOUNT = env('DISCOUNT')
