@@ -111,7 +111,7 @@ class CatalogViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['product_category', 'store_id']
 
-    '''Allows bulk creation of a resource.'''
+    '''Allows bulk creation of a products.'''
 
     def get_serializer(self, *args, **kwargs):
         if isinstance(kwargs.get("data", {}), list):
@@ -124,6 +124,13 @@ class StoreViewset(viewsets.ModelViewSet):
     serializer_class = StoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['zip', 'nearby_zip']
+
+    '''Allows bulk creation of a store.'''
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+        return super(StoreViewset, self).get_serializer(*args, **kwargs)
 
 
 class BillingAddressViewset(viewsets.ModelViewSet):
