@@ -74,6 +74,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_auth',
     'corsheaders',
+    # libraries
+    'graphene_django',
     ]
 
 MIDDLEWARE = [
@@ -167,8 +169,10 @@ REST_FRAMEWORK = {
 
 # Set your secret key. Remember to switch to your live secret key in production!
 # See your keys here: https://dashboard.stripe.com/account/apikeys
-stripe.api_key = os.getenv('STRIPE_PUBKEY', 'sk_test_4eC39HqLyjWDarjtT1zdp7dc')
+stripe.api_key = env("STRIPE_PUBKEY")
 stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
+# set on each request
+stripe_account="acct_1FPY3JEQN3kQJKqm"
 
 PROJECT = 'named-enigma-277405'
 
@@ -200,6 +204,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@tissatech.com'
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
-
-
+GRAPHENE = {
+    'SCHEMA': 'grocery60_be.schema.schema'
+}
 

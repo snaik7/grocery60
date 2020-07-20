@@ -62,6 +62,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['price'] = item.product.price
+                _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = _item[0]['quantity'] + 1
                 cart_item_list.append(_dict)
             else:
@@ -69,6 +70,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['price'] = item.product.price
+                _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = item.quantity
                 cart_item_list.append(_dict)
         return JsonResponse(cart_item_list, safe=False)

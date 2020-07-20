@@ -17,6 +17,9 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from grocery60_be import views, viewsets
+from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
+
 
 
 router = routers.DefaultRouter()
@@ -43,5 +46,6 @@ urlpatterns = [
     path('webhook/payment/', views.PaymentWebhookView.as_view()), 
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
-    path('tax/', views.TaxCalView.as_view()),
+    path('fee/', views.FeeCalView.as_view()),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]

@@ -68,6 +68,7 @@ class Product(models.Model):
     image = models.FileField(
         blank=True
     )
+    tax_exempt = models.BooleanField(blank=True, default=False)
 
     def search_catalog(self, search_key, store_id):
         if search_key and store_id:
@@ -248,8 +249,12 @@ class ShippingAddress(models.Model):
 
 
 def get_tax(state):
-    tax = Tax.objects.filter(state=state)
-    return Decimal(tax[0].tax)
+    tax = Tax.objects.filter(state=state).first()
+    return Decimal(tax.tax)
+
+
+def get_discount(customer_id):
+    return Decimal('0')
 
 
 class Order(models.Model):
@@ -362,7 +367,9 @@ class OrderPayment(models.Model):
             order_payment.updated_at = datetime.now()
             order_payment.save()
         except Exception as e:
-            raise Exception('Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(e))
+            raise Exception(
+                'Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(
+                    e))
         return order_payment.id
 
     class Meta:

@@ -1,5 +1,8 @@
 import decimal
+import traceback
 from decimal import Decimal
+
+from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models
 from grocery60_be.models import OrderPayment, Email, BillingAddress
@@ -12,17 +15,27 @@ from rest_framework.response import Response
 from rest_auth.views import LoginView
 
 
-class TaxCalView(APIView):
+class FeeCalView(APIView):
     def post(self, request, *args, **kwargs):
         data = JSONParser().parse(request)
         sub_total = data.get('sub_total')
+        no_tax_total = data.get('no_tax_total')
+        tip = data.get('tip')
         customer_id = data.get('customer_id')
-        address = BillingAddress.objects.filter(customer_id=customer_id)
-        print('state', address[0].state)
+        address = BillingAddress.objects.filter(customer_id=customer_id).first()
+        print('state', address.state)
         cents = Decimal('.01')
-        total = Decimal(sub_total) * models.get_tax(address[0].state) + Decimal(sub_total)
+        tip = Decimal(sub_total) * Decimal('0.05') if tip is None else Decimal(tip)
+        tip = tip.quantize(cents, decimal.ROUND_HALF_UP)
+        tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
+        tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
+        discount = Decimal(models.get_discount(customer_id))
+        discount = discount.quantize(cents, decimal.ROUND_HALF_UP)
+        sub_total = Decimal(sub_total) + Decimal(no_tax_total)
+        sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
+        total = Decimal(sub_total) + tax + tip - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
-        return Response({'total': total})
+        return Response({'sub_total': sub_total, 'total': total, 'tax': tax, 'tip': tip, 'discount': discount})
 
 
 class CustomLoginView(LoginView):
@@ -50,12 +63,11 @@ class CatalogSearchView(APIView):
 
 class PaymentView(APIView):
     def post(self, request):
-
         data = JSONParser().parse(request)
         order_id = data.get('metadata').get('order_id')
         # view is not fat but payload is fat...sorry payment view
         intent = stripe.PaymentIntent.create(
-            amount=data.get('amount'),
+            amount=data.get('amount') * 100,  # convert to cents
             currency=data.get('currency'),
             receipt_email=data.get('receipt_email'),
             confirmation_method='automatic',
@@ -87,6 +99,8 @@ class PaymentView(APIView):
             }
         )
 
+        print('stripe.PaymentIntent.create success with intent ' + intent.get('id'))
+
         intent = stripe.PaymentIntent.retrieve(
             intent.get('id')
         )
@@ -102,6 +116,9 @@ class PaymentView(APIView):
             raise Exception('Order Payment failed for Order = ' + order_id)
 
 
+# Stripe can call without auth
+@authentication_classes([])
+@permission_classes([])
 class PaymentWebhookView(APIView):
     def post(self, request):
         payload = JSONParser().parse(request)
@@ -125,7 +142,7 @@ class PaymentWebhookView(APIView):
             return JsonResponse(response_dict, status=400)
         '''
         event_dict = payload
-        #event_dict = event.to_dict()
+        # event_dict = event.to_dict()
         if event_dict['type'] == "payment_intent.succeeded":
             intent = event_dict['data']['object']
             print("Succeeded: ", intent['id'])
@@ -143,3 +160,17 @@ class PaymentWebhookView(APIView):
         OrderPayment().update_payment(intent['id'], event_dict['type'])
         print("Database Update Succeeded: ", intent['id'])
         return JsonResponse(event_dict, status=200)
+
+
+# views.py
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from graphene_django.views import GraphQLView
+
+'''
+@authentication_classes([])
+@permission_classes([])
+class PrivateGraphQLView(GraphQLView):
+    print('Enter')
+    pass
+'''
