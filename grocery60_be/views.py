@@ -3,11 +3,13 @@ import decimal
 import traceback
 from decimal import Decimal
 
+from django.contrib.auth import hashers
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models
-from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer
+from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -39,7 +41,22 @@ class FeeCalView(APIView):
         total = Decimal(sub_total) + tax + tip + service_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
         return Response({'sub_total': sub_total, 'tax': tax, 'tip': tip, 'service_fee': service_fee,
-                        'discount': discount,'total': total})
+                         'discount': discount, 'total': total})
+
+
+class StoreLoginView(APIView):
+    def post(self, request):
+        data = JSONParser().parse(request)
+        username = data.get('username')
+        password = data.get('password')
+        store_admin = StoreAdmin.objects.filter(username=username).first()
+        valid = hashers.check_password(password,store_admin.password)
+        if valid:
+            data = {'message': 'success'}
+            return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
+        else:
+            data = {'message': 'failure'}
+            return JsonResponse(data=data, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 class CustomLoginView(LoginView):
@@ -93,10 +110,9 @@ class PaymentView(APIView):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             loop.run_until_complete(email_send.send_email(email, 'order_cancellation.html'))
-            return JsonResponse(data='',status=status.HTTP_204_NO_CONTENT, safe=False)
+            return JsonResponse(data='', status=status.HTTP_204_NO_CONTENT, safe=False)
         else:
             raise Exception('Order Cancellation failed for Order = ', order_id)
-
 
     def post(self, request):
         data = JSONParser().parse(request)

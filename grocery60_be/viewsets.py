@@ -1,6 +1,7 @@
 import asyncio
 from decimal import Decimal
 
+from django.contrib.auth import hashers
 from django.contrib.auth.models import User
 from django.db.models import Count
 from rest_framework import viewsets
@@ -11,10 +12,11 @@ from grocery60_be import email as email_send
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
-    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer
+    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer, \
+    StoreAdminSerializer
 
 
 class UserViewset(viewsets.ModelViewSet):
@@ -134,6 +136,18 @@ class CatalogViewset(viewsets.ModelViewSet):
         if isinstance(kwargs.get("data", {}), list):
             kwargs["many"] = True
         return super(CatalogViewset, self).get_serializer(*args, **kwargs)
+
+
+class StoreAdminViewset(viewsets.ModelViewSet):
+    queryset = StoreAdmin.objects.all()
+    serializer_class = StoreAdminSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['store_id', 'username', 'password']
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            password = hashers.make_password(serializer.validated_data.get('password'))
+            serializer.save(password=password)
 
 
 class StoreViewset(viewsets.ModelViewSet):

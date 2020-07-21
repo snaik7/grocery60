@@ -20,22 +20,21 @@ from grocery60_be import views, viewsets
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
-
-
 router = routers.DefaultRouter()
-router.register('cart',viewsets.CartViewset)
-router.register('cart-item',viewsets.CartItemViewset)
-router.register('catalog',viewsets.CatalogViewset)
-router.register('store',viewsets.StoreViewset)
-router.register('customer',viewsets.CustomerViewset)
-router.register('billing',viewsets.BillingAddressViewset)
-router.register('shipping',viewsets.ShippingAddressViewset)
-router.register('order',viewsets.OrderViewset)
-router.register('order-item',viewsets.OrderItemViewset)
-router.register('delivery',viewsets.DeliveryViewset)
-router.register('shipping-method',viewsets.ShippingMethodViewset)
-router.register('order-payment',viewsets.OrderPaymentViewset)
-router.register('user',viewsets.UserViewset)
+router.register('cart', viewsets.CartViewset)
+router.register('cart-item', viewsets.CartItemViewset)
+router.register('catalog', viewsets.CatalogViewset)
+router.register('store', viewsets.StoreViewset)
+router.register('customer', viewsets.CustomerViewset)
+router.register('billing', viewsets.BillingAddressViewset)
+router.register('shipping', viewsets.ShippingAddressViewset)
+router.register('order', viewsets.OrderViewset)
+router.register('order-item', viewsets.OrderItemViewset)
+router.register('delivery', viewsets.DeliveryViewset)
+router.register('shipping-method', viewsets.ShippingMethodViewset)
+router.register('order-payment', viewsets.OrderPaymentViewset)
+router.register('user', viewsets.UserViewset)
+router.register('storeadmin', viewsets.StoreAdminViewset)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,9 +43,10 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('payment/', views.PaymentView.as_view()),
     path('payment/<int:order_id>', views.PaymentView.as_view()),
-    path('webhook/payment/', views.PaymentWebhookView.as_view()), 
+    path('webhook/payment/', views.PaymentWebhookView.as_view()),
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
+    path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]

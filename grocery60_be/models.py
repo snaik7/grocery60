@@ -4,7 +4,6 @@ from datetime import datetime
 from decimal import Decimal
 import asyncio
 
-
 from django.db import models, connection
 from django.contrib.auth.models import User
 from grocery60_be import email as email_send
@@ -49,6 +48,34 @@ class Store(models.Model):
 
     class Meta:
         db_table = "store"
+
+
+class StoreAdmin(models.Model):
+    username = models.CharField(
+        max_length=50,
+        unique=True,
+    )
+    password = models.CharField(
+        max_length=128
+    )
+    phone_number = models.CharField(
+        max_length=128
+    )
+    email = models.CharField(
+        max_length=100
+    )
+    secret = models.CharField(
+        max_length=150
+    )
+    status = models.CharField(
+        max_length=10
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "storeadmin"
 
 
 class Product(models.Model):
@@ -363,11 +390,10 @@ class OrderPayment(models.Model):
 
     def send_success_email(self, email):
         print('data received ' + email.order_id)
-        print('data received ' , email.order_items_list)
+        print('data received ', email.order_items_list)
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(email_send.send_email(email, 'order_confirmation.html'))
-
 
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
@@ -455,8 +481,10 @@ class Email(models.Model):
         self.discount = order.discount
         self.total = order.total
 
-        self.order_items_list = list(OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
-                                                                'quantity', 'line_total'))
+        self.order_items_list = list(
+            OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
+                                                               'quantity', 'line_total'))
+
 
 class Tax(models.Model):
     state = models.CharField(
