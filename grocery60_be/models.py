@@ -1,6 +1,9 @@
 import decimal
+import threading
 from datetime import datetime
 from decimal import Decimal
+import asyncio
+
 
 from django.db import models, connection
 from django.contrib.auth.models import User
@@ -361,28 +364,35 @@ class OrderPayment(models.Model):
     def send_success_email(self, email):
         print('data received ' + email.order_id)
         print('data received ' , email.order_items_list)
-        email_send.send_email(email, 'order_confirmation.html')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'order_confirmation.html'))
+
 
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
         email = Email()
-        email.action = "failure"
+        email.subject = "Order failure for Grocery 60"
         email.email = customer.email
         email.order_id = order_payment.order_id
-        email_send.send_email(email, 'order_payment_failure.html')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'order_payment_failure.html'))
 
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
         email = Email()
-        email.action = "Confirmation"
+        email.subject = "Order Confirmation for Grocery 60"
         email.email = customer.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
-        email_send.send_email(email, 'store_order_confirmation.html')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'store_order_confirmation.html'))
 
     def update_payment(self, transaction_id, status):
         try:
@@ -428,7 +438,8 @@ class Delivery(models.Model):
 
 
 class Email(models.Model):
-    action = models.TextField()
+    subject = models.TextField()
+    first_name = ''
     order_items_list = []
     username = models.TextField()
     email = models.TextField()

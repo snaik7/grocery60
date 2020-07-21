@@ -1,11 +1,13 @@
+import asyncio
 import decimal
 import traceback
 from decimal import Decimal
 
+from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models
-from grocery60_be.models import OrderPayment, Email, BillingAddress
+from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -13,6 +15,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_auth.views import LoginView
+from grocery60_be import email as email_send
 
 
 class FeeCalView(APIView):
@@ -63,6 +66,38 @@ class CatalogSearchView(APIView):
 
 
 class PaymentView(APIView):
+
+    def delete(self, request, order_id):
+        print('order id cancellation', order_id)
+        order_payment = OrderPayment.objects.filter(order_id=order_id).first()
+        print(order_payment.transaction_id)
+        try:
+            # To cancel a PaymentIntent
+            intent = stripe.PaymentIntent.cancel(
+                order_payment.transaction_id)
+        except stripe.error.StripeError as e:
+            # Display a very generic error to the user, and maybe send
+            # yourself an email
+            raise Exception('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
+                            'and we will reply you in 24 hours. '.format(order_id))
+
+        if intent.get('status') == 'canceled':
+            order_payment.status = 'Cancelled'
+            order_payment.save()
+            # Send email for order cancellation
+            email = Email()
+            email.subject = "Order cancellation for Grocery 60"
+            customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
+            email.email = customer.email
+            email.order_id = order_payment.order_id
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(email_send.send_email(email, 'order_cancellation.html'))
+            return JsonResponse(data='',status=status.HTTP_204_NO_CONTENT, safe=False)
+        else:
+            raise Exception('Order Cancellation failed for Order = ', order_id)
+
+
     def post(self, request):
         data = JSONParser().parse(request)
         order_id = data.get('metadata').get('order_id')
@@ -108,7 +143,7 @@ class PaymentView(APIView):
 
         if OrderPayment().record_payment(data, intent):
             recipient_email = Email()
-            recipient_email.action = "Confirmation"
+            recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
             recipient_email.order_id = order_id
             recipient_email.set_order(order_id)
@@ -148,4 +183,4 @@ class PaymentWebhookView(APIView):
             OrderPayment().update_payment(intent['id'], event_dict['type'])
             print("Database Update Succeeded: ", intent['id'])
 
-        return JsonResponse(event_dict, status=200)
+        return JsonResponse(event_dict, status=status.HTTP_200_OK)

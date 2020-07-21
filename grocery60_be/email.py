@@ -1,9 +1,17 @@
+import asyncio
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 
-def send_email(email, template):
-    print('*********************** email send template sratrted ***********************')
+async def send_email(email, template):
+    # Fire and Forget email
+    asyncio.ensure_future(_send_email(email, template))
+    print('Fire and Forget')
+
+
+async def _send_email(email, template):
+    print('*********************** email send template started ***********************')
     """
     Handles password reset tokens
     When a token is created, an e-mail needs to be sent to the user
@@ -17,6 +25,7 @@ def send_email(email, template):
     # send an e-mail to the user
     context = {
         'order_id': email.order_id,
+        'first_name': email.first_name,
         'email': email.email,
         'order_items_list': email.order_items_list,
         'subtotal': email.subtotal,
@@ -32,7 +41,7 @@ def send_email(email, template):
 
     msg = EmailMultiAlternatives(
         # title:
-        "Order {action} for Grocery60  ".format(action=email.action),
+        " {subject}".format(subject=email.subject),
         # message:
         email_message,
         # from:

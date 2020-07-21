@@ -1,3 +1,4 @@
+import asyncio
 from decimal import Decimal
 
 from django.contrib.auth.models import User
@@ -6,11 +7,11 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
-from rest_framework.serializers import ListSerializer
+from grocery60_be import email as email_send
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
     OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer
@@ -21,6 +22,17 @@ class UserViewset(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['username']
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save()
+        email = Email()
+        email.subject = "Welcome to Grocery 60 !!!"
+        email.email = serializer.data.get('email')
+        email.first_name = serializer.data.get('first_name')
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'registration.html'))
 
 
 class CartViewset(viewsets.ModelViewSet):
