@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db.models import Count
 from rest_framework import viewsets
@@ -53,6 +55,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         print(cart_item.query)
         cart_item_list = []
         count = 0
+        line_total = Decimal(0)
         for item in cart_item:
             _dict = {}
             product_id_list = [_item['product_id'] for _item in cart_item_list]
@@ -66,6 +69,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = _item[0]['quantity'] + 1
+                _dict['line_total'] = _dict['quantity'] * Decimal(_dict['price'])
                 cart_item_list.append(_dict)
             else:
                 _dict['cart_id'] = item.cart.id
@@ -74,6 +78,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = item.quantity
+                _dict['line_total'] = _dict['quantity'] * Decimal(_dict['price'])
                 cart_item_list.append(_dict)
         return JsonResponse(cart_item_list, safe=False)
 

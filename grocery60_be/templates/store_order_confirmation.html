@@ -1,12 +1,65 @@
+<br>
 Dear Sir/Madam
 <br>
 You're receiving this email because  order #{{order_id}} is confirmed in grocery 60 for fulfillment from your shop
 <br>
 
-You can view your order details at <a href="https://www.grocery60.com/">
+You can view your order details at <a href="https://www.grocery60.online/">
     Grocery 60 </a>
 
-
+<br>
+<table border="1">
+    <tr>
+        <td>Prodcut Name</td>
+        <td>Price</td>
+        <td>Quantity</td>
+        <td>Total</td>
+    </tr>
+{% for item in order_items_list %}
+    <tr>
+        <td>{{ item.product__product_name }}</td>
+        <td>{{ item.product__price }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.line_total }}</td>
+    </tr>
+{% endfor %}
+    <tr>
+        <td></td>
+        <td></td>
+        <td>Subtotal</td>
+        <td>{{ subtotal }}</td>
+    </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>Tax</td>
+        <td>{{ tax }}</td>
+    </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>Tip</td>
+        <td>{{ tip }}</td>
+    </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>Grocery 60 Service Fee</td>
+        <td>{{ service_fee }}</td>
+    </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>Discount</td>
+        <td>{{ discount }}</td>
+    </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>Total</td>
+        <td>{{ total }}</td>
+    </tr>
+</table>
 <br>
 Thank you for using our services !
 <br>

@@ -18,6 +18,13 @@ def send_email(email, template):
     context = {
         'order_id': email.order_id,
         'email': email.email,
+        'order_items_list': email.order_items_list,
+        'subtotal': email.subtotal,
+        'tax': email.tax,
+        'discount': email.discount,
+        'tip': email.tip,
+        'service_fee': email.service_fee,
+        'total': email.total
     }
 
     # render email text
@@ -25,11 +32,11 @@ def send_email(email, template):
 
     msg = EmailMultiAlternatives(
         # title:
-        "Order Confirmation for {title}".format(title="Grocery60"),
+        "Order {action} for Grocery60  ".format(action=email.action),
         # message:
         email_message,
         # from:
-        "admin@grocery60.com",
+        "no-reply@grocery60.online",
         # to:
         [email.email]
     )

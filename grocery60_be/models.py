@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.db import models, connection
 from django.contrib.auth.models import User
 from grocery60_be import email as email_send
-from grocery60_be import  settings
+from grocery60_be import settings
 
 
 class Store(models.Model):
@@ -267,7 +267,7 @@ def get_discount(customer_id, sub_total):
 
 
 def get_service_fee(sub_total):
-    service_fee = Decimal(settings.SERVICE_FEE)/Decimal(100) * Decimal(sub_total)
+    service_fee = Decimal(settings.SERVICE_FEE) / Decimal(100) * Decimal(sub_total)
     service_fee = Decimal(2) if service_fee < 2 else service_fee
     cents = Decimal('.01')
     service_fee = service_fee.quantize(cents, decimal.ROUND_HALF_UP)
@@ -282,6 +282,10 @@ class Order(models.Model):
         max_length=7
     )
     subtotal = models.DecimalField(max_digits=6, decimal_places=2)
+    tip = models.DecimalField(max_digits=6, decimal_places=2)
+    service_fee = models.DecimalField(max_digits=6, decimal_places=2)
+    tax = models.DecimalField(max_digits=6, decimal_places=2)
+    discount = models.DecimalField(max_digits=6, decimal_places=2)
     total = models.DecimalField(max_digits=6, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -356,6 +360,7 @@ class OrderPayment(models.Model):
 
     def send_success_email(self, email):
         print('data received ' + email.order_id)
+        print('data received ' , email.order_items_list)
         email_send.send_email(email, 'order_confirmation.html')
 
     def send_failure_email(self, transaction_id):
@@ -363,6 +368,7 @@ class OrderPayment(models.Model):
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
         email = Email()
+        email.action = "failure"
         email.email = customer.email
         email.order_id = order_payment.order_id
         email_send.send_email(email, 'order_payment_failure.html')
@@ -372,8 +378,10 @@ class OrderPayment(models.Model):
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
         email = Email()
+        email.action = "Confirmation"
         email.email = customer.email
         email.order_id = order_payment.order_id
+        email.set_order(email.order_id)
         email_send.send_email(email, 'store_order_confirmation.html')
 
     def update_payment(self, transaction_id, status):
@@ -420,10 +428,24 @@ class Delivery(models.Model):
 
 
 class Email(models.Model):
+    action = models.TextField()
+    order_items_list = []
     username = models.TextField()
     email = models.TextField()
     order_id = models.TextField()
+    subtotal, tax, discount, service_fee, tip, total = 0, 0, 0, 0, 0, 0
 
+    def set_order(self, order_id):
+        order = Order.objects.get(pk=order_id)
+        self.subtotal = order.subtotal
+        self.tax = order.tax
+        self.service_fee = order.service_fee
+        self.tip = order.tip
+        self.discount = order.discount
+        self.total = order.total
+
+        self.order_items_list = list(OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
+                                                                'quantity', 'line_total'))
 
 class Tax(models.Model):
     state = models.CharField(

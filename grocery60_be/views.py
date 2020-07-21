@@ -108,8 +108,10 @@ class PaymentView(APIView):
 
         if OrderPayment().record_payment(data, intent):
             recipient_email = Email()
+            recipient_email.action = "Confirmation"
             recipient_email.email = data.get('receipt_email')
             recipient_email.order_id = order_id
+            recipient_email.set_order(order_id)
             order_payment = OrderPayment()
             order_payment.send_success_email(recipient_email)
             return JsonResponse(intent)
