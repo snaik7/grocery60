@@ -3,8 +3,9 @@ from decimal import Decimal
 
 from django.contrib.auth import hashers
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.db.models import Count
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
@@ -77,6 +78,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.id]
                 print(_item[0])
                 cart_item_list.remove(_item[0])
+                _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
@@ -86,6 +88,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['line_total'] = _dict['quantity'] * Decimal(_dict['price'])
                 cart_item_list.append(_dict)
             else:
+                _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
@@ -142,7 +145,7 @@ class StoreAdminViewset(viewsets.ModelViewSet):
     queryset = StoreAdmin.objects.all()
     serializer_class = StoreAdminSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['store_id', 'username', 'password']
+    filterset_fields = ['store_id', 'username']
 
     def perform_create(self, serializer):
         if serializer.is_valid():
@@ -162,6 +165,24 @@ class StoreViewset(viewsets.ModelViewSet):
         if isinstance(kwargs.get("data", {}), list):
             kwargs["many"] = True
         return super(StoreViewset, self).get_serializer(*args, **kwargs)
+
+    '''Don't support bulk update'''
+    def update(self, request, pk):
+        serializer = StoreSerializer(data=request.data)
+        store = None
+        if serializer.is_valid():
+            store = Store.objects.get(id=pk)
+            if serializer.validated_data.get('image'):
+                store.image = serializer.validated_data.get('image')
+            else:
+                store.image = ContentFile(store.image)
+            store.media = serializer.validated_data.get('media') if serializer.validated_data.get('media') else store.media
+            store.save()
+
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print(serializer.errors)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BillingAddressViewset(viewsets.ModelViewSet):
