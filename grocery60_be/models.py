@@ -80,8 +80,7 @@ class StoreAdmin(models.Model):
 
 class Product(models.Model):
     product_name = models.CharField(
-        max_length=50,
-        #        unique=True,
+        max_length=50
     )
     product_url = models.CharField(
         max_length=200
@@ -91,7 +90,8 @@ class Product(models.Model):
     )
     price = models.DecimalField(max_digits=6, decimal_places=2)
     media = models.CharField(
-        max_length=500
+        max_length=500,
+        blank=True
     )
     caption = models.CharField(
         max_length=100

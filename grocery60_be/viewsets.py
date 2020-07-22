@@ -140,6 +140,25 @@ class CatalogViewset(viewsets.ModelViewSet):
             kwargs["many"] = True
         return super(CatalogViewset, self).get_serializer(*args, **kwargs)
 
+    '''Don't support bulk update'''
+    def update(self, request, pk):
+        serializer = CatalogSerializer(data=request.data)
+        product = None
+        if serializer.is_valid():
+            product = Product.objects.get(id=pk)
+            if serializer.validated_data.get('image'):
+                product.image = serializer.validated_data.get('image')
+            else:
+                product.image = ContentFile(product.image)
+            product.extra = serializer.validated_data.get('extra') if serializer.validated_data.get('extra') else product.extra
+            product.media = serializer.validated_data.get('media') if serializer.validated_data.get('media') else product.media
+            product.save()
+            serializer = CatalogSerializer(product)
+            return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print(serializer.errors)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class StoreAdminViewset(viewsets.ModelViewSet):
     queryset = StoreAdmin.objects.all()
@@ -178,7 +197,7 @@ class StoreViewset(viewsets.ModelViewSet):
                 store.image = ContentFile(store.image)
             store.media = serializer.validated_data.get('media') if serializer.validated_data.get('media') else store.media
             store.save()
-
+            serializer = CatalogSerializer(store)
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
