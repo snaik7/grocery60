@@ -1,4 +1,5 @@
 import asyncio
+import decimal
 from decimal import Decimal
 
 from django.contrib.auth import hashers
@@ -240,7 +241,9 @@ class OrderItemViewset(viewsets.ModelViewSet):
             print(data)
             product = Product.objects.get(id=data.get('product_id'))
             order = Order.objects.get(id=data.get('order_id'))
-            line_total = product.price * data.get('quantity')
+            cents = Decimal('.01')
+            line_total = product.price * Decimal(data.get('quantity'))
+            line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
             OrderItem.objects.create(product_id=product.id, order_id=order.id, extra=data.get('extra'),
                                      line_total=line_total,
                                      quantity=data.get('quantity'), canceled=data.get('canceled'))
