@@ -120,9 +120,11 @@ class PaymentView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         order_id = data.get('metadata').get('order_id')
+        amount = Decimal(data.get('amount')) * 100  # convert to cents
+        print('amount', amount)
         # view is not fat but payload is fat...sorry payment view
         intent = stripe.PaymentIntent.create(
-            amount=data.get('amount') * 100,  # convert to cents
+            amount=amount,  # convert to cents
             currency=data.get('currency'),
             receipt_email=data.get('receipt_email'),
             confirmation_method='automatic',
