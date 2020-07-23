@@ -19,6 +19,8 @@ from rest_framework import routers
 from grocery60_be import views, viewsets
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
+from graphql_jwt.decorators import jwt_cookie
+
 
 router = routers.DefaultRouter()
 router.register('cart', viewsets.CartViewset)
@@ -48,5 +50,5 @@ urlpatterns = [
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path('graphql/', jwt_cookie(csrf_exempt(GraphQLView.as_view(graphiql=True)))),
 ]

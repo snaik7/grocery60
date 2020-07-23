@@ -1,6 +1,8 @@
-from graphene import ObjectType, Schema
+from graphene import ObjectType, Schema, Mutation
 
 from grocery60_be.graphql.schema import Query
+
+import graphql_jwt
 
 
 class Query(Query, ObjectType):
@@ -10,4 +12,4 @@ class Query(Query, ObjectType):
 
 
 schema = Schema(query=Query)
-# schema = Schema(query=Query, mutation=Mutation)
+#schema = Schema(query=Query, mutation=Mutation)
