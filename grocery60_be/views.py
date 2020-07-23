@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models
-from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin
+from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin, Order
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -50,7 +50,7 @@ class StoreLoginView(APIView):
         username = data.get('username')
         password = data.get('password')
         store_admin = StoreAdmin.objects.filter(username=username).first()
-        valid = hashers.check_password(password,store_admin.password)
+        valid = hashers.check_password(password, store_admin.password)
         if valid:
             data = {'message': 'success'}
             return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
@@ -63,7 +63,7 @@ class CustomLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data.get('key'))
-        return Response({'token': token.key, 'id': token.user_id})
+        return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
 
 
 class CustomerPaymentView(APIView):
@@ -101,6 +101,9 @@ class PaymentView(APIView):
         if intent.get('status') == 'canceled':
             order_payment.status = 'Cancelled'
             order_payment.save()
+            order = Order.objects.get(id=order_id)
+            order.status = 'Cancelled'
+            order.save()
             # Send email for order cancellation
             email = Email()
             email.subject = "Order cancellation for Grocery 60"

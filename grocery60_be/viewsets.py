@@ -82,6 +82,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['cart_id'] = item.cart.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
+                _dict['product_url'] = item.product.product_url
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = _item[0]['quantity'] + 1
@@ -92,6 +93,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['cart_id'] = item.cart.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
+                _dict['product_url'] = item.product.product_url
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = item.quantity

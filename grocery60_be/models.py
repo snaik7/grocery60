@@ -70,6 +70,7 @@ class StoreAdmin(models.Model):
     status = models.CharField(
         max_length=10
     )
+    is_superuser = models.BooleanField(blank=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
@@ -180,9 +181,6 @@ class Customer(models.Model):
     )
     phone_number = models.CharField(
         max_length=128
-    )
-    email = models.CharField(
-        max_length=100
     )
 
     class Meta:
@@ -427,6 +425,14 @@ class OrderPayment(models.Model):
             order_payment.status = status
             order_payment.updated_at = datetime.now()
             order_payment.save()
+            if status == "payment_intent.succeeded":
+                order = Order.objects.get(id=order_payment.order_id).first()
+                order.status = 'Ready to fulfill'
+                order.save()
+            elif status == "payment_intent.payment_failed":
+                order = Order.objects.get(id=order_payment.order_id).first()
+                order.status = 'Payment failure'
+                order.save()
         except Exception as e:
             raise Exception(
                 'Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(
