@@ -87,7 +87,9 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = _item[0]['quantity'] + 1
-                _dict['line_total'] = _dict['quantity'] * Decimal(_dict['price'])
+                _dict['line_total'] = Decimal(_dict['quantity']) * Decimal(_dict['price'])
+                cents = Decimal('.01')
+                _dict['line_total']  = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
                 cart_item_list.append(_dict)
             else:
                 _dict['cart_item_id'] = item.id
@@ -98,7 +100,9 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = item.quantity
-                _dict['line_total'] = _dict['quantity'] * Decimal(_dict['price'])
+                _dict['line_total'] = Decimal(_dict['quantity']) * Decimal(_dict['price'])
+                cents = Decimal('.01')
+                _dict['line_total'] = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
                 cart_item_list.append(_dict)
         return JsonResponse(cart_item_list, safe=False)
 
