@@ -49,7 +49,7 @@ def grocery60_exception_handler(exc, context):
     print(' Error Type ', type(exc))
     # set status_code by category of the exception you caught
     if isinstance(exc, ERRORS_400):
-        if exc.__dict__.get('detail').get('non_field_errors')[0] == "Unable to log in with provided credentials.":
+        if not exc.__dict__ and exc.__dict__.get('detail').get('non_field_errors')[0] == "Unable to log in with provided credentials.":
             status_code = 401
         else:
             status_code = 400
