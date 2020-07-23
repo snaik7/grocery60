@@ -1,8 +1,6 @@
-from graphene import ObjectType, Schema, Mutation
-
+from graphene import ObjectType, Schema
 from grocery60_be.graphql.schema import Query
 
-import graphql_jwt
 
 
 class Query(Query, ObjectType):

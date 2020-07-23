@@ -1,9 +1,6 @@
 import graphene
 from graphql import GraphQLError
-from graphql_jwt.decorators import login_required
-from django.contrib.auth.models import User
 from graphene_django.types import DjangoObjectType
-from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be.models import Store, Product
 from grocery60_be import settings
