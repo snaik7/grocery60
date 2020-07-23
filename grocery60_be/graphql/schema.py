@@ -26,16 +26,16 @@ def validate_token(token):
 
 
 class Query:
-    stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String(required=True))
-    store = graphene.Field(StoreType, id=graphene.String(), token=graphene.String(required=True))
+    stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
+    store = graphene.Field(StoreType, id=graphene.String(), token=graphene.String())
     store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
-                                 token=graphene.String(required=True))
+                                 token=graphene.String())
 
-    products = graphene.List(ProductType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String(required=True))
-    product = graphene.Field(ProductType, id=graphene.String(), token=graphene.String(required=True))
+    products = graphene.List(ProductType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
+    product = graphene.Field(ProductType, id=graphene.String(), token=graphene.String())
     product_search = graphene.List(ProductType, category=graphene.String(), product_name=graphene.String(),
                                    extra=graphene.String(), store_id=graphene.Int(), first=graphene.Int(),
-                                   skip=graphene.Int(), token=graphene.String(required=True))
+                                   skip=graphene.Int(), token=graphene.String())
 
     def resolve_stores(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
