@@ -68,7 +68,7 @@ class CustomLoginView(LoginView):
 
 class CustomerPaymentView(APIView):
     def get(self, request, customer_id):
-        query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id)
+        query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by('-id')
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
 
