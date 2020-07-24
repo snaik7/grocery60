@@ -403,9 +403,10 @@ class OrderPayment(models.Model):
             transaction_id = intent.get('id')
             payment_method = 'card'
             order_id = data.get('metadata').get('order_id')
+            store_id = data.get('metadata').get('store_id')
             status = intent.get('status')
             order_payment = OrderPayment(amount=amount, transaction_id=transaction_id, payment_method=payment_method,
-                                         order_id=order_id, status=status)
+                                         order_id=order_id, status=status, store_id=store_id)
             order_payment.save()
         except Exception as e:
             raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))

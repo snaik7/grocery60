@@ -34,9 +34,11 @@ router.register('order', viewsets.OrderViewset)
 router.register('order-item', viewsets.OrderItemViewset)
 router.register('delivery', viewsets.DeliveryViewset)
 router.register('shipping-method', viewsets.ShippingMethodViewset)
+# this router is not in use
 router.register('order-payment', viewsets.OrderPaymentViewset)
 router.register('user', viewsets.UserViewset)
 router.register('storeadmin', viewsets.StoreAdminViewset)
+
 
 handler400 = 'grocery60_be.views.bad_request'
 handler401 = 'grocery60_be.views.permission_denied'
@@ -50,6 +52,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('customer-payment/<int:customer_id>', views.CustomerPaymentView.as_view()),
     path('rest-auth/', include('rest_auth.urls')),
+    path('order-detail/', views.OrderDetailView.as_view()),
     path('payment/', views.PaymentView.as_view()),
     path('payment/<int:order_id>', views.PaymentView.as_view()),
     path('webhook/payment/', views.PaymentWebhookView.as_view()),

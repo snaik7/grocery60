@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models
-from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin, Order
+from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin, Order, Product, OrderItem
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -16,6 +16,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_auth.views import LoginView
 from grocery60_be import email as email_send
+from grocery60_be.serializers import OrderSerializer
 
 
 class FeeCalView(APIView):
@@ -124,6 +125,7 @@ class PaymentView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         order_id = data.get('metadata').get('order_id')
+        store_id = data.get('metadata').get('store_id')
         amount = Decimal(data.get('amount')) * 100  # convert to cents
         cents = Decimal('0')
         amount = amount.quantize(cents, decimal.ROUND_HALF_UP)
@@ -211,6 +213,30 @@ class PaymentWebhookView(APIView):
             print("Database Update Succeeded: ", intent['id'])
 
         return JsonResponse(event_dict, status=status.HTTP_200_OK)
+
+
+class OrderDetailView(APIView):
+
+    def post(self, request):
+        data = request.data
+        serializer = OrderSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+
+        items = data.get('items')
+
+        for item in items:
+            print(data)
+            product = Product.objects.get(id=item.get('product_id'))
+            order = Order.objects.get(id=item.get('order_id'))
+            cents = Decimal('.01')
+            line_total = product.price * Decimal(item.get('quantity'))
+            line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
+            OrderItem.objects.create(product_id=product.id, order_id=order.id, extra=item.get('extra'),
+                                     line_total=line_total,
+                                     quantity=item.get('quantity'), canceled=item.get('canceled'))
+
+        return JsonResponse(serializer.data, safe=False)
 
 
 # Error Pages

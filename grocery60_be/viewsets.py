@@ -90,7 +90,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['quantity'] = _item[0]['quantity'] + item.quantity
                 _dict['line_total'] = Decimal(_dict['quantity']) * Decimal(_dict['price'])
                 cents = Decimal('.01')
-                _dict['line_total']  = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
+                _dict['line_total'] = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
                 cart_item_list.append(_dict)
             else:
                 _dict['cart_item_id'] = item.id
@@ -150,6 +150,7 @@ class CatalogViewset(viewsets.ModelViewSet):
         return super(CatalogViewset, self).get_serializer(*args, **kwargs)
 
     '''Don't support bulk update'''
+
     def update(self, request, pk):
         serializer = CatalogSerializer(data=request.data)
         product = None
@@ -159,8 +160,10 @@ class CatalogViewset(viewsets.ModelViewSet):
                 product.image = serializer.validated_data.get('image')
             else:
                 product.image = ContentFile(product.image)
-            product.extra = serializer.validated_data.get('extra') if serializer.validated_data.get('extra') else product.extra
-            product.media = serializer.validated_data.get('media') if serializer.validated_data.get('media') else product.media
+            product.extra = serializer.validated_data.get('extra') if serializer.validated_data.get(
+                'extra') else product.extra
+            product.media = serializer.validated_data.get('media') if serializer.validated_data.get(
+                'media') else product.media
             product.save()
             serializer = CatalogSerializer(product)
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)
@@ -195,6 +198,7 @@ class StoreViewset(viewsets.ModelViewSet):
         return super(StoreViewset, self).get_serializer(*args, **kwargs)
 
     '''Don't support bulk update'''
+
     def update(self, request, pk):
         serializer = StoreSerializer(data=request.data)
         store = None
@@ -226,6 +230,7 @@ class ShippingAddressViewset(viewsets.ModelViewSet):
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'state']
+
 
 
 class OrderViewset(viewsets.ModelViewSet):
@@ -261,7 +266,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
     queryset = OrderPayment.objects.all()
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['order_id','store_id']
+    filterset_fields = ['order_id', 'store_id']
 
 
 class ShippingMethodViewset(viewsets.ModelViewSet):

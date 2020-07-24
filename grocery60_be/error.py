@@ -49,8 +49,10 @@ def grocery60_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
     response = exception_handler(exc, context)
-    print(' Error Type ', type(exc), ' Response Status', response.status_code)
-    print(' Error Details ', str(exc))
+    if response:
+        print(' Error Type ', type(exc), ' ', str(exc), ' Response Status', response.status_code)
+    else:
+        print(' Error Details ', type(exc), ' ', str(exc))
     # set status_code by category of the exception you caught
     if isinstance(exc, ERRORS_400):
         print(' Error Status  400')
