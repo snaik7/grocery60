@@ -21,6 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
 
+
 router = routers.DefaultRouter()
 router.register('cart', viewsets.CartViewset)
 router.register('cart-item', viewsets.CartItemViewset)
@@ -37,6 +38,13 @@ router.register('order-payment', viewsets.OrderPaymentViewset)
 router.register('user', viewsets.UserViewset)
 router.register('storeadmin', viewsets.StoreAdminViewset)
 
+handler400 = 'grocery60_be.views.bad_request'
+handler401 = 'grocery60_be.views.permission_denied'
+handler403 = 'grocery60_be.views.permission_denied'
+handler404 = 'grocery60_be.views.not_found'
+handler500 = 'grocery60_be.views.server_error'
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
@@ -50,4 +58,5 @@ urlpatterns = [
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+
 ]

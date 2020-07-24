@@ -1,15 +1,17 @@
+import json
 import logging
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 import traceback
 from grocery60_be import settings
 from rest_framework.views import exception_handler
-from rest_framework.exceptions import NotAuthenticated, NotFound
+from rest_framework.exceptions import NotAuthenticated, NotFound, MethodNotAllowed
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework import exceptions
+from django.http.response import Http404, HttpResponseBadRequest, HttpResponseNotFound
 
 
 # define Python user-defined exceptions
-
 
 class ValidationError(Exception):
     """Raised when the input value is invalid"""
@@ -37,29 +39,30 @@ class ServiceException(Exception):
 
 
 # categorize your exceptions
-ERRORS_400 = (ValidationError, exceptions.ValidationError)
+ERRORS_400 = (
+ValidationError, exceptions.ValidationError, RestValidationError, HttpResponseBadRequest, MethodNotAllowed)
 ERRORS_401 = (AuthenticationError, NotAuthenticated)
-ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist)
+ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist, Http404, HttpResponseNotFound)
 
 
 def grocery60_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
     response = exception_handler(exc, context)
-    print(' Error Type ', type(exc), ' response ', response , 'response status', response.status_code)
+    print(' Error Type ', type(exc), ' Response Status', response.status_code)
+    print(' Error Details ', str(exc))
     # set status_code by category of the exception you caught
-    print(exc.detail)
-    print(exc.get_codes())
-    print(exc.get_full_details())
     if isinstance(exc, ERRORS_400):
-        print('dict__', exc.__dict__)
-        if not exc.__dict__ and exc.__dict__.get('detail').get('non_field_errors')[0] == "Unable to log in with provided credentials.":
+        print(' Error Status  400')
+        if str(exc).find('Unable to log in') > -1:
             status_code = 401
         else:
             status_code = 400
     elif isinstance(exc, ERRORS_401):
+        print(' Error Status  401')
         status_code = 401
     elif isinstance(exc, ERRORS_404):
+        print(' Error Status  404')
         status_code = 404
     else:
         # if the exception not belone to any one you expected,
@@ -67,13 +70,11 @@ def grocery60_exception_handler(exc, context):
         status_code = 500
         # you can do something like write an error log or send report mail here
         logging.error(exc)
-
     response_dict = {
         'status': 'error',
         # the format of error message determined by you base exception class
         'msg': str(exc)
     }
-
     if settings.DEBUG:
         # you can even get the traceback infomation when you are in debug mode
         # response_dict['traceback'] = traceback.format_exc()

@@ -1,10 +1,8 @@
 import asyncio
 import decimal
-import traceback
 from decimal import Decimal
 
 from django.contrib.auth import hashers
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
@@ -213,3 +211,28 @@ class PaymentWebhookView(APIView):
             print("Database Update Succeeded: ", intent['id'])
 
         return JsonResponse(event_dict, status=status.HTTP_200_OK)
+
+
+# Error Pages
+def bad_request(request, exception):
+    return JsonResponse({
+        "msg": "bad request"
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+def permission_denied(request, exception):
+    return JsonResponse({
+        "msg": "permission denied"
+    }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+def not_found(request, exception):
+    return JsonResponse({
+        "msg": "resource not found"
+    }, status=status.HTTP_404_NOT_FOUND)
+
+
+def server_error(request):
+    return JsonResponse({
+        "msg": "internal server error"
+    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
