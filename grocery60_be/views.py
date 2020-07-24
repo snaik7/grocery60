@@ -32,7 +32,7 @@ class FeeCalView(APIView):
         address = BillingAddress.objects.filter(customer_id=customer_id).first()
         print('state', address.state)
         tip = models.get_tip(tip, custom_tip, sub_total)
-        shipping_cost = models.get_shipping_cost(shipping_id) if shipping_id else Decimal('0')
+        shipping_fee = models.get_shipping_cost(shipping_id) if shipping_id else Decimal('0')
         cents = Decimal('.01')
         tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
         tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
@@ -40,10 +40,10 @@ class FeeCalView(APIView):
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
         service_fee = models.get_service_fee(sub_total)
         discount = models.get_discount(customer_id, sub_total)
-        total = Decimal(sub_total) + tax + tip + service_fee + shipping_cost - discount
+        total = Decimal(sub_total) + tax + tip + service_fee + shipping_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
         return Response({'sub_total': sub_total, 'tax': tax, 'tip': tip, 'service_fee': service_fee,
-                         'shipping_cost' : shipping_cost, 'discount': discount, 'total': total})
+                         'shipping_fee': shipping_fee, 'discount': discount, 'total': total})
 
 
 class StoreLoginView(APIView):

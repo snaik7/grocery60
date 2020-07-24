@@ -395,6 +395,7 @@ class OrderPayment(models.Model):
         max_length=200
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     def record_payment(self, data, intent):
         try:
@@ -432,10 +433,10 @@ class OrderPayment(models.Model):
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
-        customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
+        store = Store.objects.get(id=order_payment.store.id)
         email = Email()
         email.subject = "Order Confirmation for Grocery 60"
-        email.email = customer.email
+        email.email = store.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
         loop = asyncio.new_event_loop()
@@ -450,11 +451,11 @@ class OrderPayment(models.Model):
             order_payment.updated_at = datetime.now()
             order_payment.save()
             if status == "payment_intent.succeeded":
-                order = Order.objects.get(id=order_payment.order_id).first()
+                order = Order.objects.get(id=order_payment.order_id)
                 order.status = 'Ready to fulfill'
                 order.save()
             elif status == "payment_intent.payment_failed":
-                order = Order.objects.get(id=order_payment.order_id).first()
+                order = Order.objects.get(id=order_payment.order_id)
                 order.status = 'Payment failure'
                 order.save()
         except Exception as e:

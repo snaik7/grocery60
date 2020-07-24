@@ -77,7 +77,6 @@ class CartItemViewset(viewsets.ModelViewSet):
             product_id_list = [_item['product_id'] for _item in cart_item_list]
             if item.product.id in product_id_list:
                 _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.id]
-                print(_item[0])
                 cart_item_list.remove(_item[0])
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
@@ -86,7 +85,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['product_url'] = item.product.product_url
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
-                _dict['quantity'] = _item[0]['quantity'] + 1
+                _dict['quantity'] = _item[0]['quantity'] + item.quantity
                 _dict['line_total'] = Decimal(_dict['quantity']) * Decimal(_dict['price'])
                 cents = Decimal('.01')
                 _dict['line_total']  = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
@@ -258,7 +257,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
     queryset = OrderPayment.objects.all()
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['order_id']
+    filterset_fields = ['order_id','store_id']
 
 
 class ShippingMethodViewset(viewsets.ModelViewSet):
