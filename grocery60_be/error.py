@@ -45,11 +45,14 @@ ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist)
 def grocery60_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
-    exception_handler(exc, context)
-    print(' Error Type ', type(exc))
+    response = exception_handler(exc, context)
+    print(' Error Type ', type(exc), ' response ', response , 'response status', response.status_code)
     # set status_code by category of the exception you caught
+    print(exc.detail)
+    print(exc.get_codes())
+    print(exc.get_full_details())
     if isinstance(exc, ERRORS_400):
-        print(exc.__dict__)
+        print('dict__', exc.__dict__)
         if not exc.__dict__ and exc.__dict__.get('detail').get('non_field_errors')[0] == "Unable to log in with provided credentials.":
             status_code = 401
         else:

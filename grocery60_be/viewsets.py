@@ -1,4 +1,5 @@
 import asyncio
+import base64
 import decimal
 from decimal import Decimal
 
@@ -83,6 +84,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
+                _dict['image'] = base64.b64encode(item.product.image).decode()
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = _item[0]['quantity'] + item.quantity
@@ -96,6 +98,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
+                _dict['image'] = base64.b64encode(item.product.image).decode()
                 _dict['price'] = item.product.price
                 _dict['tax_exempt'] = item.product.tax_exempt
                 _dict['quantity'] = item.quantity
@@ -201,7 +204,8 @@ class StoreViewset(viewsets.ModelViewSet):
                 store.image = serializer.validated_data.get('image')
             else:
                 store.image = ContentFile(store.image)
-            store.media = serializer.validated_data.get('media') if serializer.validated_data.get('media') else store.media
+            store.media = serializer.validated_data.get('store_url') if serializer.validated_data.get('store_url') \
+                else store.store_url
             store.save()
             serializer = CatalogSerializer(store)
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)

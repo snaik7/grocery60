@@ -32,7 +32,7 @@ class Store(models.Model):
     country = models.CharField(
         max_length=50
     )
-    media = models.CharField(
+    store_url = models.CharField(
         max_length=500,
         blank=True
     )

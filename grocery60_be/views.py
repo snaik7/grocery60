@@ -46,6 +46,8 @@ class FeeCalView(APIView):
                          'shipping_fee': shipping_fee, 'discount': discount, 'total': total})
 
 
+@authentication_classes([])
+@permission_classes([])
 class StoreLoginView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
@@ -61,6 +63,8 @@ class StoreLoginView(APIView):
             return JsonResponse(data=data, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
+@authentication_classes([])
+@permission_classes([])
 class CustomLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
