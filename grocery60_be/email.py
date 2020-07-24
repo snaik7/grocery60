@@ -33,6 +33,7 @@ async def _send_email(email, template):
         'discount': email.discount,
         'tip': email.tip,
         'service_fee': email.service_fee,
+        'shipping_cost': email.shipping_cost,
         'total': email.total
     }
 

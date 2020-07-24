@@ -294,6 +294,29 @@ def get_discount(customer_id, sub_total):
     return discount
 
 
+def get_shipping_cost(shipping_id):
+    shipping_cost = Decimal('0')
+    if shipping_id:
+        shipping_method = ShippingMethod.objects.get(id=shipping_id)
+        shipping_cost = Decimal(shipping_method.price)
+        cents = Decimal('.01')
+        shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
+
+    return shipping_cost
+
+
+def get_tip(tip, custom_tip, sub_total):
+    tip_amount = Decimal('0')
+    if custom_tip:
+        tip_amount = Decimal(custom_tip)
+    elif tip:
+        tip_amount = Decimal(sub_total) * Decimal(tip) / Decimal(100)
+
+    cents = Decimal('.01')
+    tip_amount = tip_amount.quantize(cents, decimal.ROUND_HALF_UP)
+    return tip_amount
+
+
 def get_service_fee(sub_total):
     service_fee = Decimal(settings.SERVICE_FEE) / Decimal(100) * Decimal(sub_total)
     service_fee = Decimal(2) if service_fee < 2 else service_fee
@@ -313,6 +336,7 @@ class Order(models.Model):
     tip = models.DecimalField(max_digits=6, decimal_places=2)
     service_fee = models.DecimalField(max_digits=6, decimal_places=2)
     tax = models.DecimalField(max_digits=6, decimal_places=2)
+    shipping_fee = models.DecimalField(max_digits=6, decimal_places=2, default='0')
     discount = models.DecimalField(max_digits=6, decimal_places=2)
     total = models.DecimalField(max_digits=6, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -476,7 +500,7 @@ class Email(models.Model):
     username = models.TextField()
     email = models.TextField()
     order_id = models.TextField()
-    subtotal, tax, discount, service_fee, tip, total = 0, 0, 0, 0, 0, 0
+    subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
     def set_order(self, order_id):
         order = Order.objects.get(pk=order_id)
@@ -484,6 +508,7 @@ class Email(models.Model):
         self.tax = order.tax
         self.service_fee = order.service_fee
         self.tip = order.tip
+        self.shipping_fee = order.shipping_fee
         self.discount = order.discount
         self.total = order.total
 
