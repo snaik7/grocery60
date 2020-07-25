@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
-from grocery60_be import serializers, models
+from grocery60_be import serializers, models, util
 from grocery60_be.models import OrderPayment, Email, BillingAddress, Customer, StoreAdmin, Order, Product, OrderItem
 import stripe
 from rest_framework.views import APIView
@@ -133,6 +133,7 @@ class PaymentView(APIView):
         print('amount', amount)
         # view is not fat but payload is fat...sorry payment view
         intent = stripe.PaymentIntent.create(
+            idempotency_key=util.get_idempotency_key(16), #to avoid collisions.
             amount=amount,  # convert to cents
             currency=data.get('currency'),
             confirm=True,  # confirming the PaymentIntent i
