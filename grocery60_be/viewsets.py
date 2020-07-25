@@ -142,7 +142,7 @@ class CatalogViewset(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = CatalogSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['product_category', 'store_id']
+    filterset_fields = ['product_category', 'store_id', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a products.'''
@@ -179,7 +179,7 @@ class StoreAdminViewset(viewsets.ModelViewSet):
     queryset = StoreAdmin.objects.all()
     serializer_class = StoreAdminSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['store_id', 'username']
+    filterset_fields = ['store_id', 'username', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):
