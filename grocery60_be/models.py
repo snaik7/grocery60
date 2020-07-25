@@ -1,8 +1,7 @@
+import asyncio
 import decimal
-import threading
 from datetime import datetime
 from decimal import Decimal
-import asyncio
 
 from django.db import models, connection
 from django.contrib.auth.models import User
@@ -396,6 +395,10 @@ class OrderPayment(models.Model):
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    payout_status = models.CharField(
+        max_length=50,
+        blank=True
+    )
 
     def record_payment(self, data, intent):
         try:

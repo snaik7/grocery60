@@ -27,6 +27,7 @@ class UserViewset(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['username']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):
         if serializer.is_valid():
@@ -114,6 +115,7 @@ class CustomerViewset(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     def create(self, request):
         data = JSONParser().parse(request)
@@ -141,6 +143,7 @@ class CatalogViewset(viewsets.ModelViewSet):
     serializer_class = CatalogSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['product_category', 'store_id']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a products.'''
 
@@ -177,6 +180,7 @@ class StoreAdminViewset(viewsets.ModelViewSet):
     serializer_class = StoreAdminSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id', 'username']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):
         if serializer.is_valid():
@@ -189,6 +193,7 @@ class StoreViewset(viewsets.ModelViewSet):
     serializer_class = StoreSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['zip', 'nearby_zip']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a store.'''
 
@@ -211,7 +216,7 @@ class StoreViewset(viewsets.ModelViewSet):
             store.media = serializer.validated_data.get('store_url') if serializer.validated_data.get('store_url') \
                 else store.store_url
             store.save()
-            serializer = CatalogSerializer(store)
+            serializer = StoreSerializer(store)
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
@@ -223,6 +228,7 @@ class BillingAddressViewset(viewsets.ModelViewSet):
     serializer_class = BillingAddressSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'state']
+    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class ShippingAddressViewset(viewsets.ModelViewSet):
@@ -230,7 +236,7 @@ class ShippingAddressViewset(viewsets.ModelViewSet):
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'state']
-
+    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class OrderViewset(viewsets.ModelViewSet):
@@ -238,6 +244,11 @@ class OrderViewset(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'status']
+    http_method_names = ['get', 'post', 'head', 'put']
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(status='Order Received')
 
 
 class OrderItemViewset(viewsets.ModelViewSet):
@@ -245,6 +256,7 @@ class OrderItemViewset(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
+    http_method_names = ['get', 'post', 'head', 'put']
 
     def create(self, request):
         data_list = JSONParser().parse(request)
@@ -267,12 +279,35 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id', 'store_id']
+    http_method_names = ['get', 'post', 'head', 'put']
+
+    def update(self, request, pk):
+        order_payment = OrderPayment.objects.get(id=pk)
+        data = JSONParser().parse(request)
+        if data.get('amount'):
+            order_payment.amount = data.get('amount')
+        if data.get('transaction_id'):
+            order_payment.transaction_id = data.get('transaction_id')
+        if data.get('status'):
+            order_payment.status = data.get('status')
+        if data.get('payment_method'):
+            order_payment.payment_method = data.get('payment_method')
+        if data.get('payout_status'):
+            order_payment.payout_status = data.get('payout_status')
+        if data.get('order'):
+            order_payment.order.id = data.get('order')
+        if data.get('store'):
+            order_payment.store.id = data.get('store')
+        order_payment.save()
+        serializer = OrderPaymentSerializer(order_payment)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 class ShippingMethodViewset(viewsets.ModelViewSet):
     queryset = ShippingMethod.objects.all()
     serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
+    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class DeliveryViewset(viewsets.ModelViewSet):
@@ -280,6 +315,7 @@ class DeliveryViewset(viewsets.ModelViewSet):
     serializer_class = DeliverySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id']
+    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class TaxViewset(viewsets.ModelViewSet):
@@ -287,3 +323,4 @@ class TaxViewset(viewsets.ModelViewSet):
     serializer_class = TaxSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['state']
+    http_method_names = ['get', 'post', 'head', 'put']

@@ -3,6 +3,7 @@ import decimal
 from decimal import Decimal
 
 from django.contrib.auth import hashers
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
@@ -112,8 +113,8 @@ class PaymentView(APIView):
             # Send email for order cancellation
             email = Email()
             email.subject = "Order cancellation for Grocery 60"
-            customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
-            email.email = customer.email
+            user = User.objects.get(id=order_payment.order.customer_id)
+            email.email = user.email
             email.order_id = order_payment.order_id
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -134,6 +135,7 @@ class PaymentView(APIView):
         intent = stripe.PaymentIntent.create(
             amount=amount,  # convert to cents
             currency=data.get('currency'),
+            confirm=True,  # confirming the PaymentIntent i
             receipt_email=data.get('receipt_email'),
             confirmation_method='automatic',
             payment_method_data={

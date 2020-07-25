@@ -77,7 +77,7 @@ def grocery60_exception_handler(exc, context):
         # the format of error message determined by you base exception class
         'msg': str(exc)
     }
-    if settings.DEBUG:
+    if settings.DEBUG or True:
         # you can even get the traceback infomation when you are in debug mode
         # response_dict['traceback'] = traceback.format_exc()
         track = traceback.format_exc()
