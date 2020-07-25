@@ -136,7 +136,7 @@ class PaymentView(APIView):
             idempotency_key=util.get_idempotency_key(16), #to avoid collisions.
             amount=amount,  # convert to cents
             currency=data.get('currency'),
-            confirm=True,  # confirming the PaymentIntent i
+            confirm=True,  # confirming the PaymentIntent
             receipt_email=data.get('receipt_email'),
             confirmation_method='automatic',
             payment_method_data={
