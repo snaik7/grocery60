@@ -107,6 +107,9 @@ class Product(models.Model):
     image = models.FileField(
         blank=True
     )
+    status = models.CharField(
+        max_length=10
+    )
     tax_exempt = models.BooleanField(blank=True, default=False)
 
     def search_catalog(self, search_key, store_id):
