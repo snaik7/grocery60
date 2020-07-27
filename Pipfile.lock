@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a6b7ae2494c06a374a145ef662e93d013a9b33f81d8d4a8a47bc10fe22854e77"
+            "sha256": "36032dc4ef64d64a7d4ba6f4b07ec6c10cfdb379230e12168fc25dc41c2b1f21"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -373,6 +373,14 @@
             ],
             "index": "pypi",
             "version": "==2020.1"
+        },
+        "razorpay": {
+            "hashes": [
+                "sha256:0bea9e11aca8024af0cd741b779cb6d3b0a689a8488e21b5e4b345f8840a0fe4",
+                "sha256:8bae5ba6e3d8c7aebf7e4b297d15dfdb4a4b05e6fabd8d56405ac0d2677539bd"
+            ],
+            "index": "pypi",
+            "version": "==1.2.0"
         },
         "requests": {
             "hashes": [

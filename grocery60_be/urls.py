@@ -39,6 +39,7 @@ router.register('shipping-method', viewsets.ShippingMethodViewset)
 # this router is not in use
 router.register('order-payment', viewsets.OrderPaymentViewset)
 router.register('user', viewsets.UserViewset)
+router.register('category', viewsets.CategoryViewset)
 router.register('storeadmin', viewsets.StoreAdminViewset)
 
 
@@ -63,6 +64,11 @@ urlpatterns = [
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+
+
+    ### India Views ###
+    path('payment/in/', views.IndiaPaymentView.as_view()),
+    path('payment/in/<str:razor_order_id>', views.IndiaPaymentView.as_view()),
 
 ]
 

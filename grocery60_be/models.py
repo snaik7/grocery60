@@ -91,7 +91,8 @@ class Product(models.Model):
         max_length=50
     )
     product_url = models.CharField(
-        max_length=200
+        max_length=200,
+        blank=True
     )
     product_category = models.CharField(
         max_length=200
@@ -418,6 +419,14 @@ class OrderPayment(models.Model):
         max_length=50,
         blank=True
     )
+    correlation_id = models.CharField(
+        max_length=50,
+        blank=True
+    )
+    signature = models.CharField(
+        max_length=150,
+        blank=True
+    )
 
     def record_payment(self, data, intent):
         try:
@@ -427,15 +436,19 @@ class OrderPayment(models.Model):
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
             status = intent.get('status')
+            correlation_id = intent.get('id')
+            signature = None
             order_payment = OrderPayment(amount=amount, transaction_id=transaction_id, payment_method=payment_method,
-                                         order_id=order_id, status=status, store_id=store_id)
+                                         order_id=order_id, status=status, store_id=store_id,
+                                         correlation_id=correlation_id,
+                                         signature=signature)
             order_payment.save()
         except Exception as e:
             raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
         return order_payment.id
 
     def send_success_email(self, email):
-        print('data received ' + email.order_id)
+        print('data received ', email.order_id)
         print('data received ', email.order_items_list)
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -545,3 +558,12 @@ class Tax(models.Model):
 
     class Meta:
         db_table = "tax"
+
+
+class Category(models.Model):
+    category = models.CharField(
+        max_length=50
+    )
+
+    class Meta:
+        db_table = "category"

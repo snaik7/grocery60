@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
-from grocery60_be import serializers, models, util
+from grocery60_be import serializers, models, util, settings
 from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem
 import stripe
 from rest_framework.views import APIView
@@ -18,6 +18,8 @@ from rest_framework.response import Response
 from rest_auth.views import LoginView
 from grocery60_be import email as email_send
 from grocery60_be.serializers import OrderSerializer
+
+import razorpay
 
 
 class FeeCalView(APIView):
@@ -185,7 +187,6 @@ class PaymentView(APIView):
             raise Exception('Order Payment failed for Order = ' + order_id)
 
 
-
 class OrderDetailView(APIView):
 
     def post(self, request):
@@ -235,4 +236,47 @@ def server_error(request):
     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+####  India Operation Payment Views ####
 
+class IndiaPaymentView(APIView):
+    def post(self, request):
+        data = JSONParser().parse(request)
+        order_id = str(data.get('metadata').get('order_id'))
+        amount = Decimal(data.get('amount')) * 100  # convert to cents
+        paise = Decimal('0')
+        amount = amount.quantize(paise)
+        print('amount', amount)
+        razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+        intent = razorpay_client.order.create({
+            "amount": int(amount),  # convert to cents
+            "currency": data.get('currency'),
+            "receipt": order_id,
+            "payment_capture": 1
+        }
+        )
+        print('Razor Pay success with order id ', intent.get('id'))
+        if OrderPayment().record_payment(data, intent):
+            return JsonResponse(intent)
+        else:
+            raise Exception('Order Payment failed for Order = ' + order_id)
+
+    def post(self, request, razor_order_id):
+        data = JSONParser().parse(request)
+        razorpay_payment_id = data.get('razorpay_payment_id')
+        razorpay_signature = data.get('razorpay_signature')
+
+        order_payment = OrderPayment.objects.filter(correlation_id=razor_order_id).first()
+        order_payment.transaction_id = razorpay_payment_id
+        order_payment.signature = razorpay_signature
+        order_payment.status = "payment_intent.succeeded"
+        order_payment.save()
+
+        recipient_email = Email()
+        recipient_email.subject = "Order Confirmation for Grocery 60"
+        recipient_email.email = data.get('receipt_email')
+        recipient_email.order_id = order_payment.order_id
+        recipient_email.set_order(order_payment.order_id)
+        order_payment = OrderPayment()
+        order_payment.send_success_email(recipient_email)
+        return JsonResponse(data)

@@ -16,11 +16,11 @@ from grocery60_be import util
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
     OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer, \
-    StoreAdminSerializer
+    StoreAdminSerializer, CategorySerializer
 
 
 class UserViewset(viewsets.ModelViewSet):
@@ -208,12 +208,11 @@ class StoreAdminViewset(viewsets.ModelViewSet):
             loop.run_until_complete(email_send.send_email(email, 'storeadmin_registration.html'))
 
 
-
 class StoreViewset(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['zip', 'nearby_zip']
+    filterset_fields = ['zip', 'nearby_zip', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a store.'''
@@ -242,7 +241,8 @@ class StoreViewset(viewsets.ModelViewSet):
             store.phone = serializer.validated_data.get('phone')
             store.email = serializer.validated_data.get('email')
             store.status = serializer.validated_data.get('status')
-            store.payment_account = serializer.validated_data.get('payment_account') if serializer.validated_data.get('payment_account') \
+            store.payment_account = serializer.validated_data.get('payment_account') if serializer.validated_data.get(
+                'payment_account') \
                 else store.payment_account
             if serializer.validated_data.get('image'):
                 store.image = serializer.validated_data.get('image')
@@ -313,7 +313,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
     queryset = OrderPayment.objects.all()
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['order_id', 'store_id','status','payout_status', 'payout_message']
+    filterset_fields = ['order_id', 'store_id', 'status', 'payout_status', 'payout_message']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def update(self, request, pk):
@@ -364,4 +364,11 @@ class TaxViewset(viewsets.ModelViewSet):
     serializer_class = TaxSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['state']
+    http_method_names = ['get', 'post', 'head', 'put']
+
+
+class CategoryViewset(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend]
     http_method_names = ['get', 'post', 'head', 'put']
