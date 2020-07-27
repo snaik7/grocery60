@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from grocery60_be import views, viewsets
+
+import grocery60_be.webhook
+from grocery60_be import views, viewsets, webhook
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
@@ -55,7 +57,7 @@ urlpatterns = [
     path('order-detail/', views.OrderDetailView.as_view()),
     path('payment/', views.PaymentView.as_view()),
     path('payment/<int:order_id>', views.PaymentView.as_view()),
-    path('webhook/payment/', views.PaymentWebhookView.as_view()),
+    path('webhook/payment/', webhook.PaymentWebhookView.as_view()),
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),

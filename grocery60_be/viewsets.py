@@ -236,7 +236,8 @@ class StoreViewset(viewsets.ModelViewSet):
             store.zip = serializer.validated_data.get('zip')
             store.nearby_zip = serializer.validated_data.get('nearby_zip')
             store.country = serializer.validated_data.get('country')
-            store.store_url = serializer.validated_data.get('store_url')
+            store.store_url = serializer.validated_data.get('store_url') if serializer.validated_data.get('store_url') \
+                else store.store_url
             store.phone = serializer.validated_data.get('phone')
             store.email = serializer.validated_data.get('email')
             store.status = serializer.validated_data.get('status')
