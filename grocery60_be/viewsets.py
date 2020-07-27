@@ -159,6 +159,15 @@ class CatalogViewset(viewsets.ModelViewSet):
         product = None
         if serializer.is_valid():
             product = Product.objects.get(id=pk)
+            product.product_name = serializer.validated_data.get('product_name')
+            product.product_url = serializer.validated_data.get('product_url')
+            product.product_category = serializer.validated_data.get('product_category')
+            product.price = serializer.validated_data.get('price')
+            product.media = serializer.validated_data.get('media')
+            product.caption = serializer.validated_data.get('caption')
+            product.status = serializer.validated_data.get('status')
+            product.tax_exempt = serializer.validated_data.get('tax_exempt')
+
             if serializer.validated_data.get('image'):
                 product.image = serializer.validated_data.get('image')
             else:
@@ -209,6 +218,19 @@ class StoreViewset(viewsets.ModelViewSet):
         store = None
         if serializer.is_valid():
             store = Store.objects.get(id=pk)
+            store.name = serializer.validated_data.get('name')
+            store.address = serializer.validated_data.get('address')
+            store.city = serializer.validated_data.get('city')
+            store.state = serializer.validated_data.get('state')
+            store.zip = serializer.validated_data.get('zip')
+            store.nearby_zip = serializer.validated_data.get('nearby_zip')
+            store.country = serializer.validated_data.get('country')
+            store.store_url = serializer.validated_data.get('store_url')
+            store.phone = serializer.validated_data.get('phone')
+            store.email = serializer.validated_data.get('email')
+            store.status = serializer.validated_data.get('status')
+            store.payment_account = serializer.validated_data.get('payment_account') if serializer.validated_data.get('payment_account') \
+                else store.payment_account
             if serializer.validated_data.get('image'):
                 store.image = serializer.validated_data.get('image')
             else:
@@ -278,7 +300,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
     queryset = OrderPayment.objects.all()
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['order_id', 'store_id']
+    filterset_fields = ['order_id', 'store_id','status','payout_status', 'payout_message']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def update(self, request, pk):
@@ -290,14 +312,20 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
             order_payment.transaction_id = data.get('transaction_id')
         if data.get('status'):
             order_payment.status = data.get('status')
+            if data.get('status') == "PICKED":
+                order_payment.payout_status = "READY_TO_PAY"
         if data.get('payment_method'):
             order_payment.payment_method = data.get('payment_method')
-        if data.get('payout_status'):
-            order_payment.payout_status = data.get('payout_status')
         if data.get('order'):
             order_payment.order.id = data.get('order')
         if data.get('store'):
             order_payment.store.id = data.get('store')
+        if data.get('payout_message'):
+            order_payment.payout_message = data.get('payout_message')
+        if data.get('payout_status'):
+            order_payment.payout_status = data.get('payout_status')
+        if data.get('payout_message'):
+            order_payment.payout_id = data.get('payout_id')
         order_payment.save()
         serializer = OrderPaymentSerializer(order_payment)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)

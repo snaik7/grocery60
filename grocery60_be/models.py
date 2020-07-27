@@ -47,6 +47,10 @@ class Store(models.Model):
     status = models.CharField(
         max_length=20
     )
+    payment_account = models.CharField(
+        max_length=50,
+        blank=True
+    )
 
     class Meta:
         db_table = "store"
@@ -402,6 +406,14 @@ class OrderPayment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
     payout_status = models.CharField(
+        max_length=50,
+        blank=True
+    )
+    payout_message = models.CharField(
+        max_length=100,
+        blank=True
+    )
+    payout_id = models.CharField(
         max_length=50,
         blank=True
     )

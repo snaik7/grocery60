@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "46ac470f887b205502eefeefc6e14ed044c33fc87ccc2dbd5978ac4fbb8b3e7f"
+            "sha256": "a6b7ae2494c06a374a145ef662e93d013a9b33f81d8d4a8a47bc10fe22854e77"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,6 +22,14 @@
                 "sha256:d10a4bf949f619f719b227ef5386e31f49a2b6d453004b21f02661ccc8670c7b"
             ],
             "version": "==7.0.0"
+        },
+        "apscheduler": {
+            "hashes": [
+                "sha256:3bb5229eed6fbbdafc13ce962712ae66e175aa214c69bed35a06bffcf0c5e244",
+                "sha256:e8b1ecdb4c7cb2818913f766d5898183c7cb8936680710a4d3a966e02262e526"
+            ],
+            "index": "pypi",
+            "version": "==3.6.3"
         },
         "asgiref": {
             "hashes": [
@@ -412,6 +420,13 @@
             ],
             "index": "pypi",
             "version": "==0.3.1"
+        },
+        "tzlocal": {
+            "hashes": [
+                "sha256:643c97c5294aedc737780a49d9df30889321cbe1204eac2c2ec6134035a92e44",
+                "sha256:e2cb6c6b5b604af38597403e9852872d7f534962ae2954c7f35efcb1ccacf4a4"
+            ],
+            "version": "==2.1"
         },
         "unidecode": {
             "hashes": [

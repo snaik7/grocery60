@@ -105,10 +105,10 @@ class PaymentView(APIView):
                             'and we will reply you in 24 hours. '.format(order_id))
 
         if intent.get('status') == 'canceled':
-            order_payment.status = 'Cancelled'
+            order_payment.status = 'CANCELLED'
             order_payment.save()
             order = Order.objects.get(id=order_id)
-            order.status = 'Cancelled'
+            order.status = 'CANCELLED'
             order.save()
             # Send email for order cancellation
             email = Email()
@@ -126,14 +126,13 @@ class PaymentView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         order_id = data.get('metadata').get('order_id')
-        store_id = data.get('metadata').get('store_id')
         amount = Decimal(data.get('amount')) * 100  # convert to cents
         cents = Decimal('0')
-        amount = amount.quantize(cents, decimal.ROUND_HALF_UP)
+        amount = amount.quantize(cents)
         print('amount', amount)
         # view is not fat but payload is fat...sorry payment view
         intent = stripe.PaymentIntent.create(
-            idempotency_key=util.get_idempotency_key(16), #to avoid collisions.
+            idempotency_key=util.get_idempotency_key(16),  # to avoid collisions.
             amount=amount,  # convert to cents
             currency=data.get('currency'),
             confirm=True,  # confirming the PaymentIntent
@@ -160,10 +159,10 @@ class PaymentView(APIView):
                 }
             },
             metadata={
-                "OrderId": data.get('metadata').get('order_id'),
+                "OrderId": order_id,
                 "Phone": data.get('metadata').get('phone'),
-                "CustomerId": data.get('metadata').get('customer_id')
-
+                "CustomerId": data.get('metadata').get('customer_id'),
+                "StoreId": data.get('metadata').get('store_id')
             }
         )
 
@@ -265,3 +264,6 @@ def server_error(request):
     return JsonResponse({
         "msg": "internal server error"
     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+

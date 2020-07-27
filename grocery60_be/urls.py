@@ -63,3 +63,5 @@ urlpatterns = [
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 
 ]
+
+from grocery60_be import execute

@@ -38,6 +38,7 @@ urllib3 = "==1.25.9"
 Django = "==3.0.6"
 google-cloud-logging = "==1.15.0"
 django-cors-headers = "==3.4.0"
+apscheduler = "==3.6.3"
 
 [requires]
 python_version = "3.7"
