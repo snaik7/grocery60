@@ -294,7 +294,7 @@ class ShippingAddress(models.Model):
 
 
 def get_tax(state):
-    tax = Tax.objects.filter(state=state).first()
+    tax = Tax.objects.get(state=state)
     return Decimal(tax.tax)
 
 
@@ -395,7 +395,8 @@ class OrderItem(models.Model):
 class OrderPayment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     transaction_id = models.CharField(
-        max_length=200
+        max_length=200,
+        unique=True
     )
     status = models.CharField(
         max_length=100
@@ -457,7 +458,7 @@ class OrderPayment(models.Model):
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
-        customer = Customer.objects.filter(customer_id=order_payment.order.customer_id).first()
+        customer = Customer.objects.get(customer_id=order_payment.order.customer_id)
         email = Email()
         email.subject = "Order failure for Grocery 60"
         email.email = customer.email
@@ -481,8 +482,7 @@ class OrderPayment(models.Model):
 
     def update_payment(self, transaction_id, status):
         try:
-            order_payment = OrderPayment.objects.filter(transaction_id=transaction_id)
-            order_payment = order_payment[0]
+            order_payment = OrderPayment.objects.get(transaction_id=transaction_id)
             order_payment.status = status
             order_payment.updated_at = datetime.now()
             order_payment.save()
@@ -552,7 +552,8 @@ class Email(models.Model):
 
 class Tax(models.Model):
     state = models.CharField(
-        max_length=2
+        max_length=2,
+        unique=True
     )
     tax = models.DecimalField(max_digits=3, decimal_places=2)
 

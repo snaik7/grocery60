@@ -55,7 +55,7 @@ class StoreLoginView(APIView):
         data = JSONParser().parse(request)
         username = data.get('username')
         password = data.get('password')
-        store_admin = StoreAdmin.objects.filter(username=username).first()
+        store_admin = StoreAdmin.objects.get(username=username)
         valid = hashers.check_password(password, store_admin.password)
         if valid:
             data = {'message': 'success'}
@@ -94,7 +94,7 @@ class PaymentView(APIView):
 
     def delete(self, request, order_id):
         print('order id cancellation', order_id)
-        order_payment = OrderPayment.objects.filter(order_id=order_id).first()
+        order_payment = OrderPayment.objects.get(order_id=order_id)
         print(order_payment.transaction_id)
         try:
             # To cancel a PaymentIntent
@@ -261,12 +261,12 @@ class IndiaPaymentView(APIView):
         else:
             raise Exception('Order Payment failed for Order = ' + order_id)
 
-    def post(self, request, razor_order_id):
+    def put(self, request, razor_order_id):
         data = JSONParser().parse(request)
         razorpay_payment_id = data.get('razorpay_payment_id')
         razorpay_signature = data.get('razorpay_signature')
 
-        order_payment = OrderPayment.objects.filter(correlation_id=razor_order_id).first()
+        order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
         order_payment.transaction_id = razorpay_payment_id
         order_payment.signature = razorpay_signature
         order_payment.status = "payment_intent.succeeded"

@@ -54,7 +54,6 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class CatalogSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Product
         fields = '__all__'

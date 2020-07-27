@@ -368,7 +368,7 @@ class TaxViewset(viewsets.ModelViewSet):
 
 
 class CategoryViewset(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
     http_method_names = ['get', 'post', 'head', 'put']
