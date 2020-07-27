@@ -33,8 +33,10 @@ async def _send_email(email, template):
         'discount': email.discount,
         'tip': email.tip,
         'service_fee': email.service_fee,
-        'shipping_cost': email.shipping_cost,
-        'total': email.total
+        'shipping_fee': email.shipping_fee,
+        'total': email.total,
+        'username': email.username,
+        'password': email.password,
     }
 
     # render email text

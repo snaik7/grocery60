@@ -62,7 +62,8 @@ class StoreAdmin(models.Model):
         unique=True,
     )
     password = models.CharField(
-        max_length=128
+        max_length=128,
+        blank=True
     )
     phone_number = models.CharField(
         max_length=128
@@ -517,12 +518,8 @@ class Delivery(models.Model):
 
 
 class Email(models.Model):
-    subject = models.TextField()
-    first_name = ''
+    subject, first_name, username, password, email, order_id = None, None, None, None, None, None
     order_items_list = []
-    username = models.TextField()
-    email = models.TextField()
-    order_id = models.TextField()
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
     def set_order(self, order_id):

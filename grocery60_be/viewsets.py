@@ -12,6 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 from grocery60_be import email as email_send
+from grocery60_be import util
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
@@ -193,8 +194,18 @@ class StoreAdminViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            password = hashers.make_password(serializer.validated_data.get('password'))
+            text_password = util.generate_password(8)
+            password = hashers.make_password(text_password)
             serializer.save(password=password)
+            email = Email()
+            email.subject = "Welcome to Grocery 60 !!!"
+            email.email = serializer.data.get('email')
+            email.username = serializer.data.get('username')
+            email.password = text_password
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(email_send.send_email(email, 'storeadmin_registration.html'))
+
 
 
 class StoreViewset(viewsets.ModelViewSet):
