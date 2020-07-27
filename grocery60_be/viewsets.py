@@ -161,7 +161,8 @@ class CatalogViewset(viewsets.ModelViewSet):
         if serializer.is_valid():
             product = Product.objects.get(id=pk)
             product.product_name = serializer.validated_data.get('product_name')
-            product.product_url = serializer.validated_data.get('product_url')
+            product.product_url = serializer.validated_data.get('product_url') if serializer.validated_data.get(
+                'product_url') else product.product_url
             product.product_category = serializer.validated_data.get('product_category')
             product.price = serializer.validated_data.get('price')
             product.media = serializer.validated_data.get('media')
