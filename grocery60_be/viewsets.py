@@ -169,7 +169,7 @@ class CatalogViewset(viewsets.ModelViewSet):
             product.caption = serializer.validated_data.get('caption')
             product.status = serializer.validated_data.get('status')
             product.tax_exempt = serializer.validated_data.get('tax_exempt')
-
+            product.store = serializer.validated_data.get('store')
             if serializer.validated_data.get('image'):
                 product.image = serializer.validated_data.get('image')
             else:

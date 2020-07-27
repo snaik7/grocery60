@@ -54,7 +54,6 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class CatalogSerializer(serializers.ModelSerializer):
-    store = StoreSerializer(read_only=True)
 
     class Meta:
         model = Product
