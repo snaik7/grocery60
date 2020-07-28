@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.contrib.auth import hashers
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
@@ -62,6 +63,7 @@ class StoreLoginView(APIView):
         username = data.get('username')
         password = data.get('password')
         store_admin = StoreAdmin.objects.get(username=username)
+        #store_admin = get_object_or_404(StoreAdmin, username=username)
         valid = hashers.check_password(password, store_admin.password)
         if valid:
             data = {'message': 'success'}

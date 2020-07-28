@@ -72,7 +72,8 @@ class StoreAdmin(models.Model):
         max_length=100
     )
     secret = models.CharField(
-        max_length=150
+        max_length=150,
+        blank=True
     )
     status = models.CharField(
         max_length=10

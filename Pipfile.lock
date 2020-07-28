@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "36032dc4ef64d64a7d4ba6f4b07ec6c10cfdb379230e12168fc25dc41c2b1f21"
+            "sha256": "4846e486325fc895212f7c44546926be401c4315975c6b01d60df31cd197700a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -153,6 +153,14 @@
             ],
             "index": "pypi",
             "version": "==1.28.1"
+        },
+        "google-cloud-vision": {
+            "hashes": [
+                "sha256:18e78b190c81d200ae4f6a46d4af57422d68b3b05b0540d5cd1806e3874142bf",
+                "sha256:e61091a52f334a20e597b74e2fb42c9f27dda25323544cd157d6110fde26c9a6"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0"
         },
         "google-resumable-media": {
             "hashes": [

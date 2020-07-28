@@ -40,6 +40,7 @@ google-cloud-logging = "==1.15.0"
 django-cors-headers = "==3.4.0"
 apscheduler = "==3.6.3"
 razorpay = "==1.2.0"
+google-cloud-vision = "*"
 
 [requires]
 python_version = "3.7"
