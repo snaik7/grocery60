@@ -23,7 +23,6 @@ def validate_token(token):
 
 
 class Query:
-    
     stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
     store = graphene.Field(StoreType, id=graphene.String(), token=graphene.String())
     store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),

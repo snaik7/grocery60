@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.contrib.auth import hashers
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.db.models import Count
+from django.db.models import Count, Sum
 from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
@@ -70,7 +70,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         cart_id = request.GET.get('cart_id')
         cart = Cart.objects.get(id=cart_id)
         cart_item = CartItem.objects.select_related('product').all().filter(cart_id=cart_id). \
-            annotate(total=Count('product_id')).order_by('product_id')
+            order_by('product_id')
         print(cart_item.query)
         cart_item_list = []
         count = 0
@@ -108,7 +108,8 @@ class CartItemViewset(viewsets.ModelViewSet):
                 cents = Decimal('.01')
                 _dict['line_total'] = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
                 cart_item_list.append(_dict)
-        return JsonResponse(cart_item_list, safe=False)
+            cart_item_dict = { 'count': len(cart_item_list), 'results' : cart_item_list }
+        return JsonResponse(cart_item_dict, safe=False)
 
 
 class CustomerViewset(viewsets.ModelViewSet):
