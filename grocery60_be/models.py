@@ -448,6 +448,16 @@ class OrderPayment(models.Model):
             raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
         return order_payment.id
 
+    def delete_cart(self, data):
+        try:
+            cart = None
+            customer_id = data.get('metadata').get('customer_id')
+            cart = Cart.objects.get(customer_id=customer_id)
+            cart.delete()
+        except Exception as e:
+            raise Exception('Cart failed to delete = ' + cart.id + ' with ' + str(e))
+        return cart.id
+
     def send_success_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)

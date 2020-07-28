@@ -175,6 +175,7 @@ class PaymentView(APIView):
         )
 
         if OrderPayment().record_payment(data, intent):
+            OrderPayment().delete_cart(data)
             recipient_email = Email()
             recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
@@ -257,6 +258,7 @@ class IndiaPaymentView(APIView):
         )
         print('Razor Pay success with order id ', intent.get('id'))
         if OrderPayment().record_payment(data, intent):
+            OrderPayment().delete_cart(data)
             return JsonResponse(intent)
         else:
             raise Exception('Order Payment failed for Order = ' + order_id)
