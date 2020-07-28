@@ -31,13 +31,19 @@ class FeeCalView(APIView):
         shipping_id = data.get('shipping_id')
         custom_tip = data.get('custom_tip')
         customer_id = data.get('customer_id')
-        address = BillingAddress.objects.filter(customer_id=customer_id).first()
-        print('state', address.state)
+        # Calculate Tip
         tip = models.get_tip(tip, custom_tip, sub_total)
+        # Calculate Shipping Fee
         shipping_fee = models.get_shipping_cost(shipping_id) if shipping_id else Decimal('0')
         cents = Decimal('.01')
-        tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
-        tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
+        # Calculate Tax based on state
+        address = BillingAddress.objects.filter(customer_id=customer_id).first()
+        if address:
+            print('state', address.state)
+            tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
+            tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
+        else:
+            raise Exception('Please add shipping address to profile so tax calculation can be done')
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
         service_fee = models.get_service_fee(sub_total)

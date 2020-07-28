@@ -1,8 +1,10 @@
 import graphene
+from django.db.models import Count
 from graphql import GraphQLError
 from graphene_django.types import DjangoObjectType
 
-from grocery60_be.models import Store, Product
+from grocery60_be.models import Store, Product, CartItem, Cart
+from grocery60_be.models import Count as CountModel
 from grocery60_be import settings
 
 
@@ -18,11 +20,19 @@ class ProductType(DjangoObjectType):
         fields = '__all__'
 
 
+class CountType(DjangoObjectType):
+    class Meta:
+        model = CountModel
+        fields = '__all__'
+
+
 def validate_token(token):
     return settings.GRAPHQL_TOKEN == token
 
 
 class Query:
+    cart_item_count = graphene.Field(CountType, token=graphene.String(), customer_id=graphene.Int())
+
     stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
     store = graphene.Field(StoreType, id=graphene.String(), token=graphene.String())
     store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
@@ -33,6 +43,18 @@ class Query:
     product_search = graphene.List(ProductType, category=graphene.String(), product_name=graphene.String(),
                                    extra=graphene.String(), store_id=graphene.Int(), first=graphene.Int(),
                                    skip=graphene.Int(), token=graphene.String())
+
+    def resolve_cart_item_count(self, info, token=None, **kwargs):
+        if validate_token(token):
+            customer_id = kwargs.get("customer_id")
+            cart = Cart.objects.get(customer_id=customer_id)
+            cart_item = CartItem.objects.select_related('product').filter(cart_id=cart.id) \
+                .aggregate(count=Count('product_id', distinct=True))
+            count = CountType()
+            count.count = cart_item.get('count')
+            return count
+        else:
+            raise GraphQLError('Authentication credentials were not provided')
 
     def resolve_stores(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):

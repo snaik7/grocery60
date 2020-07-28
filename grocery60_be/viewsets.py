@@ -108,7 +108,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 cents = Decimal('.01')
                 _dict['line_total'] = _dict['line_total'].quantize(cents, decimal.ROUND_HALF_UP)
                 cart_item_list.append(_dict)
-            cart_item_dict = { 'count': len(cart_item_list), 'results' : cart_item_list }
+            cart_item_dict = {'count': len(cart_item_list), 'results': cart_item_list}
         return JsonResponse(cart_item_dict, safe=False)
 
 

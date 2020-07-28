@@ -293,6 +293,10 @@ class ShippingAddress(models.Model):
         db_table = "shippingaddress"
 
 
+class Count(models.Model):
+    count = models.IntegerField()
+
+
 def get_tax(state):
     tax = Tax.objects.get(state=state)
     return Decimal(tax.tax)
