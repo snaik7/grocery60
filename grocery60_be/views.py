@@ -209,7 +209,7 @@ class OrderDetailView(APIView):
         for item in items:
             print(data)
             product = Product.objects.get(id=item.get('product_id'))
-            order = Order.objects.get(id=item.get('order_id'))
+            order = Order.objects.get(id=serializer.data.get('id'))
             cents = Decimal('.01')
             line_total = product.price * Decimal(item.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
