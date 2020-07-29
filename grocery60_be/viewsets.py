@@ -75,6 +75,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         cart_item_list = []
         count = 0
         line_total = Decimal(0)
+        cart_item_dict = {}
         for item in cart_item:
             _dict = {}
             product_id_list = [_item['product_id'] for _item in cart_item_list]

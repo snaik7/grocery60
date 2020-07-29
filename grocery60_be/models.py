@@ -460,7 +460,7 @@ class OrderPayment(models.Model):
             cart = Cart.objects.get(customer_id=customer_id)
             cart.delete()
         except Exception as e:
-            raise Exception('Cart failed to delete = ' + cart.id + ' with ' + str(e))
+            raise Exception('Exception ' + str(e))
         return cart.id
 
     def send_success_email(self, email):
@@ -546,12 +546,13 @@ class Delivery(models.Model):
 
 
 class Email(models.Model):
-    subject, first_name, username, password, email, order_id = None, None, None, None, None, None
+    subject, first_name, username, password, email, order_id, token = None, None, None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
     def set_order(self, order_id):
         order = Order.objects.get(pk=order_id)
+        self.token = order.token
         self.subtotal = order.subtotal
         self.tax = order.tax
         self.service_fee = order.service_fee

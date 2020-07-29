@@ -94,6 +94,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderPaymentSerializer(serializers.ModelSerializer):
+    order = OrderSerializer(read_only=True)
+
     class Meta:
         model = OrderPayment
         fields = '__all__'

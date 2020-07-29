@@ -18,11 +18,9 @@ from django.urls import include, path
 from rest_framework import routers
 
 import grocery60_be.webhook
-from grocery60_be import views, viewsets, webhook
+from grocery60_be import views, viewsets, webhook, views_ai
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
-
-
 
 router = routers.DefaultRouter()
 router.register('cart', viewsets.CartViewset)
@@ -42,13 +40,11 @@ router.register('user', viewsets.UserViewset)
 router.register('category', viewsets.CategoryViewset)
 router.register('storeadmin', viewsets.StoreAdminViewset)
 
-
 handler400 = 'grocery60_be.views.bad_request'
 handler401 = 'grocery60_be.views.permission_denied'
 handler403 = 'grocery60_be.views.permission_denied'
 handler404 = 'grocery60_be.views.not_found'
 handler500 = 'grocery60_be.views.server_error'
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -65,10 +61,16 @@ urlpatterns = [
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 
-
     ### India Views ###
     path('payment/in/', views.IndiaPaymentView.as_view()),
     path('payment/in/<str:razor_order_id>', views.IndiaPaymentView.as_view()),
+
+    ### Product Search AI View ###
+    path('productset/', views_ai.ProductSetView.as_view()),
+    path('productset/<str:product_set_id>', views_ai.ProductSetView.as_view()),
+    path('product/', views_ai.ProductView.as_view()),
+    path('product/<int:product_id>', views_ai.ProductView.as_view()),
+    path('product/search/', views_ai.ProductSearchView.as_view()),
 
 ]
 

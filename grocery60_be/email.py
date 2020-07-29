@@ -37,6 +37,7 @@ async def _send_email(email, template):
         'total': email.total,
         'username': email.username,
         'password': email.password,
+        'token': email.token,
     }
 
     # render email text

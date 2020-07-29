@@ -202,7 +202,7 @@ class OrderDetailView(APIView):
         data = request.data
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(token=util.generate_token(4))
 
         items = data.get('items')
 
