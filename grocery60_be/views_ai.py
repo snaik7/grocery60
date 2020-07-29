@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -52,7 +53,7 @@ class ProductSearchView(APIView):
         product_category = data.get('product_category')
         file_path = data.get('file_path')
         filters = data.get('filters')
-        search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
+        results = search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
                                                  file_path, filters)
-
-        return Response({'msg': 'success'})
+        print(type(results))
+        return JsonResponse(results, safe=False)

@@ -1,5 +1,6 @@
 from google.cloud import vision
 
+
 def create_product_set(
         project_id, location, product_set_id, product_set_display_name):
     """Create a product set.
@@ -86,6 +87,7 @@ def add_product_to_product_set(
         name=product_set_path, product=product_path)
     print('Product added to product set.')
 
+
 def create_reference_image(
         project_id, location, product_id, reference_image_id, gcs_uri):
     """Create a reference image.
@@ -166,8 +168,11 @@ def get_similar_products_file(
     results = response.product_search_results.results
 
     print('Search results:')
+    result_list = []
     for result in results:
         product = result.product
+        product_dict = {'score': result.score, 'image': result.image, 'product_name': product.name,
+                        'display_name': product.display_name, 'description': product.description}
 
         print('Score(Confidence): {}'.format(result.score))
         print('Image name: {}'.format(result.image))
@@ -177,3 +182,6 @@ def get_similar_products_file(
             product.display_name))
         print('Product description: {}\n'.format(product.description))
         print('Product labels: {}\n'.format(product.product_labels))
+        result_list.append(product_dict)
+    print(type(result_list))
+    return result_list

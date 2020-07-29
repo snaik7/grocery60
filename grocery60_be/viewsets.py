@@ -283,10 +283,6 @@ class OrderViewset(viewsets.ModelViewSet):
     filterset_fields = ['customer_id', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(status='Order Received')
-
 
 class OrderItemViewset(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
@@ -343,6 +339,13 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
             order_payment.payout_id = data.get('payout_id')
         order_payment.save()
         serializer = OrderPaymentSerializer(order_payment)
+        if data.get('status') == "READY_TO_PICK":
+            recipient_email = Email()
+            recipient_email.subject = "Order Ready to pick up for Grocery 60"
+            user = User.objects.get(id=order_payment.order.customer_id)
+            recipient_email.email = user.email
+            recipient_email.order_id = order_payment.order_id
+            order_payment.send_pickup_email(recipient_email)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 

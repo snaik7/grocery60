@@ -342,9 +342,6 @@ def get_service_fee(sub_total):
 
 
 class Order(models.Model):
-    status = models.CharField(
-        max_length=50
-    )
     currency = models.CharField(
         max_length=7
     )
@@ -441,7 +438,7 @@ class OrderPayment(models.Model):
             payment_method = 'card'
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
-            status = intent.get('status')
+            status = "CONFIRMED"
             correlation_id = intent.get('id')
             signature = None
             order_payment = OrderPayment(amount=amount, transaction_id=transaction_id, payment_method=payment_method,
@@ -462,6 +459,13 @@ class OrderPayment(models.Model):
         except Exception as e:
             raise Exception('Exception ' + str(e))
         return cart.id
+
+    def send_pickup_email(self, email):
+        print('data received ', email.order_id)
+        print('data received ', email.order_items_list)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'order_pickup.html'))
 
     def send_success_email(self, email):
         print('data received ', email.order_id)

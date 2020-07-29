@@ -31,8 +31,12 @@ class PaymentWebhookView(APIView):
             intent = event_dict['data']['object']
             print("Update unknown event : ", intent['id'], '   ', event_dict['type'])
 
-        if event_dict['type'] == "payment_intent.succeeded" or event_dict['type'] == "payment_intent.payment_failed":
-            OrderPayment().update_payment(intent['id'], event_dict['type'])
-            print("Database Update Succeeded: ", intent['id'])
+        payment_status = None
+        if event_dict['type'] == "payment_intent.succeeded":
+            payment_status = "SUCCESS"
+        if event_dict['type'] == "payment_intent.payment_failed":
+            payment_status = "FAIL"
+        OrderPayment().update_payment(intent['id'], payment_status)
+        print("Database Update Succeeded: ", intent['id'])
 
         return JsonResponse(event_dict, status=status.HTTP_200_OK)
