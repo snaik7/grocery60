@@ -15,7 +15,7 @@ import environ
 import stripe
 import logging
 # Imports the Cloud Logging client library
-import google.cloud.logging # Don't conflict with standard logging
+import google.cloud.logging  # Don't conflict with standard logging
 from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
 
 # Import settings with django-environ
@@ -23,7 +23,7 @@ env = environ.Env()
 
 # Import settings from Secret Manager
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env_file = os.path.join(BASE_DIR,  ".env")
+env_file = os.path.join(BASE_DIR, ".env")
 
 if not os.path.isfile('.env'):
     import google.auth
@@ -46,18 +46,17 @@ env.read_env(env_file)
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
+# SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
 
 SECRET_KEY = env("SECRET_KEY")
 
-#SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
+# SECRET_KEY = '6#k#c$w9-v35=f-prrr)s25t0q75px)iu4m6c&((&_w42fa!%4'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*','grocery60-be-b2yd4bi7eq-uc.a.run.app']
-
+ALLOWED_HOSTS = ['*', 'grocery60-be-b2yd4bi7eq-uc.a.run.app']
 
 # Application definition
 
@@ -76,7 +75,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # libraries
     'graphene_django',
-    ]
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -110,7 +109,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -119,12 +117,11 @@ WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 DATABASES = {"default": env.db()}
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator", },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -139,7 +136,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -147,7 +143,6 @@ STATIC_URL = '/static/'
 
 # Define static storage via django-storages[google]
 GS_BUCKET_NAME = env("GS_BUCKET_NAME", None)
-
 
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
@@ -172,7 +167,7 @@ REST_FRAMEWORK = {
 stripe.api_key = env("STRIPE_PUBKEY")
 stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
 # set on each request
-stripe_account="acct_1FPY3JEQN3kQJKqm"
+stripe_account = "acct_1FPY3JEQN3kQJKqm"
 
 PROJECT = 'named-enigma-277405'
 
@@ -185,15 +180,14 @@ client = google.cloud.logging.Client()
 # at INFO level and higher
 
 handler = CloudLoggingHandler(client)
-logging.getLogger().setLevel(logging.INFO) # defaults to WARN
+logging.getLogger().setLevel(logging.INFO)  # defaults to WARN
 setup_logging(handler)
 
-
-CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+CORS_ORIGIN_ALLOW_ALL = True  # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3030',
-] # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
+]  # If this is used, then not need to use `CORS_ORIGIN_ALLOW_ALL = True`
 CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:3030',
 ]
@@ -213,9 +207,10 @@ SERVICE_FEE = 7
 DISCOUNT = 2
 PAYMENT_COUNT = 10
 PAYMENT_DELAY = 15
-PAYMENT_SCHEDULER_DELAY = 360 # in mins
+PAYMENT_SCHEDULER_DELAY = 360  # in mins
 
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET")
 
 REGION = 'us-west1'
+

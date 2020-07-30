@@ -3,6 +3,7 @@ import base64
 import decimal
 from decimal import Decimal
 
+import requests
 from django.contrib.auth import hashers
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -11,8 +12,10 @@ from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
-from grocery60_be import email as email_send
+from grocery60_be import email as email_send, search_product, settings
 from grocery60_be import util
+
+from google.cloud import storage
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
@@ -155,6 +158,53 @@ class CatalogViewset(viewsets.ModelViewSet):
             kwargs["many"] = True
         return super(CatalogViewset, self).get_serializer(*args, **kwargs)
 
+    def perform_create(self, serializer):
+
+        if serializer.is_valid():
+            serializer.save()
+
+            if isinstance(serializer.data, list):
+                data = serializer.data[:]
+            else:
+                data = [serializer.data]
+
+            for product in data:
+                # Create Product
+                store_id = str(product.get('store')) # Product Set creates using store id
+                product_id = str(product.get('id'))
+                search_product.create_product(settings.PROJECT, settings.REGION, product_id,
+                                              product.get('product_name'),
+                                              'homegoods')
+                print(' Product created with product id ', product_id)
+                # Create Product Image
+                gcs_uri = str(product.get('product_url'))
+                gcs_uri = gcs_uri.replace('https', 'gs')
+                gcs_uri = gcs_uri.replace(settings.GS_BUCKET_NAME, settings.GS_BUCKET_NAME + '-ml')
+                gcs_uri = gcs_uri.replace('storage.googleapis.com/', '')
+                url_split = gcs_uri.split('/')
+                reference_image_id = 'I_' + url_split[3]
+                source_bucket = settings.GS_BUCKET_NAME
+                source_object = url_split[3]
+                destination_bucket = settings.GS_BUCKET_NAME + '-ml'
+
+                client = storage.Client(project=settings.PROJECT)
+                bucket = client.bucket(source_bucket)
+                dst_bucket = client.bucket(destination_bucket)
+                blob = bucket.blob(source_object)
+                new_blob = bucket.copy_blob(blob, dst_bucket)
+                new_blob.acl.save(blob.acl)
+
+                search_product.create_reference_image(settings.PROJECT, settings.REGION, product_id,
+                                                      reference_image_id,
+                                                      gcs_uri)
+                print(' Product created with product id ', product_id, 'reference_image_id ', reference_image_id)
+
+
+                # Attach product to product set
+                search_product.add_product_to_product_set(settings.PROJECT, settings.REGION, product_id,
+                                                          'PS_'+store_id)
+                print(' Added  in Product Set PS_' + store_id)
+
     '''Don't support bulk update'''
 
     def update(self, request, pk):
@@ -182,6 +232,7 @@ class CatalogViewset(viewsets.ModelViewSet):
                 'media') else product.media
             product.save()
             serializer = CatalogSerializer(product)
+
             return JsonResponse(serializer.data, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
@@ -223,6 +274,22 @@ class StoreViewset(viewsets.ModelViewSet):
         if isinstance(kwargs.get("data", {}), list):
             kwargs["many"] = True
         return super(StoreViewset, self).get_serializer(*args, **kwargs)
+
+    def perform_create(self, serializer):
+        print("Bulk Insert")
+        if serializer.is_valid():
+            serializer.save()
+            if isinstance(serializer.data, list):
+                data = serializer.data[:]
+            else:
+                data = [serializer.data]
+
+            for store in data:
+                # Create Product Set for Store
+                product_set = 'PS_' + str(store.get('id'))
+                product_set_display = product_set + ' Store Set'
+                search_product.create_product_set(settings.PROJECT, settings.REGION, product_set, product_set_display)
+
 
     '''Don't support bulk update'''
 

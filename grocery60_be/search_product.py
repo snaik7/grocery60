@@ -171,17 +171,49 @@ def get_similar_products_file(
     result_list = []
     for result in results:
         product = result.product
-        product_dict = {'score': result.score, 'image': result.image, 'product_name': product.name,
-                        'display_name': product.display_name, 'description': product.description}
 
         print('Score(Confidence): {}'.format(result.score))
         print('Image name: {}'.format(result.image))
-
+        print('result', result)
         print('Product name: {}'.format(product.name))
+        print(product.name.split('/'))
+        product_id = product.name.split('/')
         print('Product display name: {}'.format(
             product.display_name))
         print('Product description: {}\n'.format(product.description))
         print('Product labels: {}\n'.format(product.product_labels))
+        image_list = list_reference_images(project_id, location, product_id[5])
+        product_dict = {'score': round(result.score * 100), 'image': result.image, 'product_name': product.name,
+                        'display_name': product.display_name, 'description': product.description,
+                        'image_url': image_list}
+
         result_list.append(product_dict)
-    print(type(result_list))
     return result_list
+
+
+def list_reference_images(
+        project_id, location, product_id):
+    """List all images in a product.
+    Args:
+        project_id: Id of the project.
+        location: A compute region name.
+        product_id: Id of the product.
+    """
+    client = vision.ProductSearchClient()
+
+    # Get the full path of the product.
+    product_path = client.product_path(
+        project=project_id, location=location, product=product_id)
+
+    # List all the reference images available in the product.
+    reference_images = client.list_reference_images(parent=product_path)
+    image_list = []
+    # Display the reference image information.
+    for image in reference_images:
+        print('Reference image name: {}'.format(image.name))
+        print('Reference image id: {}'.format(image.name.split('/')[-1]))
+        print('Reference image uri: {}'.format(image.uri))
+        print('Reference image bounding polygons: {}'.format(
+            image.bounding_polys))
+        image_list.append(image.uri.replace('gs://', 'https://storage.cloud.google.com/'))
+    return image_list

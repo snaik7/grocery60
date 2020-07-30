@@ -4,7 +4,7 @@ from django.http import JsonResponse
 import traceback
 from grocery60_be import settings
 from rest_framework.views import exception_handler
-from rest_framework.exceptions import NotAuthenticated, NotFound, MethodNotAllowed
+from rest_framework.exceptions import NotAuthenticated, NotFound, MethodNotAllowed, AuthenticationFailed
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework import exceptions
@@ -41,8 +41,9 @@ class ServiceException(Exception):
 # categorize your exceptions
 ERRORS_400 = (
 ValidationError, exceptions.ValidationError, RestValidationError, HttpResponseBadRequest, MethodNotAllowed)
-ERRORS_401 = (AuthenticationError, NotAuthenticated)
+ERRORS_401 = (AuthenticationError, NotAuthenticated, AuthenticationFailed)
 ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist, Http404, HttpResponseNotFound)
+
 
 
 def grocery60_exception_handler(exc, context):

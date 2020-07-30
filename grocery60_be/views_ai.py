@@ -37,7 +37,7 @@ class ProductView(APIView):
         product = models.Product.objects.get(id=product_id)
         gcs_uri = str(product.product_url)
         gcs_uri = gcs_uri.replace('https', 'gs')
-        gcs_uri = gcs_uri.replace('named-enigma-277405-media', 'named-enigma-277405-media-ml')
+        gcs_uri = gcs_uri.replace(settings.GS_BUCKET_NAME, settings.GS_BUCKET_NAME+'-ml')
         gcs_uri = gcs_uri.replace('storage.googleapis.com/', '')
         url_split = gcs_uri.split('/')
         reference_image_id = 'I_' + url_split[3]
@@ -49,11 +49,11 @@ class ProductView(APIView):
 class ProductSearchView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
-        product_set_id = data.get('product_set_id')
+        product_set_id = 'PS_'+data.get('store_id')
         product_category = data.get('product_category')
         file_path = data.get('file_path')
         filters = data.get('filters')
+        print('Searching set ', product_set_id, ' category ', product_category)
         results = search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
                                                  file_path, filters)
-        print(type(results))
         return JsonResponse(results, safe=False)
