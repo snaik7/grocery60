@@ -51,9 +51,9 @@ class ProductSearchView(APIView):
         data = JSONParser().parse(request)
         product_set_id = 'PS_'+data.get('store_id')
         product_category = data.get('product_category')
-        file_path = data.get('file_path')
+        image_uri = data.get('image_uri')
         filters = data.get('filters')
         print('Searching set ', product_set_id, ' category ', product_category)
         results = search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
-                                                 file_path, filters)
+                                                 image_uri, filters)
         return JsonResponse(results, safe=False)

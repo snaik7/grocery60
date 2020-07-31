@@ -1,5 +1,5 @@
 from google.cloud import vision
-
+from grocery60_be import models
 
 def create_product_set(
         project_id, location, product_set_id, product_set_display_name):
@@ -120,14 +120,14 @@ def create_reference_image(
 
 def get_similar_products_file(
         project_id, location, product_set_id, product_category,
-        file_path, filter):
+        image_uri, filter):
     """Search similar products to image.
     Args:
         project_id: Id of the project.
         location: A compute region name.
         product_set_id: Id of the product set.
         product_category: Category of the product.
-        file_path: Local file path of the image to be searched.
+        image_uri: URI of the image to be searched.
         filter: Condition to be applied on the labels.
         Example for filter: (color = red OR color = blue) AND style = kids
         It will search on all products with the following labels:
@@ -138,12 +138,9 @@ def get_similar_products_file(
     product_search_client = vision.ProductSearchClient()
     image_annotator_client = vision.ImageAnnotatorClient()
 
-    # Read the image as a stream of bytes.
-    with open(file_path, 'rb') as image_file:
-        content = image_file.read()
-
     # Create annotate image request along with product search feature.
-    image = vision.types.Image(content=content)
+    image_source = vision.types.ImageSource(image_uri=image_uri)
+    image = vision.types.Image(source=image_source)
 
     # product search specific parameters
     product_set_path = product_search_client.product_set_path(
@@ -171,23 +168,25 @@ def get_similar_products_file(
     result_list = []
     for result in results:
         product = result.product
+        if result.score > .7:
+            print('Score(Confidence): {}'.format(result.score))
+            print('Image name: {}'.format(result.image))
+            print('result', result)
+            print('Product name: {}'.format(product.name))
+            print(product.name.split('/'))
+            product_id = product.name.split('/')[5]
+            _product = models.Product.objects.get(id=product_id)
+            print('Product display name: {}'.format(
+                product.display_name))
+            print('Product description: {}\n'.format(product.description))
+            print('Product labels: {}\n'.format(product.product_labels))
+            image_list = list_reference_images(project_id, location, product_id)
+            product_dict = {'score': round(result.score * 100), 'image': result.image, 'product_name': product.name,
+                            'display_name': product.display_name, 'description': product.description,
+                            'image_url': image_list, 'product_name' : _product.product_name, 'product_url':
+                            _product.product_url, 'product_category' : _product.product_category}
 
-        print('Score(Confidence): {}'.format(result.score))
-        print('Image name: {}'.format(result.image))
-        print('result', result)
-        print('Product name: {}'.format(product.name))
-        print(product.name.split('/'))
-        product_id = product.name.split('/')
-        print('Product display name: {}'.format(
-            product.display_name))
-        print('Product description: {}\n'.format(product.description))
-        print('Product labels: {}\n'.format(product.product_labels))
-        image_list = list_reference_images(project_id, location, product_id[5])
-        product_dict = {'score': round(result.score * 100), 'image': result.image, 'product_name': product.name,
-                        'display_name': product.display_name, 'description': product.description,
-                        'image_url': image_list}
-
-        result_list.append(product_dict)
+            result_list.append(product_dict)
     return result_list
 
 

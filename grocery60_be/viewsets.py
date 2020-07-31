@@ -76,8 +76,6 @@ class CartItemViewset(viewsets.ModelViewSet):
             order_by('product_id')
         print(cart_item.query)
         cart_item_list = []
-        count = 0
-        line_total = Decimal(0)
         cart_item_dict = {}
         for item in cart_item:
             _dict = {}
@@ -87,6 +85,7 @@ class CartItemViewset(viewsets.ModelViewSet):
                 cart_item_list.remove(_item[0])
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
+                _dict['store_id'] = item.cart.store.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
@@ -101,6 +100,7 @@ class CartItemViewset(viewsets.ModelViewSet):
             else:
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
+                _dict['store_id'] = item.cart.store.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url

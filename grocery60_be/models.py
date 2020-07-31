@@ -209,6 +209,7 @@ class Cart(models.Model):
     billing_address_id = models.IntegerField(blank=True)
     customer_id = models.IntegerField()
     shipping_address_id = models.IntegerField(blank=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "cart"
