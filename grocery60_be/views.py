@@ -68,13 +68,34 @@ class VerifyLoginView(APIView):
 
 @authentication_classes([])
 @permission_classes([])
+class ResendEmailLoginView(APIView):
+
+    def get(self, request):
+        print('verifying')
+        username = request.GET.get('username')
+        user = User.objects.get(username=username)
+        email = Email()
+        email.subject = "Welcome to Grocery 60 !!!"
+        email.email = user.email
+        email.first_name = user.first_name
+        email.username = user.username
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(email_send.send_email(email, 'registration.html'))
+        print('return')
+        data = {'message': 'success'}
+        return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
+
+
+@authentication_classes([])
+@permission_classes([])
 class StoreLoginView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
         username = data.get('username')
         password = data.get('password')
         store_admin = StoreAdmin.objects.get(username=username)
-        #store_admin = get_object_or_404(StoreAdmin, username=username)
+        # store_admin = get_object_or_404(StoreAdmin, username=username)
         valid = hashers.check_password(password, store_admin.password)
         if valid:
             data = {'message': 'success'}
@@ -198,7 +219,6 @@ class PaymentView(APIView):
         )
 
         if OrderPayment().record_payment(data, intent):
-            OrderPayment().delete_cart(data)
             recipient_email = Email()
             recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
@@ -206,6 +226,7 @@ class PaymentView(APIView):
             recipient_email.set_order(order_id)
             order_payment = OrderPayment()
             order_payment.send_success_email(recipient_email)
+            OrderPayment().delete_cart(data)
             return JsonResponse(intent)
         else:
             raise Exception('Order Payment failed for Order = ' + order_id)

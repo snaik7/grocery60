@@ -6,13 +6,7 @@ from django.template.loader import render_to_string
 from grocery60_be import settings
 
 
-async def send_email(email, template):
-    # Fire and Forget email
-    asyncio.ensure_future(_send_email(email, template))
-    print('Fire and Forget')
-
-
-async def _send_email(email, template):
+def send_email(email, template):
     print('*********************** email send template started ***********************')
     """
     Handles password reset tokens
@@ -41,7 +35,7 @@ async def _send_email(email, template):
         'password': email.password,
         'token': email.token,
         'host': settings.ALLOWED_HOSTS[1],
-        #'host': 'http://localhost:8000',
+        # 'host': 'http://localhost:8000',
     }
 
     # render email text
@@ -59,3 +53,4 @@ async def _send_email(email, template):
     )
     msg.attach_alternative(email_message, "text/html")
     msg.send()
+    print('email sent')

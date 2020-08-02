@@ -4,9 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models, connection
-from django.contrib.auth.models import User, AbstractUser
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.contrib.auth.models import AbstractUser
 
 from grocery60_be import email as email_send
 from grocery60_be import settings
@@ -15,7 +13,7 @@ from grocery60_be import settings
 class User(AbstractUser):
     verified = models.CharField(
         max_length=1,
-        default='N'
+        default='Y'
     )
 
     class Meta:
@@ -469,10 +467,10 @@ class OrderPayment(models.Model):
             cart = None
             customer_id = data.get('metadata').get('customer_id')
             cart = Cart.objects.get(customer_id=customer_id)
-            cart.delete()
+            if cart:
+                cart.delete()
         except Exception as e:
-            raise Exception('Exception ' + str(e))
-        return cart.id
+            print('Exception ' + str(e))
 
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
@@ -484,9 +482,7 @@ class OrderPayment(models.Model):
     def send_success_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'order_confirmation.html'))
+        email_send.send_email(email, 'order_confirmation.html')
 
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
@@ -496,9 +492,7 @@ class OrderPayment(models.Model):
         email.subject = "Order failure for Grocery 60"
         email.email = customer.email
         email.order_id = order_payment.order_id
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'order_payment_failure.html'))
+        email_send.send_email(email, 'order_payment_failure.html')
 
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
@@ -509,9 +503,7 @@ class OrderPayment(models.Model):
         email.email = store.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'store_order_confirmation.html'))
+        email_send.send_email(email, 'store_order_confirmation.html')
 
     def update_payment(self, transaction_id, status):
         try:

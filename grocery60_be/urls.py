@@ -57,6 +57,7 @@ urlpatterns = [
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
     path('verify/login/', views.VerifyLoginView.as_view()),
+    path('email/login/', views.ResendEmailLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
