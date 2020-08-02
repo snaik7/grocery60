@@ -4,9 +4,22 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models, connection
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from grocery60_be import email as email_send
 from grocery60_be import settings
+
+
+class User(AbstractUser):
+    verified = models.CharField(
+        max_length=1,
+        default='N'
+    )
+
+    class Meta:
+        db_table = "auth_user"
 
 
 class Store(models.Model):

@@ -34,7 +34,6 @@ router.register('order', viewsets.OrderViewset)
 router.register('order-item', viewsets.OrderItemViewset)
 router.register('delivery', viewsets.DeliveryViewset)
 router.register('shipping-method', viewsets.ShippingMethodViewset)
-# this router is not in use
 router.register('order-payment', viewsets.OrderPaymentViewset)
 router.register('user', viewsets.UserViewset)
 router.register('category', viewsets.CategoryViewset)
@@ -57,6 +56,7 @@ urlpatterns = [
     path('webhook/payment/', webhook.PaymentWebhookView.as_view()),
     path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
+    path('verify/login/', views.VerifyLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),

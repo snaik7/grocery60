@@ -3,11 +3,9 @@ import base64
 import decimal
 from decimal import Decimal
 
-import requests
 from django.contrib.auth import hashers
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.db.models import Count, Sum
 from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
@@ -19,7 +17,7 @@ from google.cloud import storage
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category, User
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
     OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer, \
@@ -40,6 +38,7 @@ class UserViewset(viewsets.ModelViewSet):
         email.subject = "Welcome to Grocery 60 !!!"
         email.email = serializer.data.get('email')
         email.first_name = serializer.data.get('first_name')
+        email.username = serializer.data.get('username')
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(email_send.send_email(email, 'registration.html'))
@@ -85,7 +84,6 @@ class CartItemViewset(viewsets.ModelViewSet):
                 cart_item_list.remove(_item[0])
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
-                _dict['store_id'] = item.cart.store.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
@@ -100,7 +98,6 @@ class CartItemViewset(viewsets.ModelViewSet):
             else:
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
-                _dict['store_id'] = item.cart.store.id
                 _dict['product_id'] = item.product.id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url

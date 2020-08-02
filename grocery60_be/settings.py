@@ -116,6 +116,8 @@ WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 # Use django-environ to define the connection string
 DATABASES = {"default": env.db()}
 
+AUTH_USER_MODEL = 'grocery60_be.User'
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator", },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },

@@ -9,10 +9,10 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models, util, settings
-from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem
+from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User
 import stripe
 from rest_framework.views import APIView
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -57,6 +57,17 @@ class FeeCalView(APIView):
 
 @authentication_classes([])
 @permission_classes([])
+class VerifyLoginView(APIView):
+    def get(self, request):
+        print('verifying')
+        username = request.GET.get('username')
+        user = User.objects.get(username=username)
+        user.verified = 'Y'
+        user.save()
+        return HttpResponse('Welcome  ' + user.first_name + ', Your email is verified')
+
+@authentication_classes([])
+@permission_classes([])
 class StoreLoginView(APIView):
     def post(self, request):
         data = JSONParser().parse(request)
@@ -79,7 +90,11 @@ class CustomLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data.get('key'))
-        return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
+        if User.objects.get(id=token.user_id).verified == 'Y':
+            return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
+        else:
+            data = {'msg': 'Please login to your email and verify your email.'}
+            return JsonResponse(data=data, status=status.HTTP_401_UNAUTHORIZED, safe=False)
 
 
 class CustomerPaymentView(APIView):

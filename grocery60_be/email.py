@@ -3,6 +3,8 @@ import asyncio
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
+from grocery60_be import settings
+
 
 async def send_email(email, template):
     # Fire and Forget email
@@ -38,6 +40,8 @@ async def _send_email(email, template):
         'username': email.username,
         'password': email.password,
         'token': email.token,
+        'host': settings.ALLOWED_HOSTS[0],
+        #'host': 'http://localhost:8000',
     }
 
     # render email text

@@ -1,13 +1,13 @@
 import decimal
 from decimal import Decimal, getcontext
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Store, Product, Customer, Cart, CartItem, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category, User
 from django.contrib.auth.hashers import make_password
 
 
@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'is_active', 'last_login', 'last_name', 'groups', 'password']
+        fields = ['id', 'username', 'email', 'first_name', 'is_active', 'last_login', 'last_name', 'groups', 'password', 'verified']
 
 
 class GroupSerializer(serializers.ModelSerializer):
