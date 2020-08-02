@@ -40,7 +40,7 @@ async def _send_email(email, template):
         'username': email.username,
         'password': email.password,
         'token': email.token,
-        'host': settings.ALLOWED_HOSTS[0],
+        'host': settings.ALLOWED_HOSTS[1],
         #'host': 'http://localhost:8000',
     }
 
