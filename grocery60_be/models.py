@@ -21,7 +21,8 @@ class User(AbstractUser):
 
 class Store(models.Model):
     name = models.CharField(
-        max_length=50
+        max_length=50,
+        unique=True
     )
     address = models.CharField(
         max_length=50
