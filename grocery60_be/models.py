@@ -1,4 +1,3 @@
-import asyncio
 import decimal
 from datetime import datetime
 from decimal import Decimal
@@ -475,9 +474,7 @@ class OrderPayment(models.Model):
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'order_pickup.html'))
+        email_send.send_email(email, 'order_pickup.html')
 
     def send_success_email(self, email):
         print('data received ', email.order_id)

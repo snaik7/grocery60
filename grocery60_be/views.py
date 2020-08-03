@@ -1,4 +1,3 @@
-import asyncio
 import decimal
 from decimal import Decimal
 
@@ -79,9 +78,7 @@ class ResendEmailLoginView(APIView):
         email.email = user.email
         email.first_name = user.first_name
         email.username = user.username
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'registration.html'))
+        email_send.send_email(email, 'registration.html')
         print('return')
         data = {'message': 'success'}
         return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
@@ -162,9 +159,7 @@ class PaymentView(APIView):
             user = User.objects.get(id=order_payment.order.customer_id)
             email.email = user.email
             email.order_id = order_payment.order_id
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(email_send.send_email(email, 'order_cancellation.html'))
+            email_send.send_email(email, 'order_cancellation.html')
             return JsonResponse(data='', status=status.HTTP_204_NO_CONTENT, safe=False)
         else:
             raise Exception('Order Cancellation failed for Order = ', order_id)

@@ -1,4 +1,3 @@
-import asyncio
 import base64
 import decimal
 from decimal import Decimal
@@ -39,9 +38,7 @@ class UserViewset(viewsets.ModelViewSet):
         email.email = serializer.data.get('email')
         email.first_name = serializer.data.get('first_name')
         email.username = serializer.data.get('username')
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(email_send.send_email(email, 'registration.html'))
+        email_send.send_email(email, 'registration.html')
 
 
 class CartViewset(viewsets.ModelViewSet):
@@ -253,9 +250,7 @@ class StoreAdminViewset(viewsets.ModelViewSet):
             email.email = serializer.data.get('email')
             email.username = serializer.data.get('username')
             email.password = text_password
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(email_send.send_email(email, 'storeadmin_registration.html'))
+            email_send.send_email(email, 'storeadmin_registration.html')
 
 
 class StoreViewset(viewsets.ModelViewSet):
