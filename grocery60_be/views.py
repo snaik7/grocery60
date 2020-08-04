@@ -123,16 +123,6 @@ class CustomerPaymentView(APIView):
         return JsonResponse(serializer.data, safe=False)
 
 
-class CatalogSearchView(APIView):
-    def get(self, request):
-        search_key = request.GET.get('search_key')
-        store_id = request.GET.get('store_id')
-        category_id = request.GET.get('category_id')
-        print(store_id)
-        dict, status = models.Product().search_catalog(search_key, store_id, category_id)
-        return JsonResponse(dict, status=status, safe=False)
-
-
 class PaymentView(APIView):
 
     def delete(self, request, order_id):

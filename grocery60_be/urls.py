@@ -55,7 +55,6 @@ urlpatterns = [
     path('payment/', views.PaymentView.as_view()),
     path('payment/<int:order_id>', views.PaymentView.as_view()),
     path('webhook/payment/', webhook.PaymentWebhookView.as_view()),
-    path('search/', views.CatalogSearchView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
     path('verify/login/', views.VerifyLoginView.as_view()),
     path('email/login/', views.ResendEmailLoginView.as_view()),
