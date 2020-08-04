@@ -142,7 +142,7 @@ class CatalogViewset(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = CatalogSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['product_category', 'store_id', 'status']
+    filterset_fields = ['product_name', 'product_category', 'store_id', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a products.'''

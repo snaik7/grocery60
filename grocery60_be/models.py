@@ -129,6 +129,7 @@ class Product(models.Model):
     )
     tax_exempt = models.BooleanField(blank=True, default=False)
 
+    '''
     def search_catalog(self, search_key, store_id):
         if search_key and store_id:
             search_list = search_key.split()
@@ -182,7 +183,7 @@ class Product(models.Model):
                     "extra) ~ %s) AND store_id = %s "
         query_search_list.append(store_id)
         return query, query_search_list
-
+    '''
     class Meta:
         db_table = "product"
 
@@ -333,7 +334,7 @@ def get_shipping_cost(shipping_id):
 
 
 def get_tip(tip, custom_tip, sub_total):
-    tip_amount = Decimal('0')
+    tip_amount = Decimal('0.00')
     if custom_tip:
         tip_amount = Decimal(custom_tip)
     elif tip:

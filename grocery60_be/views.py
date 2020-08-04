@@ -32,11 +32,11 @@ class FeeCalView(APIView):
         shipping_id = data.get('shipping_id')
         custom_tip = data.get('custom_tip')
         customer_id = data.get('customer_id')
+        cents = Decimal('.01')
         # Calculate Tip
         tip = models.get_tip(tip, custom_tip, sub_total)
         # Calculate Shipping Fee
-        shipping_fee = models.get_shipping_cost(shipping_id) if shipping_id else Decimal('0')
-        cents = Decimal('.01')
+        shipping_fee = models.get_shipping_cost(shipping_id) if shipping_id else Decimal('0.00')
         # Calculate Tax based on state
         address = BillingAddress.objects.filter(customer_id=customer_id).first()
         if address:
@@ -51,8 +51,8 @@ class FeeCalView(APIView):
         discount = models.get_discount(customer_id, sub_total)
         total = Decimal(sub_total) + tax + tip + service_fee + shipping_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
-        return Response({'sub_total': sub_total, 'tax': tax, 'tip': tip, 'service_fee': service_fee,
-                         'shipping_fee': shipping_fee, 'discount': discount, 'total': total})
+        return Response({'sub_total': str(sub_total), 'tax': str(tax), 'tip': str(tip), 'service_fee': str(service_fee),
+                         'shipping_fee': str(shipping_fee), 'discount': str(discount), 'total': str(total)})
 
 
 @authentication_classes([])
@@ -127,8 +127,9 @@ class CatalogSearchView(APIView):
     def get(self, request):
         search_key = request.GET.get('search_key')
         store_id = request.GET.get('store_id')
+        category_id = request.GET.get('category_id')
         print(store_id)
-        dict, status = models.Product().search_catalog(search_key, store_id)
+        dict, status = models.Product().search_catalog(search_key, store_id, category_id)
         return JsonResponse(dict, status=status, safe=False)
 
 
