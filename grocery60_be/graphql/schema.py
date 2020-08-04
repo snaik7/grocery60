@@ -40,7 +40,7 @@ class Query:
 
     products = graphene.List(ProductType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
     product = graphene.Field(ProductType, id=graphene.String(), token=graphene.String())
-    product_search = graphene.List(ProductType, category=graphene.String(), product_name=graphene.String(),
+    product_search = graphene.List(ProductType, product_category=graphene.String(), product_name=graphene.String(),
                                    extra=graphene.String(), store_id=graphene.Int(), first=graphene.Int(),
                                    skip=graphene.Int(), token=graphene.String())
 
@@ -108,12 +108,22 @@ class Query:
 
     def resolve_product_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
-            category = kwargs.get("category", "")
-            product_name = kwargs.get("product_name", "")
-            extra = kwargs.get("extra", "")
-            store_id = kwargs.get("store_id", 0)
-            qs = Product.objects.filter(product_category__icontains=category, product_name__icontains=product_name,
-                                        extra__icontains=extra, store=store_id, status='ACTIVE')
+
+            _kwargs = {}
+            if kwargs.get('product_category') is not None:
+                _kwargs['product_category__icontains'] = kwargs.get('product_category')
+
+            if kwargs.get('product_name') is not None:
+                _kwargs['product_name__icontains'] = kwargs.get('product_name')
+
+            if kwargs.get('extra') is not None:
+                _kwargs['extra__icontains'] = kwargs.get('extra')
+
+            if kwargs.get('store_id') is not None:
+                _kwargs['store_id'] = kwargs.get('store_id')
+
+            qs = Product.objects.filter(status='ACTIVE', **_kwargs)
+
             if skip:
                 qs = qs[skip:]
             if first:

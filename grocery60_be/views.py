@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models, util, settings
+from grocery60_be.error import ValidationError
 from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User
 import stripe
 from rest_framework.views import APIView
@@ -170,48 +171,53 @@ class PaymentView(APIView):
         amount = Decimal(data.get('amount')) * 100  # convert to cents
         cents = Decimal('0')
         amount = amount.quantize(cents)
-        print('amount', amount)
-        # view is not fat but payload is fat...sorry payment view
-        intent = stripe.PaymentIntent.create(
-            idempotency_key=util.get_idempotency_key(16),  # to avoid collisions.
-            amount=amount,  # convert to cents
-            currency=data.get('currency'),
-            confirm=True,  # confirming the PaymentIntent
-            receipt_email=data.get('receipt_email'),
-            confirmation_method='automatic',
-            payment_method_data={
-                "type": "card",
-                "card": {
-                    "number": data.get('card').get('number'),
-                    "exp_month": data.get('card').get('exp_month'),
-                    "exp_year": data.get('card').get('exp_year'),
-                    "cvc": data.get('card').get('cvc')
-                },
-                "billing_details": {
-                    "address": {
-                        "city": data.get('billing_details').get('address').get('city'),
-                        "country": data.get('billing_details').get('address').get('country'),
-                        "line1": data.get('billing_details').get('address').get('line1'),
-                        "line2": data.get('billing_details').get('address').get('line2'),
-                        "postal_code": data.get('billing_details').get('address').get('postal_code'),
-                        "state": data.get('billing_details').get('address').get('state'),
+        try:
+
+            # view is not fat but payload is fat...sorry payment view
+            intent = stripe.PaymentIntent.create(
+                idempotency_key=util.get_idempotency_key(16),  # to avoid collisions.
+                amount=amount,  # convert to cents
+                currency=data.get('currency'),
+                confirm=True,  # confirming the PaymentIntent
+                receipt_email=data.get('receipt_email'),
+                confirmation_method='automatic',
+                payment_method_data={
+                    "type": "card",
+                    "card": {
+                        "number": data.get('card').get('number'),
+                        "exp_month": data.get('card').get('exp_month'),
+                        "exp_year": data.get('card').get('exp_year'),
+                        "cvc": data.get('card').get('cvc')
                     },
+                    "billing_details": {
+                        "address": {
+                            "city": data.get('billing_details').get('address').get('city'),
+                            "country": data.get('billing_details').get('address').get('country'),
+                            "line1": data.get('billing_details').get('address').get('line1'),
+                            "line2": data.get('billing_details').get('address').get('line2'),
+                            "postal_code": data.get('billing_details').get('address').get('postal_code'),
+                            "state": data.get('billing_details').get('address').get('state'),
+                        },
 
+                    }
+                },
+                metadata={
+                    "OrderId": order_id,
+                    "Phone": data.get('metadata').get('phone'),
+                    "CustomerId": data.get('metadata').get('customer_id'),
+                    "StoreId": data.get('metadata').get('store_id')
                 }
-            },
-            metadata={
-                "OrderId": order_id,
-                "Phone": data.get('metadata').get('phone'),
-                "CustomerId": data.get('metadata').get('customer_id'),
-                "StoreId": data.get('metadata').get('store_id')
-            }
-        )
+            )
 
-        print('stripe.PaymentIntent.create success with intent ' + intent.get('id'))
+            print('stripe.PaymentIntent.create success with intent ' + intent.get('id'))
 
-        intent = stripe.PaymentIntent.retrieve(
-            intent.get('id')
-        )
+            intent = stripe.PaymentIntent.retrieve(
+                intent.get('id')
+            )
+        except stripe.error.StripeError as e:
+            # Display a very generic error to the user, and maybe send
+            # yourself an email
+            raise ValidationError(e)
 
         if OrderPayment().record_payment(data, intent):
             recipient_email = Email()

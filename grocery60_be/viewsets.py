@@ -367,7 +367,7 @@ class OrderItemViewset(viewsets.ModelViewSet):
 
 
 class OrderPaymentViewset(viewsets.ModelViewSet):
-    queryset = OrderPayment.objects.all()
+    queryset = OrderPayment.objects.all().order_by('-id')
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id', 'store_id', 'status', 'payout_status', 'payout_message']
@@ -427,7 +427,7 @@ class TaxViewset(viewsets.ModelViewSet):
     queryset = Tax.objects.all()
     serializer_class = TaxSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['state']
+    filterset_fields = ['state','country']
     http_method_names = ['get', 'post', 'head', 'put']
 
 
