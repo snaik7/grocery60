@@ -9,7 +9,7 @@ from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
-from grocery60_be import email as email_send, search_product, settings
+from grocery60_be import email as email_send, search_product, settings, serializers
 from grocery60_be import util
 
 from google.cloud import storage
@@ -429,6 +429,10 @@ class TaxViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['state','country']
     http_method_names = ['get', 'post', 'head', 'put']
+
+    def retrieve(self, request, pk=None):
+        queryset = Tax.objects.all().distinct('country').values('country')
+        return JsonResponse(list(queryset), safe=False)
 
 
 class CategoryViewset(viewsets.ModelViewSet):
