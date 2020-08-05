@@ -16,11 +16,11 @@ from google.cloud import storage
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category, User
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category, User, Leads
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
     OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer, \
-    StoreAdminSerializer, CategorySerializer
+    StoreAdminSerializer, CategorySerializer, LeadsSerializer
 
 
 class UserViewset(viewsets.ModelViewSet):
@@ -339,7 +339,7 @@ class OrderViewset(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['customer_id', 'status']
+    filterset_fields = ['customer_id']
     http_method_names = ['get', 'post', 'head', 'put']
 
 
@@ -439,4 +439,12 @@ class CategoryViewset(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
+    http_method_names = ['get', 'post', 'head', 'put']
+
+
+class LeadsViewset(viewsets.ModelViewSet):
+    queryset = Leads.objects.all().order_by('customer_id')
+    serializer_class = LeadsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status']
     http_method_names = ['get', 'post', 'head', 'put']

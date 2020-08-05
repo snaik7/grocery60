@@ -93,8 +93,9 @@ class StoreLoginView(APIView):
         username = data.get('username')
         password = data.get('password')
         store_admin = StoreAdmin.objects.get(username=username)
-        # store_admin = get_object_or_404(StoreAdmin, username=username)
+        print('password ', password, ' store_admin ', store_admin.password)
         valid = hashers.check_password(password, store_admin.password)
+        print('valid ', valid)
         if valid:
             data = {'message': 'success'}
             return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)

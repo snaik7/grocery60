@@ -39,6 +39,7 @@ router.register('user', viewsets.UserViewset)
 router.register('category', viewsets.CategoryViewset)
 router.register('storeadmin', viewsets.StoreAdminViewset)
 router.register('tax', viewsets.TaxViewset)
+router.register('leads', viewsets.LeadsViewset)
 
 handler400 = 'grocery60_be.views.bad_request'
 handler401 = 'grocery60_be.views.permission_denied'

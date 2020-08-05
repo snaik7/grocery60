@@ -7,7 +7,7 @@ from rest_framework.serializers import ListSerializer
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Store, Product, Customer, Cart, CartItem, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category, User
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category, User, Leads
 from django.contrib.auth.hashers import make_password
 
 
@@ -18,7 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'is_active', 'last_login', 'last_name', 'groups', 'password', 'verified']
+        fields = ['id', 'username', 'email', 'first_name', 'is_active', 'last_login', 'last_name', 'groups', 'password',
+                  'verified']
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -122,4 +123,10 @@ class TaxSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = '__all__'
+
+
+class LeadsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Leads
         fields = '__all__'

@@ -541,3 +541,29 @@ class Category(models.Model):
 
     class Meta:
         db_table = "category"
+
+
+class Leads(models.Model):
+    customer_id = models.AutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    request = models.CharField(
+        max_length=500
+    )
+    email = models.CharField(
+        max_length=128
+    )
+    phone_number = models.CharField(
+        max_length=128
+    )
+    status = models.CharField(
+        max_length=50,
+        default='ACTIVE'
+    )
+    comments = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    class Meta:
+        db_table = "leads"
