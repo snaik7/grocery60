@@ -427,11 +427,11 @@ class TaxViewset(viewsets.ModelViewSet):
     queryset = Tax.objects.all()
     serializer_class = TaxSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['state','country']
+    filterset_fields = ['state','country','country_code']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def retrieve(self, request, pk=None):
-        queryset = Tax.objects.all().distinct('country').values('country')
+        queryset = Tax.objects.all().distinct('country_code').values('country','country_code')
         return JsonResponse(list(queryset), safe=False)
 
 

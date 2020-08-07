@@ -528,6 +528,10 @@ class Tax(models.Model):
         max_length=100,
         unique=True
     )
+    country_code = models.CharField(
+        max_length=2,
+        unique=True
+    )
     tax = models.DecimalField(max_digits=3, decimal_places=2)
 
     class Meta:
