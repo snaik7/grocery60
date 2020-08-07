@@ -50,7 +50,7 @@ handler500 = 'grocery60_be.views.server_error'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('customer-payment/<int:customer_id>', views.CustomerPaymentView.as_view()),
+    path('customer-payment/', views.CustomerPaymentView.as_view()),
     path('rest-auth/', include('rest_auth.urls')),
     path('order-detail/', views.OrderDetailView.as_view()),
     path('payment/', views.PaymentView.as_view()),
