@@ -175,7 +175,7 @@ def get_similar_products_file(
             print('Product name: {}'.format(product.name))
             print(product.name.split('/'))
             product_id = product.name.split('/')[5]
-            _product = models.Product.objects.get(id=product_id)
+            _product = models.Product.objects.get(product_id=product_id)
             print('Product display name: {}'.format(
                 product.display_name))
             print('Product description: {}\n'.format(product.description))

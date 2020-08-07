@@ -56,11 +56,11 @@ class CartItemViewset(viewsets.ModelViewSet):
 
     def create(self, request):
         data = JSONParser().parse(request)
-        product = Product.objects.get(id=data.get('product_id'))
+        product = Product.objects.get(product_id=data.get('product_id'))
         cart = Cart.objects.get(id=data.get('cart_id'))
-        data['product_id'] = product.id
+        data['product_id'] = product.product_id
         data['cart_id'] = cart.id
-        CartItem.objects.create(product_id=product.id, extra=data.get('extra'),
+        CartItem.objects.create(product_id=product.product_id, extra=data.get('extra'),
                                 quantity=data.get('quantity'), cart_id=cart.id)
         return JsonResponse(data)
 
@@ -76,12 +76,12 @@ class CartItemViewset(viewsets.ModelViewSet):
         for item in cart_item:
             _dict = {}
             product_id_list = [_item['product_id'] for _item in cart_item_list]
-            if item.product.id in product_id_list:
-                _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.id]
+            if item.product.product_id in product_id_list:
+                _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.product_id]
                 cart_item_list.remove(_item[0])
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
-                _dict['product_id'] = item.product.id
+                _dict['product_id'] = item.product.product_id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
                 _dict['image'] = base64.b64encode(item.product.image).decode()
@@ -95,7 +95,7 @@ class CartItemViewset(viewsets.ModelViewSet):
             else:
                 _dict['cart_item_id'] = item.id
                 _dict['cart_id'] = item.cart.id
-                _dict['product_id'] = item.product.id
+                _dict['product_id'] = item.product.product_id
                 _dict['product_name'] = item.product.product_name
                 _dict['product_url'] = item.product.product_url
                 _dict['image'] = base64.b64encode(item.product.image).decode()
@@ -205,7 +205,7 @@ class CatalogViewset(viewsets.ModelViewSet):
         serializer = CatalogSerializer(data=request.data)
         product = None
         if serializer.is_valid():
-            product = Product.objects.get(id=pk)
+            product = Product.objects.get(product_id=pk)
             product.product_name = serializer.validated_data.get('product_name')
             product.product_url = serializer.validated_data.get('product_url') if serializer.validated_data.get(
                 'product_url') else product.product_url
@@ -289,7 +289,7 @@ class StoreViewset(viewsets.ModelViewSet):
         serializer = StoreSerializer(data=request.data)
         store = None
         if serializer.is_valid():
-            store = Store.objects.get(id=pk)
+            store = Store.objects.get(store_id=pk)
             store.name = serializer.validated_data.get('name')
             store.address = serializer.validated_data.get('address')
             store.city = serializer.validated_data.get('city')
@@ -355,12 +355,12 @@ class OrderItemViewset(viewsets.ModelViewSet):
 
         for data in data_list:
             print(data)
-            product = Product.objects.get(id=data.get('product_id'))
+            product = Product.objects.get(product_id=data.get('product_id'))
             order = Order.objects.get(order_id=data.get('order_id'))
             cents = Decimal('.01')
             line_total = product.price * Decimal(data.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
-            OrderItem.objects.create(product_id=product.id, order_id=order.order_id, extra=data.get('extra'),
+            OrderItem.objects.create(product_id=product.product_id, order_id=order.order_id, extra=data.get('extra'),
                                      line_total=line_total,
                                      quantity=data.get('quantity'), canceled=data.get('canceled'))
         return JsonResponse(data_list, safe=False)
@@ -389,7 +389,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
         if data.get('order'):
             order_payment.order.order_id = data.get('order')
         if data.get('store'):
-            order_payment.store.id = data.get('store')
+            order_payment.store.store_id = data.get('store')
         if data.get('payout_message'):
             order_payment.payout_message = data.get('payout_message')
         if data.get('payout_status'):

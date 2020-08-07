@@ -20,6 +20,7 @@ class User(AbstractUser):
 
 
 class Store(models.Model):
+    store_id = models.AutoField(primary_key=True)
     name = models.CharField(
         max_length=50
     )
@@ -98,6 +99,7 @@ class StoreAdmin(models.Model):
 
 
 class Product(models.Model):
+    product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(
         max_length=50
     )
@@ -441,7 +443,7 @@ class OrderPayment(models.Model):
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
-        store = Store.objects.get(id=order_payment.store.id)
+        store = Store.objects.get(store_id=order_payment.store.store_id)
         email = Email()
         email.subject = "Order Confirmation for Grocery 60"
         email.email = store.email

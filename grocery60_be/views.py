@@ -244,12 +244,12 @@ class OrderDetailView(APIView):
 
         for item in items:
             print(data)
-            product = Product.objects.get(id=item.get('product_id'))
+            product = Product.objects.get(product_id=item.get('product_id'))
             order = Order.objects.get(order_id=serializer.data.get('id'))
             cents = Decimal('.01')
             line_total = product.price * Decimal(item.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
-            OrderItem.objects.create(product_id=product.id, order_id=order.order_id, extra=item.get('extra'),
+            OrderItem.objects.create(product_id=product.product_id, order_id=order.order_id, extra=item.get('extra'),
                                      line_total=line_total,
                                      quantity=item.get('quantity'), canceled=item.get('canceled'))
 

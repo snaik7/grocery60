@@ -72,7 +72,7 @@ class Query:
     def resolve_store(self, info, id, token=None, ):
         if validate_token(token):
             # Querying a single question
-            return Store.objects.get(pk=id)
+            return Store.objects.get(store_id=id)
         else:
             raise GraphQLError('Authentication credentials were not provided')
 
@@ -105,7 +105,7 @@ class Query:
     def resolve_product(self, info, id, token=None):
         if validate_token(token):
             # Querying a list
-            return Product.objects.get(pk=id)
+            return Product.objects.get(product_id=id)
         else:
             raise GraphQLError('Authentication credentials were not provided')
 

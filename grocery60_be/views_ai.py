@@ -34,7 +34,7 @@ class ProductView(APIView):
 
     def patch(self, request, product_id):
         data = JSONParser().parse(request)
-        product = models.Product.objects.get(id=product_id)
+        product = models.Product.objects.get(product_id=product_id)
         gcs_uri = str(product.product_url)
         gcs_uri = gcs_uri.replace('https', 'gs')
         gcs_uri = gcs_uri.replace(settings.GS_BUCKET_NAME, settings.GS_BUCKET_NAME+'-ml')
