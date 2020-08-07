@@ -114,7 +114,7 @@ class CustomLoginView(LoginView):
             return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
         else:
             data = {'msg': 'Please login to your email and verify your email.'}
-            return JsonResponse(data=data, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+            return JsonResponse(data=data, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 class CustomerPaymentView(APIView):
