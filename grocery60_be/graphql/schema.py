@@ -31,6 +31,7 @@ def validate_token(token):
 
 
 class Query:
+
     cart_item_count = graphene.Field(CountType, token=graphene.String(), customer_id=graphene.Int())
 
     stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
@@ -86,6 +87,8 @@ class Query:
             return qs
         else:
             raise GraphQLError('Authentication credentials were not provided')
+
+
 
     def resolve_products(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):

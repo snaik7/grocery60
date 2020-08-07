@@ -27,7 +27,7 @@ class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['username']
+    filterset_fields = ['username','email']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):

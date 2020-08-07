@@ -201,7 +201,7 @@ class PaymentView(APIView):
                 }
             )
 
-            print('stripe.PaymentIntent.create success with intent ' + intent.get('id'))
+            print('💰 stripe.PaymentIntent.create success with intent ' + intent.get('id'))
 
             intent = stripe.PaymentIntent.retrieve(
                 intent.get('id')
