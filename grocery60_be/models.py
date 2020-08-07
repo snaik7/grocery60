@@ -299,6 +299,7 @@ def get_service_fee(sub_total):
 
 
 class Order(models.Model):
+    order_id = models.AutoField(primary_key=True)
     currency = models.CharField(
         max_length=7
     )
@@ -455,11 +456,11 @@ class OrderPayment(models.Model):
             order_payment.updated_at = datetime.now()
             order_payment.save()
             if status == "payment_intent.succeeded":
-                order = Order.objects.get(id=order_payment.order_id)
+                order = Order.objects.get(order_id=order_payment.order_id)
                 order.status = 'Ready to fulfill'
                 order.save()
             elif status == "payment_intent.payment_failed":
-                order = Order.objects.get(id=order_payment.order_id)
+                order = Order.objects.get(order_id=order_payment.order_id)
                 order.status = 'Payment failure'
                 order.save()
         except Exception as e:
@@ -504,7 +505,7 @@ class Email(models.Model):
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
     def set_order(self, order_id):
-        order = Order.objects.get(pk=order_id)
+        order = Order.objects.get(order_id=order_id)
         self.token = order.token
         self.subtotal = order.subtotal
         self.tax = order.tax

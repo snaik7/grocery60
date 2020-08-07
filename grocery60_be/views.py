@@ -150,7 +150,7 @@ class PaymentView(APIView):
         if intent.get('status') == 'canceled':
             order_payment.status = 'CANCELLED'
             order_payment.save()
-            order = Order.objects.get(id=order_id)
+            order = Order.objects.get(order_id=order_id)
             order.status = 'CANCELLED'
             order.save()
             # Send email for order cancellation
@@ -245,11 +245,11 @@ class OrderDetailView(APIView):
         for item in items:
             print(data)
             product = Product.objects.get(id=item.get('product_id'))
-            order = Order.objects.get(id=serializer.data.get('id'))
+            order = Order.objects.get(order_id=serializer.data.get('id'))
             cents = Decimal('.01')
             line_total = product.price * Decimal(item.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
-            OrderItem.objects.create(product_id=product.id, order_id=order.id, extra=item.get('extra'),
+            OrderItem.objects.create(product_id=product.id, order_id=order.order_id, extra=item.get('extra'),
                                      line_total=line_total,
                                      quantity=item.get('quantity'), canceled=item.get('canceled'))
 

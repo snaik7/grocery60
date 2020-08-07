@@ -356,11 +356,11 @@ class OrderItemViewset(viewsets.ModelViewSet):
         for data in data_list:
             print(data)
             product = Product.objects.get(id=data.get('product_id'))
-            order = Order.objects.get(id=data.get('order_id'))
+            order = Order.objects.get(order_id=data.get('order_id'))
             cents = Decimal('.01')
             line_total = product.price * Decimal(data.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
-            OrderItem.objects.create(product_id=product.id, order_id=order.id, extra=data.get('extra'),
+            OrderItem.objects.create(product_id=product.id, order_id=order.order_id, extra=data.get('extra'),
                                      line_total=line_total,
                                      quantity=data.get('quantity'), canceled=data.get('canceled'))
         return JsonResponse(data_list, safe=False)
@@ -387,7 +387,7 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
         if data.get('payment_method'):
             order_payment.payment_method = data.get('payment_method')
         if data.get('order'):
-            order_payment.order.id = data.get('order')
+            order_payment.order.order_id = data.get('order')
         if data.get('store'):
             order_payment.store.id = data.get('store')
         if data.get('payout_message'):
