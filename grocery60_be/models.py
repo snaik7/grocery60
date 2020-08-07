@@ -355,6 +355,7 @@ class OrderItem(models.Model):
 
 
 class OrderPayment(models.Model):
+    payment_id = models.AutoField(primary_key=True)
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     transaction_id = models.CharField(
         max_length=200,

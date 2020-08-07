@@ -367,14 +367,14 @@ class OrderItemViewset(viewsets.ModelViewSet):
 
 
 class OrderPaymentViewset(viewsets.ModelViewSet):
-    queryset = OrderPayment.objects.all().order_by('-id')
+    queryset = OrderPayment.objects.all().order_by('-payment_id')
     serializer_class = OrderPaymentSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_id', 'store_id', 'status', 'payout_status', 'payout_message']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def update(self, request, pk):
-        order_payment = OrderPayment.objects.get(id=pk)
+        order_payment = OrderPayment.objects.get(payment_id=pk)
         data = JSONParser().parse(request)
         if data.get('amount'):
             order_payment.amount = data.get('amount')

@@ -122,10 +122,10 @@ class CustomerPaymentView(APIView):
         customer_id = request.GET.get('customer_id')
         store_id = request.GET.get('store_id')
         if store_id:
-            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id, order__customer_id=customer_id).order_by('-id')
+            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id, order__customer_id=customer_id).order_by('-payment_id')
         else:
             query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by(
-                '-id')
+                '-payment_id')
 
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
