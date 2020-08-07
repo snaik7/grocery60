@@ -210,7 +210,7 @@ class BillingAddress(models.Model):
         max_length=2
     )
     country = models.CharField(
-        max_length=3
+        max_length=100
     )
     customer_id = models.IntegerField()
 
@@ -243,7 +243,7 @@ class ShippingAddress(models.Model):
         max_length=2
     )
     country = models.CharField(
-        max_length=3
+        max_length=100
     )
     customer_id = models.IntegerField()
 
