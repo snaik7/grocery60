@@ -409,7 +409,7 @@ class OrderPayment(models.Model):
             order_payment.save()
         except Exception as e:
             raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
-        return order_payment.id
+        return order_payment.payment_id
 
     def delete_cart(self, data):
         try:
