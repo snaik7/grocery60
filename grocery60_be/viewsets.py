@@ -109,6 +109,11 @@ class CartItemViewset(viewsets.ModelViewSet):
             cart_item_dict = {'count': len(cart_item_list), 'results': cart_item_list}
         return JsonResponse(cart_item_dict, safe=False)
 
+    def destroy(self, request, pk=None):
+        product_id = request.GET.get('product_id')
+        CartItem.objects.filter(cart_id=pk, product_id=product_id).delete()
+        return JsonResponse(data='', safe=False, status=status.HTTP_204_NO_CONTENT)
+
 
 class CustomerViewset(viewsets.ModelViewSet):
     queryset = Customer.objects.all()

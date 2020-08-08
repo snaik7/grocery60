@@ -55,6 +55,7 @@ def payout_store():
                         currency="usd",
                         destination="acct_1H92XPFQ5Tn2vT0x"
                     )
+                    payment.status = 'COMPLETED'
                     payment.payout_status = 'COMPLETED'
                     payment.payout_id = transfer.get('id')
                 else:
