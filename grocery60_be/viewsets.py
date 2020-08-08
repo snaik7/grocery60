@@ -113,7 +113,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         print('destroy')
         product_id = request.GET.get('product_id')
         CartItem.objects.filter(cart_id=pk, product_id=product_id).delete()
-        return JsonResponse(data='{}', safe=False, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse(data='{}', safe=False, status=status.HTTP_200_OK)
 
 
 class CustomerViewset(viewsets.ModelViewSet):
