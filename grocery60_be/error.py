@@ -80,18 +80,22 @@ def grocery60_exception_handler(exc, context):
             error_msg = 'You do not have credentials to login'
             status_code = 401
         else:
-            error_msg = str(exc.msg)
-            status_code = 400
+            if 'msg' in dir(exc):
+                error_msg = str(exc.msg)
+                status_code = 400
+            else:
+                error_msg = 'An error while validating data'
+                status_code = 400
     elif isinstance(exc, ERRORS_401):
         print(' Error Status  401')
-        if exc.msg:
+        if 'msg' in dir(exc):
             error_msg = str(exc.msg)
         else:
             error_msg = 'You do not have permission to perform this action'
         status_code = 401
     elif isinstance(exc, ERRORS_403):
         print(' Error Status  403')
-        if exc.msg:
+        if 'msg' in dir(exc):
             error_msg = str(exc.msg)
         else:
             error_msg = 'You do not have permission to perform this action'

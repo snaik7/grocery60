@@ -29,7 +29,7 @@ class PaymentWebhookView(APIView):
             order_payment.send_failure_email(intent['id'])
         else:
             intent = event_dict['data']['object']
-            print("Update unknown event : ", intent['id'], '   ', event_dict['type'])
+            print("No action unknown event : ", intent['id'], '   ', event_dict['type'])
 
         payment_status = None
         if event_dict['type'] == "payment_intent.succeeded":

@@ -458,16 +458,12 @@ class OrderPayment(models.Model):
         try:
             order_payment = OrderPayment.objects.get(transaction_id=transaction_id)
             order_payment.status = status
+            if status == "payment_intent.succeeded":
+                order_payment.status = 'Ready to fulfill'
+            elif status == "payment_intent.payment_failed":
+                order_payment.status= 'Payment failure'
             order_payment.updated_at = datetime.now()
             order_payment.save()
-            if status == "payment_intent.succeeded":
-                order = Order.objects.get(order_id=order_payment.order_id)
-                order.status = 'Ready to fulfill'
-                order.save()
-            elif status == "payment_intent.payment_failed":
-                order = Order.objects.get(order_id=order_payment.order_id)
-                order.status = 'Payment failure'
-                order.save()
         except Exception as e:
             raise ValidationError(
                 'Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(
