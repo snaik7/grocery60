@@ -456,12 +456,12 @@ class OrderPayment(models.Model):
 
     def update_payment(self, transaction_id, status):
         try:
-            order_payment = OrderPayment.objects.get(transaction_id=transaction_id)
+            order_payment = OrderPayment.objects.filter(transaction_id=transaction_id).first()
             order_payment.status = status
-            if status == "payment_intent.succeeded":
+            if status == "SUCCEEDED":
                 order_payment.status = 'Ready to fulfill'
-            elif status == "payment_intent.payment_failed":
-                order_payment.status= 'Payment failure'
+            elif status == "FAILED":
+                order_payment.status = 'Payment failure'
             order_payment.updated_at = datetime.now()
             order_payment.save()
         except Exception as e:
