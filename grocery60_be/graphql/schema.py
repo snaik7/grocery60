@@ -3,6 +3,7 @@ from django.db.models import Count
 from graphql import GraphQLError
 from graphene_django.types import DjangoObjectType
 
+from grocery60_be.error import ValidationError
 from grocery60_be.models import Store, Product, CartItem, Cart
 from grocery60_be.models import Count as CountModel
 from grocery60_be import settings
@@ -55,7 +56,7 @@ class Query:
             count.count = cart_item.get('count')
             return count
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
     def resolve_stores(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
@@ -67,14 +68,14 @@ class Query:
                 qs = qs[:first]
             return qs
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
     def resolve_store(self, info, store_id, token=None, ):
         if validate_token(token):
             # Querying a single question
             return Store.objects.get(store_id=store_id)
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
     def resolve_store_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
@@ -86,7 +87,7 @@ class Query:
                 qs = qs[:first]
             return qs
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
 
 
@@ -100,14 +101,14 @@ class Query:
                 qs = qs[:first]
             return qs
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
     def resolve_product(self, info, product_id, token=None):
         if validate_token(token):
             # Querying a list
             return Product.objects.get(product_id=product_id)
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')
 
     def resolve_product_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
@@ -133,4 +134,4 @@ class Query:
                 qs = qs[:first]
             return qs
         else:
-            raise GraphQLError('Authentication credentials were not provided')
+            raise ValidationError('Authentication credentials were not provided')

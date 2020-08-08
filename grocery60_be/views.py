@@ -44,7 +44,7 @@ class FeeCalView(APIView):
             tax = Decimal(sub_total) * Decimal(models.get_tax(address.state) / 100)
             tax = tax.quantize(cents, decimal.ROUND_HALF_UP)
         else:
-            raise Exception('Please add shipping address to profile so tax calculation can be done')
+            raise ValidationError('Please add shipping address to profile so tax calculation can be done')
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
         service_fee = models.get_service_fee(sub_total)
@@ -144,7 +144,7 @@ class PaymentView(APIView):
         except stripe.error.StripeError as e:
             # Display a very generic error to the user, and maybe send
             # yourself an email
-            raise Exception('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
+            raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
                             'and we will reply you in 24 hours. '.format(order_id))
 
         if intent.get('status') == 'canceled':
@@ -162,7 +162,7 @@ class PaymentView(APIView):
             email_send.send_email(email, 'order_cancellation.html')
             return JsonResponse(data='', status=status.HTTP_204_NO_CONTENT, safe=False)
         else:
-            raise Exception('Order Cancellation failed for Order = ', order_id)
+            raise ValidationError('Order Cancellation failed for Order = ', order_id)
 
     def post(self, request):
         data = JSONParser().parse(request)
@@ -229,7 +229,7 @@ class PaymentView(APIView):
             OrderPayment().delete_cart(data)
             return JsonResponse(intent)
         else:
-            raise Exception('Order Payment failed for Order = ' + order_id)
+            raise ValidationError('Order Payment failed for Order = ' + order_id)
 
 
 class OrderDetailView(APIView):
@@ -305,7 +305,7 @@ class IndiaPaymentView(APIView):
             OrderPayment().delete_cart(data)
             return JsonResponse(intent)
         else:
-            raise Exception('Order Payment failed for Order = ' + order_id)
+            raise ValidationError('Order Payment failed for Order = ' + order_id)
 
     def put(self, request, razor_order_id):
         data = JSONParser().parse(request)

@@ -39,10 +39,9 @@ class ServiceException(Exception):
 
 # categorize your exceptions
 ERRORS_400 = (
-ValidationError, exceptions.ValidationError, RestValidationError, HttpResponseBadRequest, MethodNotAllowed)
+    ValidationError, exceptions.ValidationError, RestValidationError, HttpResponseBadRequest, MethodNotAllowed)
 ERRORS_401 = (AuthenticationError, NotAuthenticated, AuthenticationFailed)
 ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist, Http404, HttpResponseNotFound)
-
 
 
 def grocery60_exception_handler(exc, context):
@@ -61,7 +60,7 @@ def grocery60_exception_handler(exc, context):
             error_msg = 'You do not have permission to perform this action'
             status_code = 401
         else:
-            error_msg = 'Bad request for resource'
+            error_msg = str(exc)
             status_code = 400
     elif isinstance(exc, ERRORS_401):
         error_msg = 'You do not have permission to perform this action'

@@ -7,6 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 from grocery60_be import email as email_send
 from grocery60_be import settings
+from grocery60_be.error import ValidationError
 
 
 class User(AbstractUser):
@@ -408,7 +409,7 @@ class OrderPayment(models.Model):
                                          signature=signature)
             order_payment.save()
         except Exception as e:
-            raise Exception('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
+            raise ValidationError('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
         return order_payment.payment_id
 
     def delete_cart(self, data):
@@ -467,7 +468,7 @@ class OrderPayment(models.Model):
                 order.status = 'Payment failure'
                 order.save()
         except Exception as e:
-            raise Exception(
+            raise ValidationError(
                 'Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(
                     e))
         return order_payment.id
