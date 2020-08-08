@@ -14,12 +14,31 @@ from django.http.response import Http404, HttpResponseBadRequest, HttpResponseNo
 
 class ValidationError(Exception):
     """Raised when the input value is invalid"""
-    pass
+
+    def __init__(self, msg):
+        self.msg = msg
+        self.message = msg
+
+    def __init__(self, msg, message=None):
+        print('msg', msg)
+        self.msg = msg
+        self.message = message
+
+
+class AutherizationError(Exception):
+    """Raised when the authentication failed"""
+
+    def __init__(self, msg):
+        self.msg = msg
+        self.message = msg
 
 
 class AuthenticationError(Exception):
     """Raised when the authentication failed"""
-    pass
+
+    def __init__(self, msg):
+        self.msg = msg
+        self.message = msg
 
 
 class ObjectNotFound(Exception):
@@ -41,6 +60,7 @@ class ServiceException(Exception):
 ERRORS_400 = (
     ValidationError, exceptions.ValidationError, RestValidationError, HttpResponseBadRequest, MethodNotAllowed)
 ERRORS_401 = (AuthenticationError, NotAuthenticated, AuthenticationFailed)
+ERRORS_403 = (AutherizationError,)
 ERRORS_404 = (ObjectNotFound, ResourceNotExist, NotFound, ObjectDoesNotExist, Http404, HttpResponseNotFound)
 
 
@@ -57,15 +77,25 @@ def grocery60_exception_handler(exc, context):
     if isinstance(exc, ERRORS_400):
         print(' Error Status  400')
         if str(exc).find('Unable to log in') > -1:
-            error_msg = 'You do not have permission to perform this action'
+            error_msg = 'You do not have credentials to login'
             status_code = 401
         else:
-            error_msg = str(exc)
+            error_msg = str(exc.msg)
             status_code = 400
     elif isinstance(exc, ERRORS_401):
-        error_msg = 'You do not have permission to perform this action'
         print(' Error Status  401')
+        if exc.msg:
+            error_msg = str(exc.msg)
+        else:
+            error_msg = 'You do not have permission to perform this action'
         status_code = 401
+    elif isinstance(exc, ERRORS_403):
+        print(' Error Status  403')
+        if exc.msg:
+            error_msg = str(exc.msg)
+        else:
+            error_msg = 'You do not have permission to perform this action'
+        status_code = 403
     elif isinstance(exc, ERRORS_404):
         print(' Error Status  404')
         error_msg = 'Resource does not exists at requested url'

@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models, util, settings
-from grocery60_be.error import ValidationError
+from grocery60_be.error import ValidationError, AutherizationError, AuthenticationError
 from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User
 import stripe
 from rest_framework.views import APIView
@@ -100,8 +100,7 @@ class StoreLoginView(APIView):
             data = {'message': 'success'}
             return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
         else:
-            data = {'message': 'failure'}
-            return JsonResponse(data=data, status=status.HTTP_401_UNAUTHORIZED, safe=False)
+            raise AuthenticationError('Please login with valid credentials.')
 
 
 @authentication_classes([])
@@ -113,8 +112,7 @@ class CustomLoginView(LoginView):
         if User.objects.get(id=token.user_id).verified == 'Y':
             return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
         else:
-            data = {'msg': 'Please login to your email and verify your email.'}
-            return JsonResponse(data=data, status=status.HTTP_403_FORBIDDEN, safe=False)
+            raise AutherizationError('Please login to your email and verify your email.')
 
 
 class CustomerPaymentView(APIView):

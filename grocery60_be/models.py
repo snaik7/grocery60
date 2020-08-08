@@ -409,7 +409,8 @@ class OrderPayment(models.Model):
                                          signature=signature)
             order_payment.save()
         except Exception as e:
-            raise ValidationError('Order Payment failed for Order = ' + order_id + ' with ' + str(e))
+            raise ValidationError('Order Payment failed for Order = ' + order_id, 'Order Payment failed for Order = ' +
+                                  order_id + ' with ' + str(e))
         return order_payment.payment_id
 
     def delete_cart(self, data):
