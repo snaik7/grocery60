@@ -459,9 +459,9 @@ class OrderPayment(models.Model):
             order_payment = OrderPayment.objects.filter(transaction_id=transaction_id).first()
             order_payment.status = status
             if status == "SUCCEEDED":
-                order_payment.status = 'Ready to fulfill'
+                order_payment.status = 'READY_TO_FULFILL'
             elif status == "FAILED":
-                order_payment.status = 'Payment failure'
+                order_payment.status = 'PAYMENT_FAILURE'
             order_payment.updated_at = datetime.now()
             order_payment.save()
         except Exception as e:
