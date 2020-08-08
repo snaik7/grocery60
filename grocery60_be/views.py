@@ -158,7 +158,7 @@ class PaymentView(APIView):
             email.email = user.email
             email.order_id = order_payment.order_id
             email_send.send_email(email, 'order_cancellation.html')
-            return JsonResponse(data='', status=status.HTTP_204_NO_CONTENT, safe=False)
+            return JsonResponse(data='{}', status=status.HTTP_200_OK, safe=False)
         else:
             raise ValidationError('Order Cancellation failed for Order = ', order_id)
 
