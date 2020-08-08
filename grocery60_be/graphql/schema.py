@@ -35,12 +35,12 @@ class Query:
     cart_item_count = graphene.Field(CountType, token=graphene.String(), customer_id=graphene.Int())
 
     stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
-    store = graphene.Field(StoreType, id=graphene.String(), token=graphene.String())
+    store = graphene.Field(StoreType, store_id=graphene.Int(), token=graphene.String())
     store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
                                  token=graphene.String())
 
     products = graphene.List(ProductType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
-    product = graphene.Field(ProductType, id=graphene.String(), token=graphene.String())
+    product = graphene.Field(ProductType, product_id=graphene.Int(), token=graphene.String())
     product_search = graphene.List(ProductType, product_category=graphene.String(), product_name=graphene.String(),
                                    extra=graphene.String(), store_id=graphene.Int(), first=graphene.Int(),
                                    skip=graphene.Int(), token=graphene.String())
@@ -69,10 +69,10 @@ class Query:
         else:
             raise GraphQLError('Authentication credentials were not provided')
 
-    def resolve_store(self, info, id, token=None, ):
+    def resolve_store(self, info, store_id, token=None, ):
         if validate_token(token):
             # Querying a single question
-            return Store.objects.get(store_id=id)
+            return Store.objects.get(store_id=store_id)
         else:
             raise GraphQLError('Authentication credentials were not provided')
 
@@ -102,10 +102,10 @@ class Query:
         else:
             raise GraphQLError('Authentication credentials were not provided')
 
-    def resolve_product(self, info, id, token=None):
+    def resolve_product(self, info, product_id, token=None):
         if validate_token(token):
             # Querying a list
-            return Product.objects.get(product_id=id)
+            return Product.objects.get(product_id=product_id)
         else:
             raise GraphQLError('Authentication credentials were not provided')
 
