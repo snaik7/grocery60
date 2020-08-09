@@ -3,7 +3,7 @@ import decimal
 from decimal import Decimal
 
 from django.contrib.auth import hashers
-#from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
@@ -27,7 +27,7 @@ class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['username','email']
+    filterset_fields = ['username', 'email']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):
@@ -39,6 +39,20 @@ class UserViewset(viewsets.ModelViewSet):
         email.first_name = serializer.data.get('first_name')
         email.username = serializer.data.get('username')
         email_send.send_email(email, 'registration.html')
+
+    def update(self, request, pk):
+        data = JSONParser().parse(request)
+        user = User.objects.get(pk=pk)
+        user.username = data.get('username') if data.get('username') else user.username
+        user.first_name = data.get('first_name') if data.get('first_name') else user.first_name
+        user.last_name = data.get('last_name') if data.get('last_name') else user.first_name
+        user.email = data.get('email') if data.get('email') else user.email
+        user.is_staff = data.get('is_staff') if data.get('is_staff')  else user.is_staff
+        user.is_active = data.get('is_active') if data.get('is_active')  else user.is_active
+        user.verified = data.get('verified') if data.get('verified')  else user.verified
+        user.save()
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data)
 
 
 class CartViewset(viewsets.ModelViewSet):
@@ -170,7 +184,7 @@ class CatalogViewset(viewsets.ModelViewSet):
 
             for product in data:
                 # Create Product
-                store_id = str(product.get('store')) # Product Set creates using store id
+                store_id = str(product.get('store'))  # Product Set creates using store id
                 product_id = str(product.get('id'))
                 search_product.create_product(settings.PROJECT, settings.REGION, product_id,
                                               product.get('product_name'),
@@ -199,10 +213,9 @@ class CatalogViewset(viewsets.ModelViewSet):
                                                       gcs_uri)
                 print(' Product created with product id ', product_id, 'reference_image_id ', reference_image_id)
 
-
                 # Attach product to product set
                 search_product.add_product_to_product_set(settings.PROJECT, settings.REGION, product_id,
-                                                          'PS_'+store_id)
+                                                          'PS_' + store_id)
                 print(' Added  in Product Set PS_' + store_id)
 
     '''Don't support bulk update'''
@@ -287,7 +300,6 @@ class StoreViewset(viewsets.ModelViewSet):
                 product_set = 'PS_' + str(store.get('store_id'))
                 product_set_display = product_set + ' Store Set'
                 search_product.create_product_set(settings.PROJECT, settings.REGION, product_set, product_set_display)
-
 
     '''Don't support bulk update'''
 
@@ -433,11 +445,11 @@ class TaxViewset(viewsets.ModelViewSet):
     queryset = Tax.objects.all()
     serializer_class = TaxSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['state','country','country_code']
+    filterset_fields = ['state', 'country', 'country_code']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def retrieve(self, request, pk=None):
-        queryset = Tax.objects.all().distinct('country_code').values('country','country_code')
+        queryset = Tax.objects.all().distinct('country_code').values('country', 'country_code')
         return JsonResponse(list(queryset), safe=False)
 
 
