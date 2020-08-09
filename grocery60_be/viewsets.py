@@ -76,7 +76,7 @@ class CartItemViewset(viewsets.ModelViewSet):
         data['cart_id'] = cart.id
         CartItem.objects.create(product_id=product.product_id, extra=data.get('extra'),
                                 quantity=data.get('quantity'), cart_id=cart.id)
-        return JsonResponse(data)
+        return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
 
     def list(self, request):
         print('enter get')
@@ -185,7 +185,7 @@ class CatalogViewset(viewsets.ModelViewSet):
             for product in data:
                 # Create Product
                 store_id = str(product.get('store'))  # Product Set creates using store id
-                product_id = str(product.get('id'))
+                product_id = str(product.get('product_id'))
                 search_product.create_product(settings.PROJECT, settings.REGION, product_id,
                                               product.get('product_name'),
                                               'homegoods')
@@ -381,7 +381,7 @@ class OrderItemViewset(viewsets.ModelViewSet):
             OrderItem.objects.create(product_id=product.product_id, order_id=order.order_id, extra=data.get('extra'),
                                      line_total=line_total,
                                      quantity=data.get('quantity'), canceled=data.get('canceled'))
-        return JsonResponse(data_list, safe=False)
+        return JsonResponse(data_list, safe=False, status=status.HTTP_201_CREATED)
 
 
 class OrderPaymentViewset(viewsets.ModelViewSet):
