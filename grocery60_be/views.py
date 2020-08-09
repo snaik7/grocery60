@@ -148,6 +148,7 @@ class PasswordResetView(APIView):
             email = Email()
             email.subject = "Password reset for Grocery 60 !!!"
             email.email = user.email
+            email.username = user.username
             email.first_name = user.first_name
             email.password = text_password
             email_send.send_email(email, 'password_reset.html')
