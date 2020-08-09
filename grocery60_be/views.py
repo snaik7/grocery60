@@ -105,6 +105,24 @@ class StoreLoginView(APIView):
 
 @authentication_classes([])
 @permission_classes([])
+class StoreLoginView(APIView):
+    def post(self, request):
+        data = JSONParser().parse(request)
+        username = data.get('username')
+        password = data.get('password')
+        store_admin = StoreAdmin.objects.get(username=username)
+        print('password ', password, ' store_admin ', store_admin.password)
+        valid = hashers.check_password(password, store_admin.password)
+        print('valid ', valid)
+        if valid:
+            data = {'message': 'success'}
+            return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
+        else:
+            raise AuthenticationError('Please login with valid credentials.')
+
+
+@authentication_classes([])
+@permission_classes([])
 class CustomLoginView(LoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -113,6 +131,49 @@ class CustomLoginView(LoginView):
             return JsonResponse(data={'token': token.key, 'id': token.user_id}, status=status.HTTP_200_OK, safe=False)
         else:
             raise AutherizationError('Please login to your email and verify your email.')
+
+
+@authentication_classes([])
+@permission_classes([])
+class PasswordResetView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = JSONParser().parse(request)
+        username = data.get('username')
+        print('password reset for user', username)
+        user = User.objects.filter(username=username).first()
+        if user:
+            text_password = util.generate_password(8)
+            user.password = hashers.make_password(text_password)
+            user.save()
+            email = Email()
+            email.subject = "Password reset for Grocery 60 !!!"
+            email.email = user.email
+            email.first_name = user.first_name
+            email.password = text_password
+            email_send.send_email(email, 'password_reset.html')
+            return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
+        else:
+            raise ValidationError('User does not exist in system')
+
+
+class PasswordResetConfirmView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = JSONParser().parse(request)
+        username = data.get('username')
+        old_password = data.get('old_password')
+        new_password1 = data.get('new_password1')
+        new_password2 = data.get('new_password2')
+        user = User.objects.filter(username=username).first()
+        if user and new_password1 == new_password2:
+            valid = hashers.check_password(old_password, user.password)
+            if valid:
+                user.password = hashers.make_password(new_password1)
+                user.save()
+                return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
+            else:
+                raise ValidationError('Old password does not match in the system')
+        else:
+            raise ValidationError(' New password1 and New Password2 are not matching in the system')
 
 
 class CustomerPaymentView(APIView):
