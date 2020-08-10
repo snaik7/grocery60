@@ -204,15 +204,18 @@ class PaymentView(APIView):
         print(order_payment.transaction_id)
         try:
             # To cancel a PaymentIntent
+            """
             intent = stripe.PaymentIntent.cancel(
                 order_payment.transaction_id)
+            """
         except stripe.error.StripeError as e:
             # Display a very generic error to the user, and maybe send
             # yourself an email
             raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
                                   'and we will reply you in 24 hours. '.format(order_id))
 
-        if intent.get('status') == 'canceled':
+        #if intent.get('status') == 'canceled':
+        if True:
             order_payment.status = 'CANCELLED'
             order_payment.save()
             order = Order.objects.get(order_id=order_id)
@@ -225,7 +228,7 @@ class PaymentView(APIView):
             email.email = user.email
             email.order_id = order_payment.order_id
             email_send.send_email(email, 'order_cancellation.html')
-            return JsonResponse(data='{}', status=status.HTTP_200_OK, safe=False)
+            return JsonResponse(data='', status=status.HTTP_204_NO_CONTENT, safe=False)
         else:
             raise ValidationError('Order Cancellation failed for Order = ', order_id)
 
