@@ -17,12 +17,12 @@ class AuditMiddleware(object):
         start_time = time.time()
         self.start_time  = start_time
         self.audit_text['start_time'] = start_time
-        if request.headers.get('orderid'):
-            self.audit_text['orderid'] = request.headers.get('orderid') 
-        if request.headers.get('userid'):
-            self.audit_text['userid'] = request.headers.get('userid')
-        if request.headers.get('cartid'):
-            self.audit_text['cartid'] = request.headers.get('cartid')
+        if request.headers.get('order_id'):
+            self.audit_text['order_id'] = request.headers.get('order_id')
+        if request.headers.get('user_id'):
+            self.audit_text['user_id'] = request.headers.get('user_id')
+        if request.headers.get('cart_id'):
+            self.audit_text['cart_id'] = request.headers.get('cart_id')
         if request.headers.get('action'):
             self.audit_text['action'] = request.headers.get('action')
         self.audit_text['START'] = 'TRUE'
