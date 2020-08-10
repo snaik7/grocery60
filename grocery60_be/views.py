@@ -182,19 +182,22 @@ class CustomerPaymentView(APIView):
     def get(self, request):
         customer_id = request.GET.get('customer_id')
         store_id = request.GET.get('store_id')
-        status = request.GET.get('status') if request.GET.get('status') else 'READY_TO_FULFILL'
-        if store_id and customer_id:
+        if store_id and customer_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             order__customer_id=customer_id,
                                                                             status=status).order_by('-payment_id')
-        elif store_id:
+        elif store_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             status=status).order_by('-payment_id')
-        elif customer_id:
+        elif customer_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id,
                                                                             status=status).order_by('-payment_id')
+        elif store_id:
+            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id).order_by('-payment_id')
+        elif customer_id:
+            query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by('-payment_id')
         else:
-            query_set = OrderPayment.objects.select_related('order').filter(status=status).order_by('-payment_id')
+            query_set = OrderPayment.objects.select_related('order').order_by('-payment_id')
 
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
         return JsonResponse(serializer.data, safe=False)
