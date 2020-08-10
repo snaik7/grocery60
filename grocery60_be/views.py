@@ -182,6 +182,7 @@ class CustomerPaymentView(APIView):
     def get(self, request):
         customer_id = request.GET.get('customer_id')
         store_id = request.GET.get('store_id')
+        status = request.GET.get('status')
         if store_id and customer_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             order__customer_id=customer_id,
