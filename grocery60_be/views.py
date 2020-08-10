@@ -66,6 +66,7 @@ class VerifyLoginView(APIView):
         user.save()
         return HttpResponse('Welcome  ' + user.first_name + ', Your email is verified')
 
+
 @authentication_classes([])
 @permission_classes([])
 class ResendEmailLoginView(APIView):
@@ -181,10 +182,14 @@ class CustomerPaymentView(APIView):
     def get(self, request):
         customer_id = request.GET.get('customer_id')
         store_id = request.GET.get('store_id')
+        status = request.GET.get('status') if request.GET.get('status') else 'READY_TO_FULFILL'
         if store_id:
-            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id, order__customer_id=customer_id).order_by('-payment_id')
+            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
+                                                                            order__customer_id=customer_id,
+                                                                            status=status).order_by('-payment_id')
         else:
-            query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by(
+            query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id,
+                                                                            status=status).order_by(
                 '-payment_id')
 
         serializer = serializers.OrderPaymentSerializer(query_set, many=True)
@@ -205,7 +210,7 @@ class PaymentView(APIView):
             # Display a very generic error to the user, and maybe send
             # yourself an email
             raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
-                            'and we will reply you in 24 hours. '.format(order_id))
+                                  'and we will reply you in 24 hours. '.format(order_id))
 
         if intent.get('status') == 'canceled':
             order_payment.status = 'CANCELLED'
