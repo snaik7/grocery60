@@ -468,7 +468,7 @@ class OrderPayment(models.Model):
             raise ValidationError(
                 'Order Payment failed update in Grocery60 for Order''s  transaction_id = ' + transaction_id + ' with ' + str(
                     e))
-        return order_payment.id
+        return order_payment.payment_id
 
     class Meta:
         db_table = "orderpayment"

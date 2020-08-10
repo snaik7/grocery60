@@ -6,14 +6,15 @@ from rest_framework.views import APIView
 
 from grocery60_be.models import OrderPayment
 
+
 # Stripe can call without auth
 @authentication_classes([])
 @permission_classes([])
 class PaymentWebhookView(APIView):
     def post(self, request):
         payload = JSONParser().parse(request)
-        print('Webhook Payload from Stripe ', payload)
         event_dict = payload
+        print('Webhook Payload from Stripe ', event_dict['data']['object'], '  ', event_dict['type'])
         if event_dict['type'] == "payment_intent.succeeded":
             intent = event_dict['data']['object']
             print("Succeeded: ", intent['id'])
@@ -28,6 +29,7 @@ class PaymentWebhookView(APIView):
             order_payment = OrderPayment()
             order_payment.send_failure_email(intent['id'])
         else:
+            print('Webhook Payload from Stripe ', payload)
             intent = event_dict['data']['object']
             print("No action unknown event : ", intent['id'], '   ', event_dict['type'])
 
