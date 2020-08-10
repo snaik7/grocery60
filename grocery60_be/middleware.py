@@ -52,8 +52,6 @@ class AuditMiddleware(object):
         return None
 
     def process_template_response(self, request, response):
-        print('--------------------------------------------------')
-        logging.info('------------------------log--------------------------')
         if request.headers.get('action'):
             self.audit_text['action'] = request.headers.get('action')
         self.audit_text['END'] = 'TRUE'
