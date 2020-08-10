@@ -397,7 +397,7 @@ class OrderPayment(models.Model):
         try:
             amount = data.get('amount')
             transaction_id = intent.get('id')
-            payment_method = 'card'
+            payment_method = 'XXXX-XXXX-XXXX-'+data.get('card').get('number')[12:16]
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
             status = "CONFIRMED"
