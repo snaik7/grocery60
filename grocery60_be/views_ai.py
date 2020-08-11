@@ -37,7 +37,6 @@ class ProductView(APIView):
         product = models.Product.objects.get(product_id=product_id)
         gcs_uri = str(product.product_url)
         gcs_uri = gcs_uri.replace('https', 'gs')
-        gcs_uri = gcs_uri.replace(settings.GS_BUCKET_NAME, settings.GS_BUCKET_NAME+'-ml')
         gcs_uri = gcs_uri.replace('storage.googleapis.com/', '')
         url_split = gcs_uri.split('/')
         reference_image_id = 'I_' + url_split[3]

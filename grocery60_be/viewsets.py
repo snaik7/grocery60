@@ -196,20 +196,22 @@ class CatalogViewset(viewsets.ModelViewSet):
                 # Create Product Image
                 gcs_uri = str(product.get('product_url'))
                 gcs_uri = gcs_uri.replace('https', 'gs')
-                gcs_uri = gcs_uri.replace(settings.GS_BUCKET_NAME, settings.GS_BUCKET_NAME + '-ml')
                 gcs_uri = gcs_uri.replace('storage.googleapis.com/', '')
                 url_split = gcs_uri.split('/')
                 reference_image_id = 'I_' + url_split[3]
+
+                '''
                 source_bucket = settings.GS_BUCKET_NAME
                 source_object = url_split[3]
                 destination_bucket = settings.GS_BUCKET_NAME + '-ml'
-
+                
                 client = storage.Client(project=settings.PROJECT)
                 bucket = client.bucket(source_bucket)
                 dst_bucket = client.bucket(destination_bucket)
                 blob = bucket.blob(source_object)
                 new_blob = bucket.copy_blob(blob, dst_bucket)
                 new_blob.acl.save(blob.acl)
+                '''
 
                 search_product.create_reference_image(settings.PROJECT, settings.REGION, product_id,
                                                       reference_image_id,
