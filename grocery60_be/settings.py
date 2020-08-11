@@ -215,5 +215,6 @@ PAYMENT_SCHEDULER_DELAY = 360  # in mins
 RAZORPAY_KEY_ID = env("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET")
 
+#set for product search
 REGION = 'us-west1'
 
