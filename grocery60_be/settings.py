@@ -56,7 +56,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', 'grocery60-be-b2yd4bi7eq-uc.a.run.app']
+ALLOWED_HOSTS = ['*', 'grocery60-be-b2yd4bi7eq-uc.a.run.app','grocery60-be-xtpocjmkpa-uw.a.run.app']
 
 # Application definition
 
@@ -171,7 +171,8 @@ stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
 # set on each request
 stripe_account = "acct_1FPY3JEQN3kQJKqm"
 
-PROJECT = 'named-enigma-277405'
+#PROJECT = 'named-enigma-277405'
+PROJECT = 'grocery60-project'
 
 # Instantiates a client
 client = google.cloud.logging.Client()
