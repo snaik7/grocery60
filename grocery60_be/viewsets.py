@@ -325,6 +325,7 @@ class StoreViewset(viewsets.ModelViewSet):
             store.phone = serializer.validated_data.get('phone')
             store.email = serializer.validated_data.get('email')
             store.status = serializer.validated_data.get('status')
+            store.currency = serializer.validated_data.get('currency')
             store.payment_account = serializer.validated_data.get('payment_account') if serializer.validated_data.get(
                 'payment_account') \
                 else store.payment_account
