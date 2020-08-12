@@ -22,7 +22,7 @@ def send_email(email, template):
         'username': email.username,
         'password': email.password,
         'token': email.token,
-        'host': settings.ALLOWED_HOSTS[1],
+        'host': settings.ALLOWED_HOSTS[2],
         # 'host': 'http://localhost:8000',
     }
 
