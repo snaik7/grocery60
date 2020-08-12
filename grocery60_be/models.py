@@ -61,7 +61,8 @@ class Store(models.Model):
     )
     currency = models.CharField(
         max_length=3,
-        default='usd'
+        default='usd',
+        blank=True
     )
     payment_account = models.CharField(
         max_length=50,
