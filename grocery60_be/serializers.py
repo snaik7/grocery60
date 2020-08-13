@@ -7,7 +7,7 @@ from rest_framework.serializers import ListSerializer
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Store, Product, Customer, Cart, CartItem, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category, User, Leads
+    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, StoreAdmin, Category, User, Leads, Email
 from django.contrib.auth.hashers import make_password
 
 
@@ -130,3 +130,4 @@ class LeadsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Leads
         fields = '__all__'
+

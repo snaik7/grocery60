@@ -17,7 +17,6 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-import grocery60_be.webhook
 from grocery60_be import views, viewsets, webhook, views_ai
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
@@ -63,6 +62,7 @@ urlpatterns = [
     path('email/login/', views.ResendEmailLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
+    path('send/', views.SendView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 
     ### India Views ###

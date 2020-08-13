@@ -38,7 +38,9 @@ class UserViewset(viewsets.ModelViewSet):
         email.email = serializer.data.get('email')
         email.first_name = serializer.data.get('first_name')
         email.username = serializer.data.get('username')
-        email_send.send_email(email, 'registration.html')
+        email.template = 'registration.html'
+        #email_send.send_email(email, 'registration.html')
+        email_send.send_email(email)
 
     def update(self, request, pk):
         data = JSONParser().parse(request)

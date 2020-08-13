@@ -505,8 +505,8 @@ class Delivery(models.Model):
         db_table = "delivery"
 
 
-class Email(models.Model):
-    subject, first_name, username, password, email, order_id, token = None, None, None, None, None, None, None
+class Email():
+    subject, first_name, username, password, email, order_id, token, template = None, None, None, None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
