@@ -276,3 +276,27 @@ def delete_product(project_id, location, product_id):
     # Delete a product.
     client.delete_product(name=product_path)
     print('Product deleted.')
+
+def list_product_sets(project_id, location):
+    """List all product sets.
+    Args:
+        project_id: Id of the project.
+        location: A compute region name.
+    """
+    client = vision.ProductSearchClient()
+
+    # A resource that represents Google Cloud Platform location.
+    location_path = client.location_path(
+        project=project_id, location=location)
+
+    # List all the product sets available in the region.
+    product_sets = client.list_product_sets(parent=location_path)
+
+    # Display the product set information.
+    for product_set in product_sets:
+        print('Product set name: {}'.format(product_set.name))
+        print('Product set id: {}'.format(product_set.name.split('/')[-1]))
+        print('Product set display name: {}'.format(product_set.display_name))
+        print('Product set index time:')
+        print('  seconds: {}'.format(product_set.index_time.seconds))
+        print('  nanos: {}\n'.format(product_set.index_time.nanos))
