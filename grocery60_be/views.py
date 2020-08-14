@@ -81,7 +81,9 @@ class ResendEmailLoginView(APIView):
         email.email = user.email
         email.first_name = user.first_name
         email.username = user.username
-        email_send.send_email(email, 'registration.html')
+        email.template = 'registration.html'
+        #email_send.send_email(email, 'registration.html')
+        email_send.send_email_topic(email)
         print('return')
         data = {'message': 'success'}
         return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
@@ -153,7 +155,10 @@ class PasswordResetView(APIView):
             email.username = user.username
             email.first_name = user.first_name
             email.password = text_password
-            email_send.send_email(email, 'password_reset.html')
+            #email_send.send_email(email, 'password_reset.html')
+            email.template = 'password_reset.html'
+            email_send.send_email_topic(email)
+
             return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
         else:
             raise ValidationError('User does not exist in system')
@@ -235,7 +240,9 @@ class PaymentView(APIView):
             user = User.objects.get(id=order_payment.order.customer_id)
             email.email = user.email
             email.order_id = order_payment.order_id
-            email_send.send_email(email, 'order_cancellation.html')
+            email.template = 'order_cancellation.html'
+            #email_send.send_email(email, 'order_cancellation.html')
+            email_send.send_email_topic(email)
             response_dict = {
                 'status': 'success'
             }

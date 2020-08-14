@@ -1,5 +1,28 @@
+import json
+
 from google.cloud import vision
-from grocery60_be import models
+from grocery60_be import models, settings
+
+from google.cloud import pubsub_v1
+
+
+def create_product_set_topic(project_id, location, product_set_id, product_set_display_name):
+    publisher = pubsub_v1.PublisherClient()
+    # The `topic_path` method creates a fully qualified identifier
+    # in the form `projects/{project_id}/topics/{topic_id}`
+    topic_path = publisher.topic_path(settings.PROJECT, 'productset')
+
+    product_set_dict = {'project_id': project_id, 'location': location, 'product_set_id': product_set_id,
+                        'product_set_display_name': product_set_display_name}
+    print('product_set_dict', product_set_dict)
+
+    # Data must be a bytestring
+    # using encode() + dumps() to convert to bytes
+    data_bytes = json.dumps(product_set_dict).encode('utf-8')
+    # When you publish a message, the client returns a future.
+    future = publisher.publish(topic_path, data=data_bytes)
+    print(future.result())
+
 
 def create_product_set(
         project_id, location, product_set_id, product_set_display_name):
@@ -28,6 +51,26 @@ def create_product_set(
 
     # Display the product set information.
     print('Product set name: {}'.format(response.name))
+
+
+def create_product_topic(product):
+    publisher = pubsub_v1.PublisherClient()
+    # The `topic_path` method creates a fully qualified identifier
+    # in the form `projects/{project_id}/topics/{topic_id}`
+    topic_path = publisher.topic_path(settings.PROJECT, 'product')
+
+    data = {'store_id': str(product.get('store')), 'product_id': str(product.get('product_id')),
+            'product_name': product.get('product_name'), 'product_url': product.get('product_url')}
+    print('data', data)
+
+    # Data must be a bytestring
+    # using encode() + dumps() to convert to bytes
+    data_bytes = json.dumps(data).encode('utf-8')
+    # When you publish a message, the client returns a future.
+    future = publisher.publish(topic_path, data=data_bytes)
+    print(future.result())
+
+    print("Published messages.")
 
 
 def create_product(
@@ -183,8 +226,8 @@ def get_similar_products_file(
             image_list = list_reference_images(project_id, location, product_id)
             product_dict = {'score': round(result.score * 100), 'image': result.image, 'product_name': product.name,
                             'display_name': product.display_name, 'description': product.description,
-                            'image_url': image_list, 'product_name' : _product.product_name, 'product_url':
-                            _product.product_url, 'product_category' : _product.product_category}
+                            'image_url': image_list, 'product_name': _product.product_name, 'product_url':
+                                _product.product_url, 'product_category': _product.product_category}
 
             result_list.append(product_dict)
     return result_list

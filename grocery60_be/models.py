@@ -431,12 +431,15 @@ class OrderPayment(models.Model):
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        email_send.send_email(email, 'order_pickup.html')
+        #email_send.send_email(email, 'order_pickup.html')
+        email.template = 'order_pickup.html'
+        email_send.send_email_topic(email)
 
     def send_success_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        email_send.send_email(email, 'order_confirmation.html')
+        email.template = 'order_confirmation.html'
+        email_send.send_email_topic(email)
 
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
@@ -446,7 +449,8 @@ class OrderPayment(models.Model):
         email.subject = "Order failure for Grocery 60"
         email.email = customer.email
         email.order_id = order_payment.order_id
-        email_send.send_email(email, 'order_payment_failure.html')
+        email.template = 'order_payment_failure.html'
+        email_send.send_email_topic(email)
 
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
@@ -457,7 +461,8 @@ class OrderPayment(models.Model):
         email.email = store.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
-        email_send.send_email(email, 'store_order_confirmation.html')
+        email.template = 'order_payment_failure.html'
+        email_send.send_email_topic(email)
 
     def update_payment(self, transaction_id, status):
         try:
@@ -513,17 +518,24 @@ class Email():
     def set_order(self, order_id):
         order = Order.objects.get(order_id=order_id)
         self.token = order.token
-        self.subtotal = order.subtotal
-        self.tax = order.tax
-        self.service_fee = order.service_fee
-        self.tip = order.tip
-        self.shipping_fee = order.shipping_fee
-        self.discount = order.discount
-        self.total = order.total
+        self.subtotal = str(order.subtotal)
+        self.tax = str(order.tax)
+        self.service_fee = str(order.service_fee)
+        self.tip = str(order.tip)
+        self.shipping_fee = str(order.shipping_fee)
+        self.discount = str(order.discount)
+        self.total = str(order.total)
 
-        self.order_items_list = list(
-            OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
-                                                               'quantity', 'line_total'))
+        query_set = OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
+                                                           'quantity', 'line_total')
+        for item in query_set:
+            item_list = {}
+            print('item', item)
+            item_list['product__product_name'] = item.get('product__product_name')
+            item_list['product__price'] = item.get('product__price')
+            item_list['quantity'] = item.get('quantity')
+            item_list['line_total'] = item.get('line_total')
+            self.order_items_list.append(item_list)
 
 
 class Tax(models.Model):

@@ -40,7 +40,7 @@ class UserViewset(viewsets.ModelViewSet):
         email.username = serializer.data.get('username')
         email.template = 'registration.html'
         #email_send.send_email(email, 'registration.html')
-        email_send.send_email(email)
+        email_send.send_email_topic(email)
 
     def update(self, request, pk):
         data = JSONParser().parse(request)
@@ -189,6 +189,8 @@ class CatalogViewset(viewsets.ModelViewSet):
 
             for product in data:
                 # Create Product
+                search_product.create_product_topic(product)
+                '''
                 store_id = str(product.get('store'))  # Product Set creates using store id
                 product_id = str(product.get('product_id'))
                 search_product.create_product(settings.PROJECT, settings.REGION, product_id,
@@ -202,19 +204,6 @@ class CatalogViewset(viewsets.ModelViewSet):
                 url_split = gcs_uri.split('/')
                 reference_image_id = 'I_' + url_split[3]
 
-                '''
-                source_bucket = settings.GS_BUCKET_NAME
-                source_object = url_split[3]
-                destination_bucket = settings.GS_BUCKET_NAME + '-ml'
-                
-                client = storage.Client(project=settings.PROJECT)
-                bucket = client.bucket(source_bucket)
-                dst_bucket = client.bucket(destination_bucket)
-                blob = bucket.blob(source_object)
-                new_blob = bucket.copy_blob(blob, dst_bucket)
-                new_blob.acl.save(blob.acl)
-                '''
-
                 search_product.create_reference_image(settings.PROJECT, settings.REGION, product_id,
                                                       reference_image_id,
                                                       gcs_uri)
@@ -224,6 +213,7 @@ class CatalogViewset(viewsets.ModelViewSet):
                 search_product.add_product_to_product_set(settings.PROJECT, settings.REGION, product_id,
                                                           'PS_' + store_id)
                 print(' Added  in Product Set PS_' + store_id)
+                '''
 
     '''Don't support bulk update'''
 
@@ -276,7 +266,9 @@ class StoreAdminViewset(viewsets.ModelViewSet):
             email.email = serializer.data.get('email')
             email.username = serializer.data.get('username')
             email.password = text_password
-            email_send.send_email(email, 'storeadmin_registration.html')
+            email.template = 'storeadmin_registration.html'
+            #email_send.send_email(email, 'storeadmin_registration.html')
+            email_send.send_email_topic(email)
 
 
 class StoreViewset(viewsets.ModelViewSet):
@@ -306,7 +298,7 @@ class StoreViewset(viewsets.ModelViewSet):
                 # Create Product Set for Store
                 product_set = 'PS_' + str(store.get('store_id'))
                 product_set_display = product_set + ' Store Set'
-                search_product.create_product_set(settings.PROJECT, settings.REGION, product_set, product_set_display)
+                search_product.create_product_set_topic(settings.PROJECT, settings.REGION, product_set, product_set_display)
 
     '''Don't support bulk update'''
 
