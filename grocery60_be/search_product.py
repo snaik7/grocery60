@@ -259,3 +259,20 @@ def list_reference_images(
             image.bounding_polys))
         image_list.append(image.uri.replace('gs://', 'https://storage.cloud.google.com/'))
     return image_list
+
+def delete_product(project_id, location, product_id):
+    """Delete the product and all its reference images.
+    Args:
+        project_id: Id of the project.
+        location: A compute region name.
+        product_id: Id of the product.
+    """
+    client = vision.ProductSearchClient()
+
+    # Get the full path of the product.
+    product_path = client.product_path(
+        project=project_id, location=location, product=product_id)
+
+    # Delete a product.
+    client.delete_product(name=product_path)
+    print('Product deleted.')
