@@ -112,6 +112,8 @@ WSGI_APPLICATION = 'grocery60_be.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# Understand limit of gcp connecions -  https://cloud.google.com/sql/docs/postgres/quotas
+# default max connections = 25
 
 # Use django-environ to define the connection string
 DATABASES = {"default": env.db()}

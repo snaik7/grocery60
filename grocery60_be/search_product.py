@@ -293,10 +293,14 @@ def list_product_sets(project_id, location):
     product_sets = client.list_product_sets(parent=location_path)
 
     # Display the product set information.
+    product_list = []
     for product_set in product_sets:
         print('Product set name: {}'.format(product_set.name))
         print('Product set id: {}'.format(product_set.name.split('/')[-1]))
+        product_list.append(product_set.name.split('/')[-1])
         print('Product set display name: {}'.format(product_set.display_name))
         print('Product set index time:')
         print('  seconds: {}'.format(product_set.index_time.seconds))
         print('  nanos: {}\n'.format(product_set.index_time.nanos))
+
+    return product_list

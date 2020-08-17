@@ -62,7 +62,6 @@ urlpatterns = [
     path('email/login/', views.ResendEmailLoginView.as_view()),
     path('stores/login/', views.StoreLoginView.as_view()),
     path('fee/', views.FeeCalView.as_view()),
-    path('send/', views.SendView.as_view()),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 
     ### India Views ###
@@ -77,5 +76,3 @@ urlpatterns = [
     path('product/search/', views_ai.ProductSearchView.as_view()),
 
 ]
-
-from grocery60_be import execute
