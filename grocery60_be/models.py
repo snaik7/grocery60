@@ -457,11 +457,11 @@ class OrderPayment(models.Model):
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         store = Store.objects.get(store_id=order_payment.store.store_id)
         email = Email()
-        email.subject = "Order Confirmation for Grocery 60"
+        email.subject = "Store Order Confirmation for Grocery 60"
         email.email = store.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
-        email.template = 'order_payment_failure.html'
+        email.template = 'store_order_confirmation.html'
         email_send.send_email_topic(email)
 
     def update_payment(self, transaction_id, status):
