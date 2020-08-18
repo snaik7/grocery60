@@ -172,7 +172,10 @@ class PasswordResetConfirmView(APIView):
         new_password1 = data.get('new_password1')
         new_password2 = data.get('new_password2')
         user = User.objects.filter(username=username).first()
-        if user and new_password1 == new_password2:
+
+        if user:
+            if new_password1 != new_password2:
+                raise ValidationError('New password1 and New Password2 are not matching in the system')
             valid = hashers.check_password(old_password, user.password)
             if valid:
                 user.password = hashers.make_password(new_password1)
@@ -180,8 +183,10 @@ class PasswordResetConfirmView(APIView):
                 return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
             else:
                 raise ValidationError('Old password does not match in the system')
+
         else:
-            raise ValidationError(' New password1 and New Password2 are not matching in the system')
+            raise ValidationError('User does not exist in the system')
+
 
 
 class CustomerPaymentView(APIView):
