@@ -402,7 +402,7 @@ class OrderPayment(models.Model):
         try:
             amount = data.get('amount')
             transaction_id = intent.get('id')
-            payment_method = 'Card ending in '+data.get('card').get('number')[12:16]
+            payment_method = 'Card ending in ' + data.get('card').get('number')[12:16]
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
             status = "CONFIRMED"
@@ -414,8 +414,9 @@ class OrderPayment(models.Model):
                                          signature=signature)
             order_payment.save()
         except Exception as e:
-            raise ValidationError('Order Payment failed for Order = ' + order_id, 'Order Payment failed for Order = ' +
-                                  str(order_id) + ' with ' + str(e))
+            raise ValidationError('Order Payment failed for Order = ' + str(order_id) + ' Order Payment failed for '
+                                                                                        'Order = ' + str(
+                order_id) + ' with ' + str(e))
         return order_payment.payment_id
 
     def delete_cart(self, data):
@@ -431,7 +432,7 @@ class OrderPayment(models.Model):
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        #email_send.send_email(email, 'order_pickup.html')
+        # email_send.send_email(email, 'order_pickup.html')
         email.template = 'order_pickup.html'
         email_send.send_email_topic(email)
 
@@ -509,7 +510,6 @@ class Delivery(models.Model):
     class Meta:
         db_table = "delivery"
 
-
 class Email():
     subject, first_name, username, password, email, order_id, token, template = None, None, None, None, None, None, None, None
     order_items_list = []
@@ -527,16 +527,22 @@ class Email():
         self.total = str(order.total)
 
         query_set = OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
-                                                           'quantity', 'line_total')
+                                                                       'quantity', 'line_total')
         for item in query_set:
             item_list = {}
             print('item', item)
             item_list['product__product_name'] = item.get('product__product_name')
-            item_list['product__price'] = item.get('product__price')
+            item_list['product__price'] = str(item.get('product__price'))
             item_list['quantity'] = item.get('quantity')
-            item_list['line_total'] = item.get('line_total')
+            item_list['line_total'] = str(item.get('line_total'))
             self.order_items_list.append(item_list)
 
+    def asdict(self):
+        return {'token': self.token, 'subtotal': self.subtotal, 'order_items_list': self.order_items_list, 'tax': self.tax,
+                'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
+                'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
+                'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template
+                }
 
 class Tax(models.Model):
     state = models.CharField(

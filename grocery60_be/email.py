@@ -9,9 +9,9 @@ def send_email_topic(email):
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
     topic_path = publisher.topic_path(settings.PROJECT, 'email')
-
-    data = vars(email)
-    print('data', data )
+    print('email', email)
+    data = email.asdict()
+    print('data', data)
 
     # Data must be a bytestring
     # using encode() + dumps() to convert to bytes
