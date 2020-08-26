@@ -525,7 +525,7 @@ class Email():
         self.shipping_fee = str(order.shipping_fee)
         self.discount = str(order.discount)
         self.total = str(order.total)
-
+        self. order_items_list = []
         query_set = OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
                                                                        'quantity', 'line_total')
         for item in query_set:
