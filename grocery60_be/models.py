@@ -402,7 +402,10 @@ class OrderPayment(models.Model):
         try:
             amount = data.get('amount')
             transaction_id = intent.get('id')
-            payment_method = 'Card ending in ' + data.get('card').get('number')[12:16]
+            if data.get('card'):
+                payment_method = 'Card ending in ' + data.get('card').get('number')[12:16]
+            else:
+                payment_method = 'Razor Pay'
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
             status = "CONFIRMED"

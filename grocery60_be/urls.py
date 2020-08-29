@@ -74,5 +74,6 @@ urlpatterns = [
     path('product/', views_ai.ProductView.as_view()),
     path('product/<int:product_id>', views_ai.ProductView.as_view()),
     path('product/search/', views_ai.ProductSearchView.as_view()),
+    path('product/image/search/', views_ai.ProductImageSearchView.as_view()),
 
 ]

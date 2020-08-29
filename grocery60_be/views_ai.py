@@ -3,6 +3,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from grocery60_be import search_product, settings, models
+from google_images_search import GoogleImagesSearch
 
 
 class ProductSetView(APIView):
@@ -56,3 +57,27 @@ class ProductSearchView(APIView):
         results = search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
                                                  image_uri, filters)
         return JsonResponse(results, safe=False)
+
+
+class ProductImageSearchView(APIView):
+    def get(self, request):
+        search = request.GET.get('key')
+        # you can provide API key and CX using arguments,
+        # or you can set environment variables: GCS_DEVELOPER_KEY, GCS_CX
+        gis = GoogleImagesSearch(settings.API_KEY, settings.SEARCH_ENGINE_ID)
+        # define search params:
+        _search_params = {
+            'q': search,
+            'num': 1
+        }
+
+        ## this will only search for images:
+        gis.search(search_params=_search_params)
+
+
+        # search first, then download and resize afterwards:
+        gis.search(search_params=_search_params)
+        for image in gis.results():
+            url = image.url
+
+        return JsonResponse({'image': url}, safe=False)
