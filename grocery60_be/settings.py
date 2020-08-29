@@ -219,6 +219,6 @@ RAZORPAY_KEY_SECRET = env("RAZORPAY_KEY_SECRET")
 
 #set for product search
 REGION = 'us-west1'
-API_KEY = env("API_KEY")
-SEARCH_ENGINE_ID = 'cc67409fec6045edd'
+#API_KEY = env("API_KEY")
+#SEARCH_ENGINE_ID = 'cc67409fec6045edd'
 
