@@ -16,10 +16,10 @@ from google.cloud import storage
 
 from grocery60_be.error import ValidationError
 from grocery60_be.models import Cart, CartItem, Customer, Product, Store, BillingAddress, ShippingAddress, Order, \
-    OrderItem, OrderPayment, ShippingMethod, Delivery, Tax, Email, StoreAdmin, Category, User, Leads
+    OrderItem, OrderPayment, ShippingMethod, Tax, Email, StoreAdmin, Category, User, Leads
 from grocery60_be.serializers import CartSerializer, CartItemSerializer, CustomerSerializer, CatalogSerializer, \
     StoreSerializer, BillingAddressSerializer, ShippingAddressSerializer, OrderSerializer, OrderItemSerializer, \
-    OrderPaymentSerializer, ShippingMethodSerializer, DeliverySerializer, UserSerializer, TaxSerializer, \
+    OrderPaymentSerializer, ShippingMethodSerializer, UserSerializer, TaxSerializer, \
     StoreAdminSerializer, CategorySerializer, LeadsSerializer
 
 
@@ -414,6 +414,8 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
             order_payment.payout_status = data.get('payout_status')
         if data.get('payout_message'):
             order_payment.payout_id = data.get('payout_id')
+        if data.get('shippingmethod'):
+            order_payment.shippingmethod_id = data.get('shippingmethod')
         order_payment.save()
         serializer = OrderPaymentSerializer(order_payment)
         if data.get('status') == "READY_TO_PICK":
@@ -430,15 +432,25 @@ class ShippingMethodViewset(viewsets.ModelViewSet):
     queryset = ShippingMethod.objects.all()
     serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['store_id']
     http_method_names = ['get', 'post', 'head', 'put']
 
 
-class DeliveryViewset(viewsets.ModelViewSet):
-    queryset = Delivery.objects.all()
-    serializer_class = DeliverySerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['order_id']
-    http_method_names = ['get', 'post', 'head', 'put']
+    '''Allows bulk creation of a shipping method for store'''
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get("data", {}), list):
+            kwargs["many"] = True
+        return super(ShippingMethodViewset, self).get_serializer(*args, **kwargs)
+
+    def perform_create(self, serializer):
+        print("Bulk Insert")
+        if serializer.is_valid():
+            serializer.save()
+            if isinstance(serializer.data, list):
+                data = serializer.data[:]
+            else:
+                data = [serializer.data]
 
 
 class TaxViewset(viewsets.ModelViewSet):

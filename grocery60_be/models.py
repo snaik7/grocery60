@@ -359,6 +359,21 @@ class OrderItem(models.Model):
     class Meta:
         db_table = "orderitem"
 
+class ShippingMethod(models.Model):
+    name = models.CharField(
+        max_length=255
+    )
+    carrier = models.CharField(
+        max_length=32
+    )
+    min_weight = models.DecimalField(max_digits=6, decimal_places=2)
+    max_weight = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    updated_at = models.DateTimeField(auto_now=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "shippingmethod"
 
 class OrderPayment(models.Model):
     payment_id = models.AutoField(primary_key=True)
@@ -397,6 +412,7 @@ class OrderPayment(models.Model):
         max_length=150,
         blank=True
     )
+    shippingmethod = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
 
     def record_payment(self, data, intent):
         try:
@@ -408,13 +424,14 @@ class OrderPayment(models.Model):
                 payment_method = 'Razor Pay'
             order_id = data.get('metadata').get('order_id')
             store_id = data.get('metadata').get('store_id')
+            shippingmethod_id = data.get('metadata').get('shippingmethod_id')
             status = "CONFIRMED"
             correlation_id = intent.get('id')
             signature = None
             order_payment = OrderPayment(amount=amount, transaction_id=transaction_id, payment_method=payment_method,
                                          order_id=order_id, status=status, store_id=store_id,
                                          correlation_id=correlation_id,
-                                         signature=signature)
+                                         signature=signature, shippingmethod_id=shippingmethod_id)
             order_payment.save()
         except Exception as e:
             raise ValidationError('Order Payment failed for Order = ' + str(order_id) + ' Order Payment failed for '
@@ -488,30 +505,6 @@ class OrderPayment(models.Model):
         db_table = "orderpayment"
 
 
-class ShippingMethod(models.Model):
-    name = models.CharField(
-        max_length=255
-    )
-    carrier = models.CharField(
-        max_length=32
-    )
-    min_weight = models.DecimalField(max_digits=6, decimal_places=2)
-    max_weight = models.DecimalField(max_digits=6, decimal_places=2)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "shippingmethod"
-
-
-class Delivery(models.Model):
-    fulfilled_at = models.DateTimeField(blank=True)
-    shipped_at = models.DateTimeField(blank=True)
-    shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = "delivery"
 
 class Email():
     subject, first_name, username, password, email, order_id, token, template = None, None, None, None, None, None, None, None
