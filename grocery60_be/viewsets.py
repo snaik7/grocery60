@@ -433,6 +433,17 @@ class ShippingMethodViewset(viewsets.ModelViewSet):
     serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id']
+    http_method_names = ['get', 'post', 'head', 'put']
+
+    def update(self, request, pk):
+        shipping_method = ShippingMethod.objects.get(id=pk)
+        data = JSONParser().parse(request)
+        if data.get('status'):
+            shipping_method.status = data.get('status')
+        shipping_method.save()
+        serializer = ShippingMethodSerializer(shipping_method)
+        return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
 
 
     '''Allows bulk creation of a shipping method for store'''

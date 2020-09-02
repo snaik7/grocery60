@@ -371,6 +371,9 @@ class ShippingMethod(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     updated_at = models.DateTimeField(auto_now=True)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=10
+    )
 
     class Meta:
         db_table = "shippingmethod"
