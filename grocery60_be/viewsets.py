@@ -350,6 +350,7 @@ class ShippingAddressViewset(viewsets.ModelViewSet):
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'state']
+    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class OrderViewset(viewsets.ModelViewSet):
@@ -432,7 +433,6 @@ class ShippingMethodViewset(viewsets.ModelViewSet):
     serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id']
-    http_method_names = ['get', 'post', 'head', 'put']
 
 
     '''Allows bulk creation of a shipping method for store'''
