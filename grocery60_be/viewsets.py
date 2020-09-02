@@ -350,7 +350,6 @@ class ShippingAddressViewset(viewsets.ModelViewSet):
     serializer_class = ShippingAddressSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id', 'state']
-    http_method_names = ['get', 'post', 'head', 'put']
 
 
 class OrderViewset(viewsets.ModelViewSet):
