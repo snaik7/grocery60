@@ -406,7 +406,7 @@ class IndiaPaymentView(APIView):
         order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
         order_payment.transaction_id = razorpay_payment_id
         order_payment.signature = razorpay_signature
-        order_payment.status = "payment_intent.succeeded"
+        order_payment.status = "CONFIRMED"
         order_payment.save()
 
         recipient_email = Email()
