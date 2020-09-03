@@ -432,7 +432,7 @@ class ShippingMethodViewset(viewsets.ModelViewSet):
     queryset = ShippingMethod.objects.all()
     serializer_class = ShippingMethodSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['store_id','status']
+    filterset_fields = ['store_id', 'status']
     http_method_names = ['get', 'post', 'head', 'put']
 
     def update(self, request, pk):
