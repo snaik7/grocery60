@@ -393,7 +393,6 @@ class IndiaPaymentView(APIView):
         )
         print('Razor Pay success with order id ', intent.get('id'))
         if OrderPayment().record_payment(data, intent):
-            OrderPayment().delete_cart(data)
             return JsonResponse(intent)
         else:
             raise ValidationError('Order Payment failed for Order = ' + order_id)
@@ -402,6 +401,8 @@ class IndiaPaymentView(APIView):
         data = JSONParser().parse(request)
         razorpay_payment_id = data.get('razorpay_payment_id')
         razorpay_signature = data.get('razorpay_signature')
+
+        OrderPayment().delete_cart(data)
 
         order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
         order_payment.transaction_id = razorpay_payment_id
