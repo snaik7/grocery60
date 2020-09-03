@@ -9,7 +9,8 @@ from rest_framework.decorators import authentication_classes, permission_classes
 
 from grocery60_be import serializers, models, util, settings
 from grocery60_be.error import ValidationError, AutherizationError, AuthenticationError
-from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User
+from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User, \
+    Customer
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse, HttpResponse
@@ -402,6 +403,7 @@ class IndiaPaymentView(APIView):
         data = JSONParser().parse(request)
         razorpay_payment_id = data.get('razorpay_payment_id')
         razorpay_signature = data.get('razorpay_signature')
+        customer_id = data.get('customer_id')
 
         order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
         order_payment.transaction_id = razorpay_payment_id
@@ -409,14 +411,17 @@ class IndiaPaymentView(APIView):
         order_payment.status = "READY_TO_FULFILL"
         order_payment.save()
 
+        user = User.objects.get(id=customer_id)
         recipient_email = Email()
         recipient_email.currency = '₹'
         recipient_email.subject = "Order Confirmation for Grocery 60"
-        recipient_email.email = data.get('receipt_email')
+        recipient_email.email = user.email
         recipient_email.order_id = order_payment.order_id
         recipient_email.set_order(order_payment.order_id)
         order_payment = OrderPayment()
         order_payment.send_success_email(recipient_email)
+
+        order_payment.send_store_email(razor_order_id)
 
         OrderPayment().delete_cart(data)
 

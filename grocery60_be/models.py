@@ -480,10 +480,10 @@ class OrderPayment(models.Model):
 
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
-        order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
+        order_payment = OrderPayment.objects.select_related('order').filter(correlation_id=transaction_id).first()
         store = Store.objects.get(store_id=order_payment.store.store_id)
         email = Email()
-        email.currency = '$'
+        email.currency = '$' if store.currency == 'usd' else '₹'
         email.subject = "Store Order Confirmation for Grocery 60"
         email.email = store.email
         email.order_id = order_payment.order_id
@@ -544,8 +544,8 @@ class Email():
         return {'token': self.token, 'subtotal': self.subtotal, 'order_items_list': self.order_items_list, 'tax': self.tax,
                 'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
                 'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
-                'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template
-                }
+                'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template,
+                'currency': self.currency}
 
 class Tax(models.Model):
     state = models.CharField(
