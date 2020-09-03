@@ -483,6 +483,7 @@ class OrderPayment(models.Model):
         order_payment = OrderPayment.objects.select_related('order').filter(transaction_id=transaction_id).first()
         store = Store.objects.get(store_id=order_payment.store.store_id)
         email = Email()
+        email.currency = '$'
         email.subject = "Store Order Confirmation for Grocery 60"
         email.email = store.email
         email.order_id = order_payment.order_id
@@ -512,7 +513,8 @@ class OrderPayment(models.Model):
 
 
 class Email():
-    subject, first_name, username, password, email, order_id, token, template = None, None, None, None, None, None, None, None
+    subject, first_name, username, password, email, order_id, token, template, currency = None, None, None, None, None, \
+                                                                                          None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 

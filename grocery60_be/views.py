@@ -311,6 +311,7 @@ class PaymentView(APIView):
 
         if OrderPayment().record_payment(data, intent):
             recipient_email = Email()
+            recipient_email.currency = '$'
             recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
             recipient_email.order_id = order_id
@@ -409,6 +410,7 @@ class IndiaPaymentView(APIView):
         order_payment.save()
 
         recipient_email = Email()
+        recipient_email.currency = '₹'
         recipient_email.subject = "Order Confirmation for Grocery 60"
         recipient_email.email = data.get('receipt_email')
         recipient_email.order_id = order_payment.order_id
