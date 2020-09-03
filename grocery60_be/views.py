@@ -402,12 +402,10 @@ class IndiaPaymentView(APIView):
         razorpay_payment_id = data.get('razorpay_payment_id')
         razorpay_signature = data.get('razorpay_signature')
 
-        OrderPayment().delete_cart(data)
-
         order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
         order_payment.transaction_id = razorpay_payment_id
         order_payment.signature = razorpay_signature
-        order_payment.status = "CONFIRMED"
+        order_payment.status = "READY_TO_FULFILL"
         order_payment.save()
 
         recipient_email = Email()
@@ -417,4 +415,7 @@ class IndiaPaymentView(APIView):
         recipient_email.set_order(order_payment.order_id)
         order_payment = OrderPayment()
         order_payment.send_success_email(recipient_email)
+
+        OrderPayment().delete_cart(data)
+
         return JsonResponse(data)
