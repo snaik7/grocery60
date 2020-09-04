@@ -39,6 +39,8 @@ class Query:
     store = graphene.Field(StoreType, store_id=graphene.Int(), token=graphene.String())
     store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
                                  token=graphene.String())
+    store_zip_search = graphene.List(StoreType, nearby_zip=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
+                                 token=graphene.String())
 
     products = graphene.List(ProductType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
     product = graphene.Field(ProductType, product_id=graphene.Int(), token=graphene.String())
@@ -81,6 +83,18 @@ class Query:
         if validate_token(token):
             store_name = kwargs.get("store_name", "")
             qs = Store.objects.filter(name__icontains=store_name, status='ACTIVE')
+            if skip:
+                qs = qs[skip:]
+            if first:
+                qs = qs[:first]
+            return qs
+        else:
+            raise ValidationError('Authentication credentials were not provided')
+
+    def resolve_store_zip_search(self, info, first=None, skip=None, token=None, **kwargs):
+        if validate_token(token):
+            nearby_zip = kwargs.get("nearby_zip", "")
+            qs = Store.objects.filter(nearby_zip__icontains=nearby_zip, status='ACTIVE')
             if skip:
                 qs = qs[skip:]
             if first:
