@@ -18,6 +18,5 @@ def send_email_topic(email):
     data_bytes = json.dumps(data).encode('utf-8')
     # When you publish a message, the client returns a future.
     future = publisher.publish(topic_path, data=data_bytes)
-    print(future.result())
 
     print("Published messages.")

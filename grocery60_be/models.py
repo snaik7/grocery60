@@ -442,8 +442,9 @@ class OrderPayment(models.Model):
                                          signature=signature, shippingmethod_id=shippingmethod_id)
             order_payment.save()
         except Exception as e:
-            raise ValidationError('Order Payment failed for Order = ' + order_id, 'Order Payment failed for Order = ' +
-                                  str(order_id) + ' with ' + str(e))
+            raise ValidationError('Order Payment failed for Order = ' + str(order_id) + ' Order Payment failed for '
+                                                                                        'Order = ' + str(
+                order_id) + ' with ' + str(e))
         return order_payment.payment_id
 
     def delete_cart(self, data):
@@ -461,12 +462,15 @@ class OrderPayment(models.Model):
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        email_send.send_email(email, 'order_pickup.html')
+        # email_send.send_email(email, 'order_pickup.html')
+        email.template = 'order_pickup.html'
+        email_send.send_email_topic(email)
 
     def send_success_email(self, email):
         print('data received ', email.order_id)
         print('data received ', email.order_items_list)
-        email_send.send_email(email, 'order_confirmation.html')
+        email.template = 'order_confirmation.html'
+        email_send.send_email_topic(email)
 
     def send_failure_email(self, transaction_id):
         print('Payment failure data received ' + transaction_id)
@@ -476,7 +480,8 @@ class OrderPayment(models.Model):
         email.subject = "Order failure for Grocery 60"
         email.email = customer.email
         email.order_id = order_payment.order_id
-        email_send.send_email(email, 'order_payment_failure.html')
+        email.template = 'order_payment_failure.html'
+        email_send.send_email_topic(email)
 
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
@@ -488,7 +493,8 @@ class OrderPayment(models.Model):
         email.email = store.email
         email.order_id = order_payment.order_id
         email.set_order(email.order_id)
-        email_send.send_email(email, 'store_order_confirmation.html')
+        email.template = 'store_order_confirmation.html'
+        email_send.send_email_topic(email)
 
     def update_payment(self, transaction_id, status):
         try:
@@ -510,27 +516,10 @@ class OrderPayment(models.Model):
         db_table = "orderpayment"
 
 
-class ShippingMethod(models.Model):
-    name = models.CharField(
-        max_length=255
-    )
-    carrier = models.CharField(
-        max_length=32
-    )
-    min_weight = models.DecimalField(max_digits=6, decimal_places=2)
-    max_weight = models.DecimalField(max_digits=6, decimal_places=2)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = "shippingmethod"
-
-
-
 
 class Email():
     subject, first_name, username, password, email, order_id, token, template, currency = None, None, None, None, None, \
-                                                                                         None, None, None, None
+                                                                                          None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
