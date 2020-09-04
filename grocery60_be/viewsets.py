@@ -275,7 +275,7 @@ class StoreViewset(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['zip', 'nearby_zip', 'status']
+    filterset_fields = ['zip', 'nearby_zip', 'status', 'country']
     http_method_names = ['get', 'post', 'head', 'put']
 
     '''Allows bulk creation of a store.'''
