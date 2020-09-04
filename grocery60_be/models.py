@@ -291,12 +291,12 @@ def get_shipping_cost(shipping_id):
     return shipping_cost
 
 
-def get_tip(tip, custom_tip, sub_total):
+def get_tip(tip, custom_tip, sub_total, no_tax_total):
     tip_amount = Decimal('0.00')
     if custom_tip:
         tip_amount = Decimal(custom_tip)
     elif tip:
-        tip_amount = Decimal(sub_total) * Decimal(tip) / Decimal(100)
+        tip_amount = (Decimal(sub_total) + Decimal(no_tax_total)) * Decimal(tip) / Decimal(100)
 
     cents = Decimal('.01')
     tip_amount = tip_amount.quantize(cents, decimal.ROUND_HALF_UP)
