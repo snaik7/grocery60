@@ -55,7 +55,7 @@ class ProductSearchView(APIView):
         filters = data.get('filters')
         print('Searching set ', product_set_id, ' category ', product_category)
         results = search_product.get_similar_products_file(settings.PROJECT, settings.REGION, product_set_id, product_category,
-                                                 image_uri, filters)
+                                                           image_uri, filters)
         return JsonResponse(results, safe=False)
 
 
