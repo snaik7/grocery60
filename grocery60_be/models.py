@@ -450,9 +450,9 @@ class OrderPayment(models.Model):
     def delete_cart(self, data):
         try:
             cart = None
-            customer_id = data.get('metadata').get('customer_id')
+            customer_id = data.get('customer_id')
             if not customer_id:
-                customer_id = data.get('customer_id')
+                customer_id = data.get('metadata').get('customer_id')
             cart = Cart.objects.get(customer_id=customer_id)
             if cart:
                 cart.delete()
