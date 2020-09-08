@@ -457,7 +457,7 @@ class OrderPayment(models.Model):
             if cart:
                 cart.delete()
         except Exception as e:
-            print('Exception ' + str(e))
+            print('Exception in deleting cart ' + str(e))
 
     def send_pickup_email(self, email):
         print('data received ', email.order_id)
