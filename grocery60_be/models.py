@@ -451,7 +451,7 @@ class OrderPayment(models.Model):
         try:
             cart = None
             customer_id = data.get('metadata').get('customer_id')
-            if customer_id:
+            if not customer_id:
                 customer_id = data.get('customer_id')
             cart = Cart.objects.get(customer_id=customer_id)
             if cart:
