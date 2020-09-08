@@ -37,8 +37,8 @@ class Query:
 
     stores = graphene.List(StoreType, first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
     store = graphene.Field(StoreType, store_id=graphene.Int(), token=graphene.String())
-    store_search = graphene.List(StoreType, store_name=graphene.String(), first=graphene.Int(), skip=graphene.Int(),
-                                 token=graphene.String())
+    store_search = graphene.List(StoreType, store_name=graphene.String(), country=graphene.String(), first=graphene.Int(),
+                                 skip=graphene.Int(), token=graphene.String())
     store_zip_search = graphene.List(StoreType, nearby_zip=graphene.String(), country=graphene.String(),
                                      first=graphene.Int(), skip=graphene.Int(), token=graphene.String())
 
@@ -82,7 +82,8 @@ class Query:
     def resolve_store_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
             store_name = kwargs.get("store_name", "")
-            qs = Store.objects.filter(name__icontains=store_name, status='ACTIVE')
+            country = kwargs.get("country", "USA")
+            qs = Store.objects.filter(name__icontains=store_name, country=country, status='ACTIVE')
             if skip:
                 qs = qs[skip:]
             if first:
