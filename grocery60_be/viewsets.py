@@ -63,6 +63,34 @@ class CartViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id']
 
+    def list(self, request):
+        print('enter cart item get')
+        customer_id = request.GET.get('customer_id')
+        cart = Cart.objects.filter(customer_id=customer_id).first()
+        serializer = CartSerializer(cart)
+
+        cart_item = CartItem.objects.select_related('product').all().filter(cart_id=cart.id). \
+            order_by('product_id')
+        print(cart_item.query)
+        cart_item_list = []
+        for item in cart_item:
+            _dict = {}
+            product_id_list = [_item['product_id'] for _item in cart_item_list]
+            if item.product.product_id in product_id_list:
+                _item = [_item for _item in cart_item_list if _item['product_id'] == item.product.product_id]
+                cart_item_list.remove(_item[0])
+                _dict['product_id'] = item.product.product_id
+                _dict['quantity'] = _item[0]['quantity'] + item.quantity
+                cart_item_list.append(_dict)
+            else:
+                _dict['product_id'] = item.product.product_id
+                _dict['quantity'] = item.quantity
+                cart_item_list.append(_dict)
+
+
+        cart_item_dict = {'count': len(cart_item_list), 'result': serializer.data}
+        return JsonResponse(cart_item_dict, safe=False)
+
 
 class CartItemViewset(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
