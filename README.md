@@ -5,7 +5,7 @@
 Grocery 60 app is deployed in Cloud Run on GCP. The README file introduces the general approach for organizing this stuff and then explains how to install it, how to use the existing functionality
 and how to extend it. Cloud build automatically deploys the app to Cloud Run after checkin to repo.
 
-## Introduction
+## Introduction 
 
 The goal is to have a zero to hero one-click setup that can be extended for specific purposes (e.g. work stuff) without touching the base. 
 
