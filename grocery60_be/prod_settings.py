@@ -33,7 +33,7 @@ if not os.path.isfile('.env'):
 
     if project:
         client = sm.SecretManagerServiceClient()
-        path = client.secret_version_path(project, "django_settings", "latest")
+        path = client.secret_version_path(project, "django_settings_prod", "latest")
         payload = client.access_secret_version(path).payload.data.decode("UTF-8")
 
         with open(env_file, "w") as f:
