@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from grocery60_be.models import OrderPayment
 
 
-# Stripe can call without auth
+# Stripe can make webhook call without auth
 @authentication_classes([])
 @permission_classes([])
 class PaymentWebhookView(APIView):

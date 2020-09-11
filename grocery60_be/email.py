@@ -8,7 +8,7 @@ def send_email_topic(email):
     publisher = pubsub_v1.PublisherClient()
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(settings.PROJECT, 'email')
+    topic_path = publisher.topic_path(settings.PROJECT, 'email'+settings.build)
     print('email', email)
     data = email.asdict()
     print('data', data)
