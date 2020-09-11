@@ -10,7 +10,7 @@ def create_product_set_topic(project_id, location, product_set_id, product_set_d
     publisher = pubsub_v1.PublisherClient()
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(settings.PROJECT, 'productset')
+    topic_path = publisher.topic_path(settings.PROJECT, 'productset'+settings.build)
 
     product_set_dict = {'project_id': project_id, 'location': location, 'product_set_id': product_set_id,
                         'product_set_display_name': product_set_display_name}
@@ -57,7 +57,7 @@ def create_product_topic(product):
     publisher = pubsub_v1.PublisherClient()
     # The `topic_path` method creates a fully qualified identifier
     # in the form `projects/{project_id}/topics/{topic_id}`
-    topic_path = publisher.topic_path(settings.PROJECT, 'product')
+    topic_path = publisher.topic_path(settings.PROJECT, 'product'+settings.build)
 
     data = {'store_id': str(product.get('store')), 'product_id': str(product.get('product_id')),
             'product_name': product.get('product_name'), 'product_url': product.get('product_url')}
