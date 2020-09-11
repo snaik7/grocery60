@@ -20,6 +20,7 @@ from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
 
 # Import settings with django-environ
 env = environ.Env()
+build = 'prod'
 
 # Import settings from Secret Manager
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

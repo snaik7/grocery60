@@ -296,7 +296,7 @@ class StoreViewset(viewsets.ModelViewSet):
 
             for store in data:
                 # Create Product Set for Store
-                product_set = 'PS_' + str(store.get('store_id'))
+                product_set = 'PS_' + settings.build + str(store.get('store_id'))
                 product_set_display = product_set + ' Store Set'
                 search_product.create_product_set_topic(settings.PROJECT, settings.REGION, product_set, product_set_display)
 
