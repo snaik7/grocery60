@@ -305,7 +305,7 @@ def get_tip(tip, custom_tip, sub_total, no_tax_total):
 
 def get_service_fee(sub_total, country):
     service_fee = Decimal(settings.SERVICE_FEE) / Decimal(100) * Decimal(sub_total)
-    if country == 'IND':
+    if country == 'IN':
         service_fee = Decimal(50) if service_fee < 50 else service_fee
     else:
         service_fee = Decimal(2) if service_fee < 2 else service_fee
