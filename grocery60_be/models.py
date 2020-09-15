@@ -303,9 +303,12 @@ def get_tip(tip, custom_tip, sub_total, no_tax_total):
     return tip_amount
 
 
-def get_service_fee(sub_total):
+def get_service_fee(sub_total, country):
     service_fee = Decimal(settings.SERVICE_FEE) / Decimal(100) * Decimal(sub_total)
-    service_fee = Decimal(2) if service_fee < 2 else service_fee
+    if country == 'IND':
+        service_fee = Decimal(50) if service_fee < 50 else service_fee
+    else:
+        service_fee = Decimal(2) if service_fee < 2 else service_fee
     cents = Decimal('.01')
     service_fee = service_fee.quantize(cents, decimal.ROUND_HALF_UP)
     return service_fee

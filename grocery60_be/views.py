@@ -49,7 +49,7 @@ class FeeCalView(APIView):
             raise ValidationError('Please add shipping address to profile so tax calculation can be done')
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
-        service_fee = models.get_service_fee(sub_total)
+        service_fee = models.get_service_fee(sub_total, address.country)
         discount = models.get_discount(customer_id, sub_total)
         total = Decimal(sub_total) + tax + tip + service_fee + shipping_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
