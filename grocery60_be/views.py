@@ -315,6 +315,7 @@ class PaymentView(APIView):
             recipient_email.currency = '$'
             recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
+            recipient_email.phone = data.get('metadata').get('phone')
             recipient_email.order_id = order_id
             recipient_email.set_order(order_id)
             order_payment = OrderPayment()

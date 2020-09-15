@@ -478,6 +478,7 @@ class OrderPayment(models.Model):
         customer = Customer.objects.get(customer_id=order_payment.order.customer_id)
         email = Email()
         email.subject = "Order failure for Grocery 60"
+        email.phone = customer.phone_number
         email.email = customer.email
         email.order_id = order_payment.order_id
         email.template = 'order_payment_failure.html'
@@ -518,8 +519,8 @@ class OrderPayment(models.Model):
 
 
 class Email():
-    subject, first_name, username, password, email, order_id, token, template, currency = None, None, None, None, None, \
-                                                                                          None, None, None, None
+    subject, first_name, username, password, email, order_id, token, template, currency, phone = None, None, None, None, None, \
+                                                                                          None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
@@ -550,7 +551,7 @@ class Email():
                 'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
                 'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
                 'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template,
-                'currency': self.currency}
+                'currency': self.currency, 'phone': self.phone}
 
 class Tax(models.Model):
     state = models.CharField(
