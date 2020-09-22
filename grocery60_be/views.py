@@ -120,7 +120,7 @@ class StoreLoginView(APIView):
         valid = hashers.check_password(password, store_admin.password)
         print('valid ', valid)
         if valid:
-            data = {'message': 'success'}
+            data = {'message': 'success', 'is_superuser': store_admin.is_superuser}
             return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
         else:
             raise AuthenticationError('Please login with valid credentials.')
