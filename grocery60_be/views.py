@@ -341,7 +341,6 @@ class OrderDetailView(APIView):
         for item in items:
             print('order', data)
             print('product_id', serializer.data.get('order_id'))
-            print('product_id', serializer.order_id)
             print('product_id', order.order_id)
             product = Product.objects.get(product_id=item.get('product_id'))
             order = Order.objects.get(order_id=order.order_id)
