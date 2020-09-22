@@ -82,7 +82,7 @@ class Query:
     def resolve_store_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
             store_name = kwargs.get("store_name", "")
-            country = kwargs.get("country", "USA")
+            country = kwargs.get("country", "US")
             qs = Store.objects.filter(name__icontains=store_name, country=country, status='ACTIVE')
             if skip:
                 qs = qs[skip:]
@@ -95,7 +95,7 @@ class Query:
     def resolve_store_zip_search(self, info, first=None, skip=None, token=None, **kwargs):
         if validate_token(token):
             nearby_zip = kwargs.get("nearby_zip", "")
-            country = kwargs.get("country", "USA")
+            country = kwargs.get("country", "US")
             qs = Store.objects.filter(nearby_zip__icontains=nearby_zip, country=country, status='ACTIVE')
             if skip:
                 qs = qs[skip:]
