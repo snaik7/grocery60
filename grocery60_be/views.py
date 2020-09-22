@@ -334,7 +334,7 @@ class OrderDetailView(APIView):
         data = request.data
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(token=util.generate_token(4))
+            order = serializer.save(token=util.generate_token(4))
 
         items = data.get('items')
 
@@ -342,8 +342,9 @@ class OrderDetailView(APIView):
             print('order', data)
             print('product_id', serializer.data.get('order_id'))
             print('product_id', serializer.order_id)
+            print('product_id', order.order_id)
             product = Product.objects.get(product_id=item.get('product_id'))
-            order = Order.objects.get(order_id=serializer.data.get('order_id'))
+            order = Order.objects.get(order_id=order.order_id)
             cents = Decimal('.01')
             line_total = product.price * Decimal(item.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
