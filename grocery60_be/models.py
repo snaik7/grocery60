@@ -112,7 +112,7 @@ class StoreAdmin(models.Model):
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(
-        max_length=50
+        max_length=500
     )
     product_url = models.CharField(
         max_length=200,
@@ -362,7 +362,7 @@ class OrderItem(models.Model):
     quantity = models.IntegerField()
     canceled = models.BooleanField()
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "orderitem"
