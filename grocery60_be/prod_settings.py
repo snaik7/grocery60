@@ -172,7 +172,7 @@ REST_FRAMEWORK = {
 stripe.api_key = env("STRIPE_PUBKEY")
 stripe.api_version = os.getenv('STRIPE_APIKEY', '2020-03-02')
 # set on each request
-stripe_account = "acct_1FPY3JEQN3kQJKqm"
+stripe_account = "acct_1HSZgsKNK8C6rbwM"
 
 #PROJECT = 'named-enigma-277405'
 PROJECT = 'grocery60-project'
