@@ -362,7 +362,7 @@ class OrderItem(models.Model):
     quantity = models.IntegerField()
     canceled = models.BooleanField()
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "orderitem"
