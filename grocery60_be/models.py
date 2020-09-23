@@ -112,7 +112,7 @@ class StoreAdmin(models.Model):
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(
-        max_length=50
+        max_length=500
     )
     product_url = models.CharField(
         max_length=200,
@@ -303,9 +303,12 @@ def get_tip(tip, custom_tip, sub_total, no_tax_total):
     return tip_amount
 
 
-def get_service_fee(sub_total):
+def get_service_fee(sub_total, country):
     service_fee = Decimal(settings.SERVICE_FEE) / Decimal(100) * Decimal(sub_total)
-    service_fee = Decimal(2) if service_fee < 2 else service_fee
+    if country == 'IN':
+        service_fee = Decimal(50) if service_fee < 50 else service_fee
+    else:
+        service_fee = Decimal(7) if service_fee < 7 else service_fee
     cents = Decimal('.01')
     service_fee = service_fee.quantize(cents, decimal.ROUND_HALF_UP)
     return service_fee
@@ -478,6 +481,7 @@ class OrderPayment(models.Model):
         customer = Customer.objects.get(customer_id=order_payment.order.customer_id)
         email = Email()
         email.subject = "Order failure for Grocery 60"
+        email.phone = customer.phone_number
         email.email = customer.email
         email.order_id = order_payment.order_id
         email.template = 'order_payment_failure.html'
@@ -518,8 +522,8 @@ class OrderPayment(models.Model):
 
 
 class Email():
-    subject, first_name, username, password, email, order_id, token, template, currency = None, None, None, None, None, \
-                                                                                          None, None, None, None
+    subject, first_name, username, password, email, order_id, token, template, currency, phone = None, None, None, None, None, \
+                                                                                          None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
@@ -550,7 +554,7 @@ class Email():
                 'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
                 'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
                 'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template,
-                'currency': self.currency}
+                'currency': self.currency, 'phone': self.phone}
 
 class Tax(models.Model):
     state = models.CharField(

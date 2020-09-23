@@ -49,7 +49,7 @@ class FeeCalView(APIView):
             raise ValidationError('Please add shipping address to profile so tax calculation can be done')
         sub_total = Decimal(sub_total) + Decimal(no_tax_total)
         sub_total = sub_total.quantize(cents, decimal.ROUND_HALF_UP)
-        service_fee = models.get_service_fee(sub_total)
+        service_fee = models.get_service_fee(sub_total, address.country)
         discount = models.get_discount(customer_id, sub_total)
         total = Decimal(sub_total) + tax + tip + service_fee + shipping_fee - discount
         total = total.quantize(cents, decimal.ROUND_HALF_UP)
@@ -120,7 +120,7 @@ class StoreLoginView(APIView):
         valid = hashers.check_password(password, store_admin.password)
         print('valid ', valid)
         if valid:
-            data = {'message': 'success'}
+            data = {'message': 'success', 'is_superuser': store_admin.is_superuser}
             return JsonResponse(data=data, status=status.HTTP_200_OK, safe=False)
         else:
             raise AuthenticationError('Please login with valid credentials.')
@@ -224,17 +224,19 @@ class PaymentView(APIView):
         print('order id cancellation', order_id)
         order_payment = OrderPayment.objects.get(order_id=order_id)
         print(order_payment.transaction_id)
-        try:
-            # To cancel a PaymentIntent
-            intent = stripe.PaymentIntent.cancel(
-                order_payment.transaction_id)
-        except stripe.error.StripeError as e:
-            # Display a very generic error to the user, and maybe send
-            # yourself an email
-            raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
-                                  'and we will reply you in 24 hours. '.format(order_id))
+        # Perform for stripe orders
+        if order_payment.transaction_id.startswith('pi_'):
+            try:
+                # To cancel a PaymentIntent
+                intent = stripe.PaymentIntent.cancel(
+                    order_payment.transaction_id)
+            except stripe.error.StripeError as e:
+                # Display a very generic error to the user, and maybe send
+                # yourself an email
+                raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
+                                      'and we will reply you in 24 hours. '.format(order_id))
 
-        if intent.get('status') == 'canceled':
+        if not order_payment.transaction_id.startswith('pi_') or intent.get('status') == 'canceled':
             order_payment.status = 'CANCELED'
             order_payment.save()
             order = Order.objects.get(order_id=order_id)
@@ -315,6 +317,7 @@ class PaymentView(APIView):
             recipient_email.currency = '$'
             recipient_email.subject = "Order Confirmation for Grocery 60"
             recipient_email.email = data.get('receipt_email')
+            recipient_email.phone = data.get('metadata').get('phone')
             recipient_email.order_id = order_id
             recipient_email.set_order(order_id)
             order_payment = OrderPayment()
@@ -331,14 +334,16 @@ class OrderDetailView(APIView):
         data = request.data
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(token=util.generate_token(4))
+            order = serializer.save(token=util.generate_token(4))
 
         items = data.get('items')
 
         for item in items:
-            print(data)
+            print('order data ', data)
+            print('product_id serializer ', serializer.data.get('order_id'))
+            print('product_id object ', order.order_id)
             product = Product.objects.get(product_id=item.get('product_id'))
-            order = Order.objects.get(order_id=serializer.data.get('order_id'))
+            order = Order.objects.get(order_id=order.order_id)
             cents = Decimal('.01')
             line_total = product.price * Decimal(item.get('quantity'))
             line_total = line_total.quantize(cents, decimal.ROUND_HALF_UP)
