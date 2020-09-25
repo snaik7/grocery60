@@ -163,7 +163,8 @@ class PasswordResetView(APIView):
         else:
             raise ValidationError('User does not exist in system')
 
-
+@authentication_classes([])
+@permission_classes([])
 class ForgotUserView(APIView):
     def post(self, request, *args, **kwargs):
         data = JSONParser().parse(request)
