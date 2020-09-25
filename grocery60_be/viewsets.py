@@ -31,12 +31,11 @@ class UserViewset(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'put']
 
     def perform_create(self, serializer):
+        user = User.objects.filter(email=serializer.data.get('email')).first()
+        if user:
+            raise ValidationError('User already exists in system with provided email id')
         if serializer.is_valid():
-            user = User.objects.filter(email=serializer.data.get('email')).first()
-            if user:
-                raise ValidationError('User already exists in system with provided email id')
-            else:
-                serializer.save()
+            serializer.save()
         email = Email()
         email.subject = "Welcome to Grocery 60 !!!"
         email.email = serializer.data.get('email')
