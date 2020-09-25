@@ -15,6 +15,7 @@ class User(AbstractUser):
         max_length=1,
         default='Y'
     )
+    email = models.EmailField(unique=True)
 
     class Meta:
         db_table = "auth_user"
