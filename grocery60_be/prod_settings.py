@@ -57,7 +57,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', 'grocery60-be-b2yd4bi7eq-uc.a.run.app','grocery60-be-xtpocjmkpa-uw.a.run.app']
+ALLOWED_HOSTS = ['*','grocery60-be-xtpocjmkpa-uw.a.run.app','https://grocery60-be-prod-xtpocjmkpa-uw.a.run.app']
 
 # Application definition
 

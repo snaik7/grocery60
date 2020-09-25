@@ -159,10 +159,27 @@ class PasswordResetView(APIView):
             #email_send.send_email(email, 'password_reset.html')
             email.template = 'password_reset.html'
             email_send.send_email_topic(email)
-
             return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
         else:
             raise ValidationError('User does not exist in system')
+
+
+class ForgotUserView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = JSONParser().parse(request)
+        email = data.get('email')
+        user = User.objects.filter(email=email).first()
+        if user:
+            email = Email()
+            email.subject = "Forgot username for Grocery 60 !!!"
+            email.email = user.email
+            email.username = user.username
+            email.first_name = user.first_name
+            email.template = 'forgot_username.html'
+            email_send.send_email_topic(email)
+            return JsonResponse(data={"msg": "Username is sent to your email"}, status=status.HTTP_200_OK, safe=False)
+        else:
+            raise ValidationError('User does not exist in the system')
 
 
 class PasswordResetConfirmView(APIView):

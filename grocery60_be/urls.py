@@ -56,6 +56,7 @@ urlpatterns = [
     path('webhook/payment/', webhook.PaymentWebhookView.as_view()),
     path('rest-auth/login/v1/', views.CustomLoginView.as_view()),
     path('verify/login/', views.VerifyLoginView.as_view()),
+    path('forgot/user/', views.ForgotUserView.as_view()),
     path('rest-auth/password/reset/v1/', views.PasswordResetView.as_view()),
     path('rest-auth/password/reset/confirm/v1/', views.PasswordResetConfirmView.as_view()),
     path('email/login/', views.ResendEmailLoginView.as_view()),
