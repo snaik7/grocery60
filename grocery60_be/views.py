@@ -10,7 +10,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from grocery60_be import serializers, models, util, settings
 from grocery60_be.error import ValidationError, AutherizationError, AuthenticationError
 from grocery60_be.models import OrderPayment, Email, BillingAddress, StoreAdmin, Order, Product, OrderItem, User, \
-    Customer
+    Customer, ShippingAddress, ShippingMethod, Store
 import stripe
 from rest_framework.views import APIView
 from django.http import JsonResponse, HttpResponse
@@ -337,6 +337,18 @@ class PaymentView(APIView):
             recipient_email.email = data.get('receipt_email')
             recipient_email.phone = data.get('metadata').get('phone')
             recipient_email.order_id = order_id
+            recipient_email.customer_id = data.get('metadata').get('customer_id')
+            shippingmethod_id = data.get('metadata').get('shippingmethod_id')
+            shipping_method = ShippingMethod.objects.get(id=shippingmethod_id)
+            if shipping_method.name != 'Store Pickup':
+                shipping_address = ShippingAddress.objects.get(customer_id=recipient_email.customer_id)
+                recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
+                    shipping_address.country + ', ' + shipping_address.zip
+            else:
+                store = Store.objects.get(store_id=data.get('metadata').get('store_id'))
+                recipient_email.address = store.address + ', ' + store.city + ', ' + \
+                    store.country + ', ' + store.zip
+
             recipient_email.set_order(order_id)
             order_payment = OrderPayment()
             order_payment.send_success_email(recipient_email)
@@ -439,8 +451,10 @@ class IndiaPaymentView(APIView):
         recipient_email.currency = '₹'
         recipient_email.subject = "Order Confirmation for Grocery 60"
         recipient_email.email = user.email
+        recipient_email.customer_id = customer_id
         recipient_email.order_id = order_payment.order_id
         recipient_email.set_order(order_payment.order_id)
+
         order_payment = OrderPayment()
         order_payment.send_success_email(recipient_email)
 

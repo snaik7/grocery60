@@ -523,8 +523,8 @@ class OrderPayment(models.Model):
 
 
 class Email():
-    subject, first_name, username, password, email, order_id, token, template, currency, phone = None, None, None, None, None, \
-                                                                                          None, None, None, None, None
+    subject, first_name, username, password, email, order_id, token, template, currency, phone, address, customer_id = None, None, None, None, None, \
+                                                                                          None, None, None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
@@ -555,7 +555,7 @@ class Email():
                 'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
                 'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
                 'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template,
-                'currency': self.currency, 'phone': self.phone}
+                'currency': self.currency, 'phone': self.phone, 'address': self.address}
 
 class Tax(models.Model):
     state = models.CharField(
