@@ -464,7 +464,7 @@ class IndiaPaymentView(APIView):
             recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
                                       shipping_address.country + ', ' + shipping_address.zip
         else:
-            store = Store.objects.get(store_id=)
+            store = Store.objects.get(store_id=Order.objects.get(order_id=recipient_email.order_id).store.store_id)
             recipient_email.address = store.address + ', ' + store.city + ', ' + \
                                       store.country + ', ' + store.zip
 
