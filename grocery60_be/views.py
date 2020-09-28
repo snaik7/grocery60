@@ -83,7 +83,7 @@ class ResendEmailLoginView(APIView):
         email.first_name = user.first_name
         email.username = user.username
         email.template = 'registration.html'
-        #email_send.send_email(email, 'registration.html')
+        # email_send.send_email(email, 'registration.html')
         email_send.send_email_topic(email)
         print('return')
         data = {'message': 'success'}
@@ -156,12 +156,13 @@ class PasswordResetView(APIView):
             email.username = user.username
             email.first_name = user.first_name
             email.password = text_password
-            #email_send.send_email(email, 'password_reset.html')
+            # email_send.send_email(email, 'password_reset.html')
             email.template = 'password_reset.html'
             email_send.send_email_topic(email)
             return JsonResponse(data={}, status=status.HTTP_200_OK, safe=False)
         else:
             raise ValidationError('User does not exist in system')
+
 
 @authentication_classes([])
 @permission_classes([])
@@ -207,7 +208,6 @@ class PasswordResetConfirmView(APIView):
             raise ValidationError('User does not exist in the system')
 
 
-
 class CustomerPaymentView(APIView):
     def get(self, request):
         customer_id = request.GET.get('customer_id')
@@ -226,7 +226,8 @@ class CustomerPaymentView(APIView):
         elif store_id:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id).order_by('-payment_id')
         elif customer_id:
-            query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by('-payment_id')
+            query_set = OrderPayment.objects.select_related('order').filter(order__customer_id=customer_id).order_by(
+                '-payment_id')
         elif status:
             query_set = OrderPayment.objects.select_related('order').filter(status=status).order_by('-payment_id')
         else:
@@ -251,8 +252,9 @@ class PaymentView(APIView):
             except stripe.error.StripeError as e:
                 # Display a very generic error to the user, and maybe send
                 # yourself an email
-                raise ValidationError('Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
-                                      'and we will reply you in 24 hours. '.format(order_id))
+                raise ValidationError(
+                    'Order Cancellation failed for Order  #{:d}. Please email to info@grocery60.online '
+                    'and we will reply you in 24 hours. '.format(order_id))
 
         if not order_payment.transaction_id.startswith('pi_') or intent.get('status') == 'canceled':
             order_payment.status = 'CANCELED'
@@ -267,7 +269,7 @@ class PaymentView(APIView):
             email.email = user.email
             email.order_id = order_payment.order_id
             email.template = 'order_cancellation.html'
-            #email_send.send_email(email, 'order_cancellation.html')
+            # email_send.send_email(email, 'order_cancellation.html')
             email_send.send_email_topic(email)
             response_dict = {
                 'status': 'success'
@@ -343,11 +345,11 @@ class PaymentView(APIView):
             if shipping_method.name != 'Store Pickup':
                 shipping_address = ShippingAddress.objects.get(customer_id=recipient_email.customer_id)
                 recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
-                    shipping_address.country + ', ' + shipping_address.zip
+                                          shipping_address.country + ', ' + shipping_address.zip
             else:
                 store = Store.objects.get(store_id=data.get('metadata').get('store_id'))
                 recipient_email.address = store.address + ', ' + store.city + ', ' + \
-                    store.country + ', ' + store.zip
+                                          store.country + ', ' + store.zip
 
             recipient_email.set_order(order_id)
             order_payment = OrderPayment()
@@ -439,8 +441,9 @@ class IndiaPaymentView(APIView):
         razorpay_payment_id = data.get('razorpay_payment_id')
         razorpay_signature = data.get('razorpay_signature')
         customer_id = data.get('customer_id')
-
+        shippingmethod_id = 0
         order_payment = OrderPayment.objects.get(correlation_id=razor_order_id)
+        shippingmethod_id = order_payment.shippingmethod.id
         order_payment.transaction_id = razorpay_payment_id
         order_payment.signature = razorpay_signature
         order_payment.status = "READY_TO_FULFILL"
@@ -454,6 +457,16 @@ class IndiaPaymentView(APIView):
         recipient_email.customer_id = customer_id
         recipient_email.order_id = order_payment.order_id
         recipient_email.set_order(order_payment.order_id)
+
+        shipping_method = ShippingMethod.objects.get(id=shippingmethod_id)
+        if shipping_method.name != 'Store Pickup':
+            shipping_address = ShippingAddress.objects.get(customer_id=recipient_email.customer_id)
+            recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
+                                      shipping_address.country + ', ' + shipping_address.zip
+        else:
+            store = Store.objects.get(store_id=)
+            recipient_email.address = store.address + ', ' + store.city + ', ' + \
+                                      store.country + ', ' + store.zip
 
         order_payment = OrderPayment()
         order_payment.send_success_email(recipient_email)
