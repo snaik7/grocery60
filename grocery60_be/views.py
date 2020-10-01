@@ -39,7 +39,7 @@ class FeeCalView(APIView):
         tip = models.get_tip(tip, custom_tip, sub_total, no_tax_total)
         # Calculate Shipping Fee
         print('calling shipping_fee')
-        shipping_fee = models.get_shipping_cost(shipping_id, customer_id) if shipping_id else Decimal('0.00')
+        shipping_fee = get_shipping_cost(shipping_id, customer_id) if shipping_id else Decimal('0.00')
         # Calculate Tax based on state
         address = BillingAddress.objects.filter(customer_id=customer_id).first()
         if address:
@@ -57,6 +57,48 @@ class FeeCalView(APIView):
         return Response({'sub_total': str(sub_total), 'tax': str(tax), 'tip': str(tip), 'service_fee': str(service_fee),
                          'shipping_fee': str(shipping_fee), 'discount': str(discount), 'total': str(total)})
 
+
+
+def get_shipping_cost(shipping_id, customer_id):
+    print('get_shipping_cost')
+    shipping_cost = Decimal('0')
+    if shipping_id:
+        shipping_method = ShippingMethod.objects.get(id=shipping_id)
+        if shipping_method.name == 'Store Pickup':
+            shipping_cost = Decimal(shipping_method.price)
+        else:
+            print('not store pickup')
+            shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
+            destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
+                          shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
+
+            store = Store.objects.get(store_id=shipping_method.store_id)
+            origin = store.address + ', ' + store.city + ', ' + \
+                     store.country + ', ' + store.zip
+
+            resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
+                                '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
+
+            print(resp.status_code)
+            if resp.status_code != 200:
+                print('dist response ' + resp.text)
+                raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
+            else:
+                print('dist response ' + resp.text)
+            distance_resp = json.loads(resp.text)
+            distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
+            distance = distance.replace(' mi', '')
+            print('distance', distance)
+            shipping_extra = 0
+            if distance > 10:
+                shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
+
+            shipping_cost = Decimal(shipping_method.price) + Decimal(shipping_extra)
+
+        cents = Decimal('.01')
+        shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
+
+    return shipping_cost
 
 @authentication_classes([])
 @permission_classes([])
