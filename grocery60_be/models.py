@@ -41,7 +41,7 @@ class Store(models.Model):
         max_length=50
     )
     nearby_zip = models.CharField(
-        max_length=50
+        max_length=500
     )
     country = models.CharField(
         max_length=50
@@ -284,14 +284,14 @@ def get_discount(customer_id, sub_total):
 
 import logging
 def get_shipping_cost(shipping_id, customer_id):
-    logging.info('get_shipping_cost')
+    print('get_shipping_cost')
     shipping_cost = Decimal('0')
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
         if shipping_method.name == 'Store Pickup':
             shipping_cost = Decimal(shipping_method.price)
         else:
-            logging.info('not store pickup')
+            print('not store pickup')
             shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
             destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
                           shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
@@ -299,13 +299,14 @@ def get_shipping_cost(shipping_id, customer_id):
             store = Store.objects.get(store_id=shipping_method.store_id)
             origin = store.address + ', ' + store.city + ', ' + \
                      store.country + ', ' + store.zip
-
+            import sys
+            sys.stdout.flush()
             resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
 
             logging.info(resp.status_code)
             if resp.status_code != 200:
-                logging.info('dist response ' + resp.text)
+                print('dist response ' + resp.text)
                 raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
             else:
                 logging.info('dist response ' + resp.text)
