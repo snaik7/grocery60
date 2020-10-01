@@ -282,30 +282,16 @@ def get_discount(customer_id, sub_total):
     discount = discount.quantize(cents, decimal.ROUND_HALF_UP)
     return discount
 
-import logging
+
 def get_shipping_cost(shipping_id, customer_id):
     print('get_shipping_cost')
-    # Instantiates a client
-    client = google.cloud.logging.Client()
-
-    # Connects the logger to the root logging handler; by default this captures
-    # all logs at INFO level and higher
-    client.setup_logging()
-
-    # The data to log
-    text = 'Hello, these are logs from cloud run!'
-
-    # Emits the data using the standard logging module
-    logging.warning(text)
-
-
     shipping_cost = Decimal('0')
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
         if shipping_method.name == 'Store Pickup':
             shipping_cost = Decimal(shipping_method.price)
         else:
-            logging.warning('not store pickup')
+            print('not store pickup')
             shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
             destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
                           shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
@@ -317,16 +303,16 @@ def get_shipping_cost(shipping_id, customer_id):
             resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
 
-            logging.info(resp.status_code)
+            print(resp.status_code)
             if resp.status_code != 200:
-                logging.warning('dist response ' + resp.text)
+                print('dist response ' + resp.text)
                 raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
             else:
-                logging.warning('dist response ' + resp.text)
+                print('dist response ' + resp.text)
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
             distance = distance.replace(' mi', '')
-            logging.warning('distance', distance)
+            print('distance', distance)
             shipping_extra = 0
             if distance > 10:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
