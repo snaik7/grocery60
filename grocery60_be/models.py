@@ -318,9 +318,9 @@ def get_shipping_cost(shipping_id, customer_id):
             if distance > 0:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
 
-        shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra) 
+        shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra)
         cents = Decimal('.01')
-        shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
+        shipping_cost = distance.quantize(cents, decimal.ROUND_HALF_UP)
 
     return shipping_cost
 
