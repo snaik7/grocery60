@@ -301,7 +301,7 @@ def get_shipping_cost(shipping_id, customer_id):
             origin = store.address + ', ' + store.city + ', ' + \
                      store.country + ', ' + store.zip
 
-            resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
+            resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
 
             print(resp.status_code)
@@ -314,15 +314,12 @@ def get_shipping_cost(shipping_id, customer_id):
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
             distance = distance.replace(' mi', '')
             print('distance', distance)
-
-            raise ValidationError('distance error'+distance)
-
-            if distance > 0:
+            if distance > 10:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
 
         shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra)
         cents = Decimal('.01')
-        shipping_cost = distance.quantize(cents, decimal.ROUND_HALF_UP)
+        shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
 
     return shipping_cost
 
