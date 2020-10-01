@@ -315,6 +315,8 @@ def get_shipping_cost(shipping_id, customer_id):
             distance = distance.replace(' mi', '')
             print('distance', distance)
 
+            raise ValidationError('distance error'+distance)
+
             if distance > 0:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
 
