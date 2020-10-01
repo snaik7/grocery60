@@ -292,7 +292,6 @@ def get_shipping_cost(shipping_id, customer_id):
         if shipping_method.name == 'Store Pickup':
             shipping_cost = Decimal(shipping_method.price)
         else:
-            print('not store pickup')
             shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
             destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
                           shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
@@ -303,27 +302,22 @@ def get_shipping_cost(shipping_id, customer_id):
 
             resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
-
             print(resp.status_code)
             if resp.status_code != 200:
                 print('dist response ' + resp.text)
                 raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
-            else:
-                print('dist response ' + resp.text)
+
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance').get('text')
-            print('distance------', distance)
             distance = distance.replace(',', '')
             distance = distance.replace(' mi', '')
             distance = int(distance)
             print('distance', distance)
-            if distance > 10:
-                shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
-            print('shipping_extra', shipping_extra)
+            if distance > settings.DELIVERY_FREE_MILES:
+                shipping_extra = (distance - settings.DELIVERY_FREE_MILES) * settings.DELIVERY_PER_MILE
         shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra)
         cents = Decimal('.01')
         shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
-
     return shipping_cost
 
 
