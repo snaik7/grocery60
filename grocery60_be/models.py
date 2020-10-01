@@ -312,6 +312,7 @@ def get_shipping_cost(shipping_id, customer_id):
                 print('dist response ' + resp.text)
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
+            print('distance------', distance)
             distance = distance.replace(' mi', '')
             print('distance', distance)
             if distance > 10:
