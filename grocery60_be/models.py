@@ -290,7 +290,7 @@ def get_shipping_cost(shipping_id, customer_id):
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
         if shipping_method.name == 'Store Pickup':
-            shipping_cost = Decimal(shipping_method.price) + 1
+            shipping_cost = Decimal(shipping_method.price)
         else:
             print('not store pickup')
             shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
@@ -315,10 +315,10 @@ def get_shipping_cost(shipping_id, customer_id):
             distance = distance.replace(' mi', '')
             print('distance', distance)
 
-            if distance > 10:
+            if distance > 0:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
 
-        shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra)
+        shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra) 
         cents = Decimal('.01')
         shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
 
