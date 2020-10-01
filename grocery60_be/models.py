@@ -303,12 +303,12 @@ def get_shipping_cost(shipping_id, customer_id):
             resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
 
-            print(resp.status_code)
+            logging.info(resp.status_code)
             if resp.status_code != 200:
-                print('dist response ' + resp.text)
+                logging.info('dist response ' + resp.text)
                 raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
             else:
-                print('dist response ' + resp.text)
+                logging.info('dist response ' + resp.text)
 
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
