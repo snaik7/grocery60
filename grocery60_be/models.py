@@ -313,7 +313,9 @@ def get_shipping_cost(shipping_id, customer_id):
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance').get('text')
             print('distance------', distance)
+            distance = distance.replace(',', '')
             distance = distance.replace(' mi', '')
+            distance = int(distance)
             print('distance', distance)
             if distance > 10:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
