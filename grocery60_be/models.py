@@ -289,7 +289,7 @@ def get_shipping_cost(shipping_id, customer_id):
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
         if shipping_method.name == 'Store Pickup':
-            shipping_cost = Decimal(shipping_method.price)
+            shipping_cost = Decimal(shipping_method.price) + 1
         else:
             print('not store pickup')
             shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
