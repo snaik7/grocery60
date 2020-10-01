@@ -286,6 +286,7 @@ def get_discount(customer_id, sub_total):
 def get_shipping_cost(shipping_id, customer_id):
     print('get_shipping_cost')
     shipping_cost = Decimal('0')
+    shipping_extra = Decimal('0')
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
         if shipping_method.name == 'Store Pickup':
@@ -313,12 +314,11 @@ def get_shipping_cost(shipping_id, customer_id):
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
             distance = distance.replace(' mi', '')
             print('distance', distance)
-            shipping_extra = 0
+
             if distance > 10:
                 shipping_extra = (distance - 10) * settings.DELIVERY_PER_MILE
 
-            shipping_cost = Decimal(shipping_method.price) + Decimal(shipping_extra)
-
+        shipping_cost = Decimal(shipping_method.price) + Decimal(shipping_extra)
         cents = Decimal('.01')
         shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
 
