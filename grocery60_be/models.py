@@ -299,8 +299,7 @@ def get_shipping_cost(shipping_id, customer_id):
             store = Store.objects.get(store_id=shipping_method.store_id)
             origin = store.address + ', ' + store.city + ', ' + \
                      store.country + ', ' + store.zip
-            import sys
-            sys.stdout.flush()
+
             resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/xml?origins=' + origin +
                                 '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
 
@@ -310,7 +309,8 @@ def get_shipping_cost(shipping_id, customer_id):
                 raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
             else:
                 logging.info('dist response ' + resp.text)
-
+            import sys
+            sys.stdout.flush()
             distance_resp = json.loads(resp.text)
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance')
             distance = distance.replace(' mi', '')
