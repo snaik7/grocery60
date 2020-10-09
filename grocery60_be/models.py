@@ -311,7 +311,7 @@ def get_shipping_cost(shipping_id, customer_id):
             distance = distance_resp.get('rows')[0].get('elements')[0].get('distance').get('text')
             distance = distance.replace(',', '')
             distance = distance.replace(' mi', '')
-            distance = round(distance)
+            distance = round(float(distance))
             print('distance', distance)
             if distance > settings.DELIVERY_FREE_MILES:
                 shipping_extra = (distance - settings.DELIVERY_FREE_MILES) * settings.DELIVERY_PER_MILE
