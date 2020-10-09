@@ -1,6 +1,8 @@
 import decimal
 from datetime import datetime
 from decimal import Decimal
+import requests
+import json
 
 from django.db import models, connection
 from django.contrib.auth.models import AbstractUser
@@ -15,6 +17,7 @@ class User(AbstractUser):
         max_length=1,
         default='Y'
     )
+    email = models.EmailField(unique=True)
 
     class Meta:
         db_table = "auth_user"
@@ -38,7 +41,7 @@ class Store(models.Model):
         max_length=50
     )
     nearby_zip = models.CharField(
-        max_length=50
+        max_length=500
     )
     country = models.CharField(
         max_length=50
@@ -280,14 +283,41 @@ def get_discount(customer_id, sub_total):
     return discount
 
 
-def get_shipping_cost(shipping_id):
+def get_shipping_cost(shipping_id, customer_id):
+    print('get_shipping_cost')
     shipping_cost = Decimal('0')
+    shipping_extra = Decimal('0')
     if shipping_id:
         shipping_method = ShippingMethod.objects.get(id=shipping_id)
-        shipping_cost = Decimal(shipping_method.price)
+        if shipping_method.name == 'Store Pickup':
+            shipping_cost = Decimal(shipping_method.price)
+        else:
+            shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
+            destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
+                          shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
+
+            store = Store.objects.get(store_id=shipping_method.store_id)
+            origin = store.address + ', ' + store.city + ', ' + \
+                     store.country + ', ' + store.zip
+
+            resp = requests.get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + origin +
+                                '&destinations=' + destination + '&mode=car&units=imperial&key=' + settings.API_KEY)
+            print(resp.status_code)
+            if resp.status_code != 200:
+                print('dist response ' + resp.text)
+                raise ValidationError('Google distance API failed to retrieve distance to calculate shipping')
+
+            distance_resp = json.loads(resp.text)
+            distance = distance_resp.get('rows')[0].get('elements')[0].get('distance').get('text')
+            distance = distance.replace(',', '')
+            distance = distance.replace(' mi', '')
+            distance = round(float(distance))
+            print('distance', distance)
+            if distance > settings.DELIVERY_FREE_MILES:
+                shipping_extra = (distance - settings.DELIVERY_FREE_MILES) * settings.DELIVERY_PER_MILE
+        shipping_cost = Decimal(shipping_cost) + Decimal(shipping_extra)
         cents = Decimal('.01')
         shipping_cost = shipping_cost.quantize(cents, decimal.ROUND_HALF_UP)
-
     return shipping_cost
 
 
@@ -367,6 +397,7 @@ class OrderItem(models.Model):
     class Meta:
         db_table = "orderitem"
 
+
 class ShippingMethod(models.Model):
     name = models.CharField(
         max_length=255
@@ -385,6 +416,7 @@ class ShippingMethod(models.Model):
 
     class Meta:
         db_table = "shippingmethod"
+
 
 class OrderPayment(models.Model):
     payment_id = models.AutoField(primary_key=True)
@@ -520,10 +552,9 @@ class OrderPayment(models.Model):
         db_table = "orderpayment"
 
 
-
 class Email():
-    subject, first_name, username, password, email, order_id, token, template, currency, phone = None, None, None, None, None, \
-                                                                                          None, None, None, None, None
+    subject, first_name, username, password, email, order_id, token, template, currency, phone, address, customer_id = None, None, None, None, None, \
+                                                                                                                       None, None, None, None, None, None, None
     order_items_list = []
     subtotal, tax, discount, service_fee, tip, shipping_fee, total = 0, 0, 0, 0, 0, 0, 0
 
@@ -537,7 +568,7 @@ class Email():
         self.shipping_fee = str(order.shipping_fee)
         self.discount = str(order.discount)
         self.total = str(order.total)
-        self. order_items_list = []
+        self.order_items_list = []
         query_set = OrderItem.objects.filter(order_id=order_id).values('product__product_name', 'product__price',
                                                                        'quantity', 'line_total')
         for item in query_set:
@@ -550,11 +581,14 @@ class Email():
             self.order_items_list.append(item_list)
 
     def asdict(self):
-        return {'token': self.token, 'subtotal': self.subtotal, 'order_items_list': self.order_items_list, 'tax': self.tax,
-                'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee, 'discount': self.discount,
+        return {'token': self.token, 'subtotal': self.subtotal, 'order_items_list': self.order_items_list,
+                'tax': self.tax,
+                'service_fee': self.service_fee, 'tip': self.tip, 'shipping_fee': self.shipping_fee,
+                'discount': self.discount,
                 'total': self.total, 'subject': self.subject, 'first_name': self.first_name, 'username': self.username,
                 'password': self.password, 'email': self.email, 'order_id': self.order_id, 'template': self.template,
-                'currency': self.currency, 'phone': self.phone}
+                'currency': self.currency, 'phone': self.phone, 'address': self.address}
+
 
 class Tax(models.Model):
     state = models.CharField(
