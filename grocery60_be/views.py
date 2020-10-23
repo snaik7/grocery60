@@ -218,6 +218,9 @@ class CustomerPaymentView(APIView):
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             order__customer_id=customer_id,
                                                                             status=status).order_by('-payment_id')
+        elif store_id and customer_id:
+            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
+                                                                            order__customer_id=customer_id).order_by('-payment_id')
         elif store_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             status=status).order_by('-payment_id')
