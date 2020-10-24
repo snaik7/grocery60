@@ -481,6 +481,7 @@ class TaxViewset(viewsets.ModelViewSet):
 
 
 class CategoryViewset(viewsets.ModelViewSet):
+    pagination_class = None
     queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]

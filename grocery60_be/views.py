@@ -218,6 +218,9 @@ class CustomerPaymentView(APIView):
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             order__customer_id=customer_id,
                                                                             status=status).order_by('-payment_id')
+        elif store_id and customer_id:
+            query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
+                                                                            order__customer_id=customer_id).order_by('-payment_id')
         elif store_id and status:
             query_set = OrderPayment.objects.select_related('order').filter(store_id=store_id,
                                                                             status=status).order_by('-payment_id')
@@ -465,7 +468,7 @@ class IndiaPaymentView(APIView):
             recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
                                       shipping_address.country + ', ' + shipping_address.zip
         else:
-            store = Store.objects.get(store_id=Order.objects.get(order_id=recipient_email.order_id).store.store_id)
+            store = Store.objects.get(store_id=OrderPayment.objects.get(order_id=recipient_email.order_id).store.store_id)
             recipient_email.address = store.address + ', ' + store.city + ', ' + \
                                       store.country + ', ' + store.zip
 
