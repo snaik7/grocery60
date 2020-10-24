@@ -81,7 +81,6 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    customer = CustomerSerializer(read_only=True)
     class Meta:
         model = Order
         fields = '__all__'

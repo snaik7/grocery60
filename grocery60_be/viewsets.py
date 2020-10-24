@@ -358,7 +358,7 @@ class OrderViewset(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['customer_id']
-    http_method_names = ['get', 'post', 'head', 'put']
+    http_method_names = ['get', 'post', 'head', 'put', 'delete']
 
 
 class OrderItemViewset(viewsets.ModelViewSet):
