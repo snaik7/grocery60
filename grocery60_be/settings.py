@@ -20,7 +20,7 @@ from google.cloud.logging.handlers import CloudLoggingHandler, setup_logging
 
 # Import settings with django-environ
 env = environ.Env()
-build = 'dev'
+build = 'prod'
 
 # Import settings from Secret Manager
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,7 +34,7 @@ if not os.path.isfile('.env'):
 
     if project:
         client = sm.SecretManagerServiceClient()
-        path = client.secret_version_path(project, "django_settings", "latest")
+        path = client.secret_version_path(project, "django_settings_prod", "latest")
         payload = client.access_secret_version(path).payload.data.decode("UTF-8")
 
         with open(env_file, "w") as f:
@@ -210,7 +210,7 @@ GRAPHENE = {
 
 GRAPHQL_TOKEN = env('GRAPHQL_TOKEN')
 SERVICE_FEE = 7
-DISCOUNT = 2
+DISCOUNT = 0
 DELIVERY_PER_MILE = 0.5
 DELIVERY_FREE_MILES = 10
 PAYMENT_COUNT = 10
