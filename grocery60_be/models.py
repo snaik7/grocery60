@@ -522,7 +522,9 @@ class OrderPayment(models.Model):
     def send_store_email(self, transaction_id):
         print('Store success data received ' + transaction_id)
         order_payment = OrderPayment.objects.select_related('order').filter(correlation_id=transaction_id).first()
+        print('order_payment ', order_payment)
         store = Store.objects.get(store_id=order_payment.store.store_id)
+        print('store ', store)
         email = Email()
         email.currency = '₹' if store.currency == 'inr' else '$'
         email.subject = "Store Order Confirmation for Grocery 60"
