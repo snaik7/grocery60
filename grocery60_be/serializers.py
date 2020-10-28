@@ -103,6 +103,7 @@ class ShippingMethodSerializer(serializers.ModelSerializer):
 class OrderPaymentSerializer(serializers.ModelSerializer):
     order = OrderSerializer(read_only=True)
     shippingmethod = ShippingMethodSerializer(read_only=True)
+    store = StoreSerializer(read_only=True)
 
     class Meta:
         model = OrderPayment

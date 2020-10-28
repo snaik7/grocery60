@@ -48,7 +48,11 @@ class UserViewset(viewsets.ModelViewSet):
         user.username = data.get('username') if data.get('username') else user.username
         user.first_name = data.get('first_name') if data.get('first_name') else user.first_name
         user.last_name = data.get('last_name') if data.get('last_name') else user.first_name
-        user.email = data.get('email') if data.get('email') else user.email
+        user = User.objects.filter(email=data.get('email')).first()
+        if user:
+            raise ValidationError('User already exist in the system')
+        else:
+            user.email = data.get('email') if data.get('email') else user.email
         user.is_staff = data.get('is_staff') if data.get('is_staff')  else user.is_staff
         user.is_active = data.get('is_active') if data.get('is_active')  else user.is_active
         user.verified = data.get('verified') if data.get('verified')  else user.verified
