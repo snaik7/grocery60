@@ -48,8 +48,11 @@ class UserViewset(viewsets.ModelViewSet):
         user.username = data.get('username') if data.get('username') else user.username
         user.first_name = data.get('first_name') if data.get('first_name') else user.first_name
         user.last_name = data.get('last_name') if data.get('last_name') else user.first_name
-        user = User.objects.filter(email=data.get('email')).first()
-        if user:
+        print('update', user.email, ' new val ', data.get('email'))
+        user_exist = None
+        if data.get('email') and data.get('email') != user.email:
+            user_exist = User.objects.filter(email=data.get('email')).first()
+        if user_exist:
             raise ValidationError('User already exist in the system')
         else:
             user.email = data.get('email') if data.get('email') else user.email
