@@ -39,7 +39,7 @@ class UserViewset(viewsets.ModelViewSet):
         email.first_name = serializer.data.get('first_name')
         email.username = serializer.data.get('username')
         email.template = 'registration.html'
-        #email_send.send_email(email, 'registration.html')
+        # email_send.send_email(email, 'registration.html')
         email_send.send_email_topic(email)
 
     def update(self, request, pk):
@@ -48,14 +48,17 @@ class UserViewset(viewsets.ModelViewSet):
         user.username = data.get('username') if data.get('username') else user.username
         user.first_name = data.get('first_name') if data.get('first_name') else user.first_name
         user.last_name = data.get('last_name') if data.get('last_name') else user.first_name
-        user = User.objects.filter(email=data.get('email')).first()
-        if user:
+        print('update', user.email, ' new val ', data.get('email'))
+        user_exist = None
+        if data.get('email') and data.get('email') != user.email:
+            user_exist = User.objects.filter(email=data.get('email')).first()
+        if user_exist:
             raise ValidationError('User already exist in the system')
         else:
             user.email = data.get('email') if data.get('email') else user.email
-        user.is_staff = data.get('is_staff') if data.get('is_staff')  else user.is_staff
-        user.is_active = data.get('is_active') if data.get('is_active')  else user.is_active
-        user.verified = data.get('verified') if data.get('verified')  else user.verified
+        user.is_staff = data.get('is_staff') if data.get('is_staff') else user.is_staff
+        user.is_active = data.get('is_active') if data.get('is_active') else user.is_active
+        user.verified = data.get('verified') if data.get('verified') else user.verified
         user.save()
         serializer = UserSerializer(user)
         return JsonResponse(serializer.data)
@@ -271,7 +274,7 @@ class StoreAdminViewset(viewsets.ModelViewSet):
             email.username = serializer.data.get('username')
             email.password = text_password
             email.template = 'storeadmin_registration.html'
-            #email_send.send_email(email, 'storeadmin_registration.html')
+            # email_send.send_email(email, 'storeadmin_registration.html')
             email_send.send_email_topic(email)
 
 
@@ -302,7 +305,8 @@ class StoreViewset(viewsets.ModelViewSet):
                 # Create Product Set for Store
                 product_set = 'PS_' + settings.build + str(store.get('store_id'))
                 product_set_display = product_set + ' Store Set'
-                search_product.create_product_set_topic(settings.PROJECT, settings.REGION, product_set, product_set_display)
+                search_product.create_product_set_topic(settings.PROJECT, settings.REGION, product_set,
+                                                        product_set_display)
 
     '''Don't support bulk update'''
 
@@ -433,6 +437,17 @@ class OrderPaymentViewset(viewsets.ModelViewSet):
             recipient_email.phone = customer.phone_number
             recipient_email.token = token
             recipient_email.order_id = order_payment.order_id
+            shippingmethod_id = order_payment.shippingmethod_id
+            shipping_method = ShippingMethod.objects.get(id=shippingmethod_id)
+            if shipping_method.name != 'Store Pickup':
+                shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
+                recipient_email.address = shipping_address.address + ' ' + shipping_address.house_number + ', ' + shipping_address.city + ', ' + \
+                                          shipping_address.country + ', ' + shipping_address.zip
+            else:
+                store = Store.objects.get(store_id=order_payment.store.store_id)
+                recipient_email.address = store.address + ', ' + store.city + ', ' + \
+                                          store.country + ', ' + store.zip
+
             order_payment.send_pickup_email(recipient_email)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
@@ -452,8 +467,6 @@ class ShippingMethodViewset(viewsets.ModelViewSet):
         shipping_method.save()
         serializer = ShippingMethodSerializer(shipping_method)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-
-
 
     '''Allows bulk creation of a shipping method for store'''
 
