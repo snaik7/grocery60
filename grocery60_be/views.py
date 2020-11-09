@@ -39,7 +39,9 @@ class FeeCalView(APIView):
         tip = models.get_tip(tip, custom_tip, sub_total, no_tax_total)
         # Calculate Shipping Fee
         print('calling shipping_fee')
-        shipping_fee = models.get_shipping_cost(shipping_id, customer_id) if shipping_id else Decimal('0.00')
+        total_amount = Decimal('0.00')
+        total_amount = Decimal(sub_total) + Decimal(no_tax_total)
+        shipping_fee = models.get_shipping_cost(shipping_id, customer_id, total_amount) if shipping_id else Decimal('0.00')
         # Calculate Tax based on state
         address = BillingAddress.objects.filter(customer_id=customer_id).first()
         if address:
