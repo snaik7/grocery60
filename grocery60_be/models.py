@@ -295,7 +295,6 @@ def get_shipping_cost(shipping_id, customer_id, total_amount):
             if total_amount.compare(Decimal('50')) < 0:
                 shipping_cost = Decimal(shipping_method.price)
             else:
-                shipping_cost = Decimal(shipping_method.price)
                 shipping_address = ShippingAddress.objects.get(customer_id=customer_id)
                 destination = shipping_address.address + ' ' + shipping_address.house_number + ', ' + \
                               shipping_address.city + ', ' + shipping_address.country + ', ' + shipping_address.zip
