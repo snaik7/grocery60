@@ -343,7 +343,7 @@ def get_service_fee(sub_total, country):
     if country == 'IN':
         service_fee = Decimal(50) if service_fee < 50 else service_fee
     else:
-        service_fee = Decimal(3) if service_fee < 7 else service_fee
+        service_fee = Decimal(3) if service_fee < 3 else service_fee
     cents = Decimal('.01')
     service_fee = service_fee.quantize(cents, decimal.ROUND_HALF_UP)
     return service_fee
