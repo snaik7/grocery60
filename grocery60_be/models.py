@@ -214,7 +214,8 @@ class BillingAddress(models.Model):
         max_length=1024
     )
     house_number = models.CharField(
-        max_length=12
+        max_length=12,
+        blank=True
     )
     zip = models.CharField(
         max_length=12
@@ -247,7 +248,8 @@ class ShippingAddress(models.Model):
         max_length=1024
     )
     house_number = models.CharField(
-        max_length=12
+        max_length=12,
+        blank=True
     )
     zip = models.CharField(
         max_length=12
